@@ -1,0 +1,78 @@
+/** A small set of authentic everyday adhkār used for the daily reminder. */
+export type Athkar = {
+  id: string;
+  arabic: string;
+  translation: string;
+  source: string;
+};
+
+export const ATHKAR: Athkar[] = [
+  {
+    id: 'tasbih',
+    arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+    translation: 'Glory and praise be to Allah; glory be to Allah the Magnificent.',
+    source: 'Bukhari & Muslim',
+  },
+  {
+    id: 'tahlil',
+    arabic: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+    translation:
+      'None has the right to be worshipped but Allah alone, with no partner. His is the dominion and the praise, and He is able to do all things.',
+    source: 'Bukhari & Muslim',
+  },
+  {
+    id: 'istighfar',
+    arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
+    translation: 'I seek the forgiveness of Allah and turn to Him in repentance.',
+    source: 'Bukhari',
+  },
+  {
+    id: 'salawat',
+    arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
+    translation: 'O Allah, send blessings and peace upon our Prophet Muhammad.',
+    source: 'Sunnah',
+  },
+  {
+    id: 'hawqala',
+    arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
+    translation: 'There is no might nor power except with Allah.',
+    source: 'Bukhari & Muslim',
+  },
+  {
+    id: 'hasbiya',
+    arabic: 'حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ',
+    translation:
+      'Allah is sufficient for me; none has the right to be worshipped but Him. Upon Him I rely, and He is the Lord of the Mighty Throne.',
+    source: 'Abu Dawud',
+  },
+  {
+    id: 'muadh',
+    arabic: 'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
+    translation:
+      'O Allah, help me to remember You, to thank You, and to worship You in the best manner.',
+    source: 'Abu Dawud',
+  },
+  {
+    id: 'radhitu',
+    arabic: 'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا',
+    translation:
+      'I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad ﷺ as my Prophet.',
+    source: 'Abu Dawud & Tirmidhi',
+  },
+  {
+    id: 'four',
+    arabic: 'سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ',
+    translation: 'Glory be to Allah; praise be to Allah; none is worthy of worship but Allah; Allah is the Greatest.',
+    source: 'Muslim',
+  },
+  {
+    id: 'afiyah',
+    arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ',
+    translation: 'O Allah, I ask You for pardon and well-being in this world and the next.',
+    source: 'Ibn Majah',
+  },
+];
+
+export function randomAthkar(): Athkar {
+  return ATHKAR[Math.floor(Math.random() * ATHKAR.length)];
+}

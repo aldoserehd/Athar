@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Athar",
+    "slug": "athar",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "athar",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0c465b"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.athar.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Athar uses your location to calculate accurate prayer times and the qibla direction for where you are.",
+        "NSCameraUsageDescription": "Athar uses the camera to scan a photo of a hadith and find it in the library.",
+        "NSPhotoLibraryUsageDescription": "Athar lets you choose a photo of a hadith to scan and find it in the library."
+      }
+    },
+    "android": {
+      "package": "com.athar.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0c465b"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Athar uses your location to calculate accurate prayer times and the qibla direction for where you are."
+        }
+      ],
+      "expo-notifications",
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Athar lets you choose a photo of a hadith to scan and find it in the library.",
+          "cameraPermission": "Athar uses the camera to scan a photo of a hadith and find it in the library."
+        }
+      ],
+      "expo-audio"
+    ]
+  }
+}
