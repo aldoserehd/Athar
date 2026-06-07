@@ -45,7 +45,18 @@
           "locationWhenInUsePermission": "Athar uses your location to calculate accurate prayer times and the qibla direction for where you are."
         }
       ],
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/adhan/makkah_30.wav",
+            "./assets/adhan/alafasy_30.wav",
+            "./assets/adhan/qatami_30.wav",
+            "./assets/adhan/menshawy_30.wav",
+            "./assets/adhan/refaat_30.wav"
+          ]
+        }
+      ],
       "expo-localization",
       [
         "expo-image-picker",

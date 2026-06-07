@@ -196,7 +196,14 @@ export function PrayerScreen() {
         {t('prayer.calcNote', { method: methodInfo(settings.method).label })}
       </Text>
 
-      <PrayerSettingsSheet visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <PrayerSettingsSheet
+        visible={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onOpenNotifications={() => {
+          setSettingsOpen(false);
+          navigation.navigate('Notifications');
+        }}
+      />
     </Screen>
   );
 }

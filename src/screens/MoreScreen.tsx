@@ -26,8 +26,8 @@ export function MoreScreen() {
       </Text>
       <Card padded={false} style={styles.group}>
         <LinkRow
-          label="Adhān & athkār"
-          icon="notifications-outline"
+          label="Adhān voice, reciters & athkār"
+          icon="notifications"
           onPress={() => navigation.navigate('Notifications')}
         />
       </Card>

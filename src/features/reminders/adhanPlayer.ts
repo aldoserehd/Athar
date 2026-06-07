@@ -28,9 +28,20 @@ export function useAdhanPreview() {
   const ref = useRef<AudioPlayer | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
 
+  const release = () => {
+    if (ref.current) {
+      try {
+        ref.current.pause();
+      } catch {
+        /* already stopped */
+      }
+      ref.current.remove();
+      ref.current = null;
+    }
+  };
+
   const stop = useCallback(() => {
-    ref.current?.remove();
-    ref.current = null;
+    release();
     setPlaying(null);
   }, []);
 
@@ -40,8 +51,8 @@ export function useAdhanPreview() {
         stop();
         return;
       }
-      ref.current?.remove();
-      ref.current = null;
+      // Always stop whatever is currently playing before starting another.
+      release();
       await enableAudio();
       const player = createAudioPlayer(adhanSource(id));
       player.play();

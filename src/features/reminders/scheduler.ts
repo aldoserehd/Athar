@@ -26,12 +26,18 @@ export type ReminderMessages = {
 };
 
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
+  handleNotification: async (n) => {
+    // Adhān: don't play the short alert sound in-foreground — we play the full
+    // adhān in-app instead (see ReminderScheduler). Locked/background still uses
+    // the bundled 30s clip via the OS.
+    const isAdhan = n.request.content.data?.type === 'adhan';
+    return {
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: !isAdhan,
+      shouldSetBadge: false,
+    };
+  },
 });
 
 export async function ensurePermission(): Promise<boolean> {
@@ -76,8 +82,20 @@ export async function applyReminders(
 
   const channelId = Platform.OS === 'android' ? ANDROID_CHANNEL : undefined;
 
-  // Adhān — daily repeating per enabled prayer.
+  // Adhān — daily repeating per enabled prayer, with a 30s adhān clip as the
+  // alert sound (plays on the lock screen). On Android the sound lives on a
+  // per-reciter channel; on iOS it's referenced per-notification.
   if (settings.adhanEnabled && times) {
+    const soundFile = `${settings.reciterId}_30.wav`;
+    let adhanChannel = channelId;
+    if (Platform.OS === 'android') {
+      adhanChannel = `adhan-${settings.reciterId}`;
+      await Notifications.setNotificationChannelAsync(adhanChannel, {
+        name: `Adhān — ${reciterName(settings.reciterId)}`,
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: soundFile,
+      });
+    }
     for (const slot of times.slots) {
       if (!slot.isPrayer) continue;
       const key = slot.name as SalahKey;
@@ -86,14 +104,14 @@ export async function applyReminders(
         content: {
           title: `${messages.adhanTitle(messages.prayerName(key))} 🕌`,
           body: messages.adhanBody(reciterName(settings.reciterId)),
-          sound: 'default',
+          sound: soundFile,
           data: { type: 'adhan' },
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,
           hour: slot.time.getHours(),
           minute: slot.time.getMinutes(),
-          channelId,
+          channelId: adhanChannel,
         },
       });
     }

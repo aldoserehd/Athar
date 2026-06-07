@@ -7,15 +7,8 @@ export type ReminderSlot = { key: SalahKey; label: string; time: Date };
 
 const ANDROID_CHANNEL = 'prayer-reminders';
 
-/** Foreground display behaviour — show the banner even when the app is open. */
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// (Notification handler lives in features/reminders/scheduler.ts — the single
+// source of truth now that reminders are managed there.)
 
 export async function ensureNotificationPermission(): Promise<boolean> {
   try {

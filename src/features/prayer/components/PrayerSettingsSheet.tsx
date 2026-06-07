@@ -11,9 +11,11 @@ import { METHODS } from '../methods';
 type Props = {
   visible: boolean;
   onClose: () => void;
+  /** Opens the adhān & athkār notification settings. */
+  onOpenNotifications?: () => void;
 };
 
-export function PrayerSettingsSheet({ visible, onClose }: Props) {
+export function PrayerSettingsSheet({ visible, onClose, onOpenNotifications }: Props) {
   const theme = useTheme();
   const { settings, setMethod, setHour12 } = usePrayer();
   const t = useT();
@@ -42,8 +44,30 @@ export function PrayerSettingsSheet({ visible, onClose }: Props) {
           </View>
 
           <ScrollView style={{ maxHeight: 460 }} showsVerticalScrollIndicator={false}>
+            {/* Adhān & notifications — prominent entry */}
+            {onOpenNotifications ? (
+              <Pressable
+                onPress={onOpenNotifications}
+                style={[
+                  styles.adhanRow,
+                  { backgroundColor: theme.colors.primaryContainer, borderRadius: theme.radius.md },
+                ]}
+              >
+                <Ionicons name="notifications" size={22} color={theme.colors.onPrimaryContainer} />
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <Text variant="bodyMedium" style={{ color: theme.colors.onPrimaryContainer }}>
+                    {t('notifications.adhanReminders')}
+                  </Text>
+                  <Text variant="caption" style={{ color: theme.colors.onPrimaryContainer, opacity: 0.8, marginTop: 1 }}>
+                    {t('notifications.dailyAthkar')} · {t('notifications.adhanDesc')}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={theme.colors.onPrimaryContainer} />
+              </Pressable>
+            ) : null}
+
             {/* Time format */}
-            <Text variant="caption" color="textMuted" style={[styles.section, { marginTop: 8 }]}>
+            <Text variant="caption" color="textMuted" style={[styles.section, { marginTop: 16 }]}>
               {t('settings.timeFormat')}
             </Text>
             <View style={[styles.segment, { backgroundColor: theme.colors.surfaceContainer }]}>
@@ -132,6 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
   },
+  adhanRow: { flexDirection: 'row', alignItems: 'center', padding: 14, marginTop: 8 },
   section: { letterSpacing: 0.5, marginTop: 18, marginBottom: 8 },
   segment: { flexDirection: 'row', padding: 4, borderRadius: 12 },
   segmentItem: { flex: 1, paddingVertical: 9, alignItems: 'center' },
