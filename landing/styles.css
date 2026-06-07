@@ -79,12 +79,8 @@ a:hover {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: var(--teal);
-  color: var(--sand);
-  display: grid;
-  place-items: center;
-  font-family: 'Amiri', serif;
-  font-size: 17px;
+  object-fit: cover;
+  vertical-align: middle;
 }
 .nav-links {
   display: flex;
