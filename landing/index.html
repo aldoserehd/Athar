@@ -58,9 +58,9 @@
       .eyebrow { letter-spacing: 0.16em; }
       html { scroll-behavior: smooth; }
       .mark {
-        width: 36px; height: 36px; border-radius: 10px; background: #0f4c5c;
-        display: grid; place-items: center; font-family: 'Amiri', serif; font-size: 19px; color: #f4e4c1;
-        flex: none;
+        width: 36px; height: 36px; border-radius: 10px;
+        object-fit: cover; flex: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.35);
       }
       /* iPhone frame */
       .iphone {
@@ -89,7 +89,7 @@
     <header class="fixed top-0 w-full z-50 backdrop-blur-lg border-b border-white/5 h-20" style="background: rgba(5,20,36,0.82)">
       <div class="max-w-[1200px] mx-auto px-6 flex justify-between items-center h-full gap-4">
         <a href="#top" class="flex items-center gap-3">
-          <span class="mark">أ</span>
+          <img src="logo.png" alt="Athar" class="mark" />
           <span class="text-2xl font-bold tracking-tight text-on-surface">Athar</span>
         </a>
         <nav class="hidden md:flex items-center gap-9 text-[12px] eyebrow font-semibold">
@@ -257,7 +257,7 @@
     <footer class="py-14 border-t border-outline/30" style="background:#010f1f">
       <div class="max-w-[1200px] mx-auto px-6 grid md:grid-cols-2 gap-6">
         <div class="space-y-3">
-          <div class="flex items-center gap-3"><span class="mark">أ</span><span class="text-2xl font-bold">Athar</span></div>
+          <div class="flex items-center gap-3"><img src="logo.png" alt="Athar" class="mark" /><span class="text-2xl font-bold">Athar</span></div>
           <p class="text-muted max-w-sm" data-i18n="footTag">© <span id="year">2026</span> Athar · أثر — a trace, a transmitted tradition. Scholarly, serene, minimalist.</p>
         </div>
         <div class="grid grid-cols-2 gap-8">
@@ -316,8 +316,8 @@
         },
         ar: {
           navFeatures: 'المزايا', navShowcase: 'جولة', navPhilosophy: 'فلسفتنا', navSupport: 'الدعم', getApp: 'حمّل التطبيق',
-          heroEyebrow: 'عِلمٌ وسكينة', heroTitle: 'رفيقك الإسلامي', heroTitleAccent: 'العِلمي.',
-          heroDesc: 'مواقيت الصلاة والقبلة، ومتابعة للصلاة مع الأذان، ومكتبة حديث قابلة للبحث يمكنك مسحها من صورة، ودليل مساجد مجتمعي. بسيط، هادف، وبلا إعلانات.',
+          heroEyebrow: 'عِلمٌ وسكينة', heroTitle: 'رفيقك في', heroTitleAccent: 'طريق العِلم.',
+          heroDesc: 'مواقيت الصلاة والقبلة، ومتابعة للصلاة مع الأذان، ومكتبة أحاديث قابلة للبحث تَعثُر على الحديث من صورته، ودليل مساجد مجتمعي. بساطةٌ وهدوءٌ بلا إعلانات.',
           comingSoon: 'قريبًا على',
           featuresTitle: 'كل ما تحتاجه في مكان هادئ', featuresSub: 'مصمَّم بدقة عِلمية وبساطة هادئة — بلا إعلانات ولا ضجيج.',
           f1Title: 'المواقيت والقبلة', f1Body: 'مواقيت دقيقة عالميًا على جهازك، وعدّ تنازلي حيّ، وبوصلة قبلة تفاعلية.',

@@ -218,9 +218,9 @@ export const translations = {
     },
     salah: {
       title: 'صلواتي',
-      subtitle: 'حافظ على صلواتك، صلاةً صلاة',
+      subtitle: 'حافظ على صلواتك، صلاةً تلو الأخرى',
       allExcused: 'جميع الصلوات معذورة اليوم.',
-      allDone: 'تمّت المحاسبة — تقبّل الله.',
+      allDone: 'تمّت المحاسبة — تقبّل الله منك.',
       tapEach: 'اضغط على كل صلاة عند أدائها.',
       reminders: 'تذكيرات الصلاة',
       remindersDesc: 'تنبيه لطيف عند كل وقت صلاة.',
@@ -314,7 +314,7 @@ export const translations = {
       midday: 'الظهيرة',
       evening: 'المساء',
       night: 'الليل',
-      offlineNote: 'تُجدوَل التنبيهات على جهازك وتعمل دون اتصال.',
+      offlineNote: 'التنبيهات مجدولة على جهازك وتعمل دون اتصال.',
     },
     reminders: {
       adhanTitle: '%{name} · حان وقت الصلاة',
