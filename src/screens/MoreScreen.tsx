@@ -8,6 +8,7 @@ import { Card, Logo, Screen, Text } from '@/components';
 import { useTheme, useThemeControls } from '@/theme';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { LANGUAGES } from '@/i18n';
+import { useOnboarding } from '@/features/onboarding';
 import type { RootStackParamList } from '@/navigation/types';
 
 const APP_VERSION = '0.1.0';
@@ -17,6 +18,7 @@ export function MoreScreen() {
   const { preference, setPreference } = useThemeControls();
   const { t, language, setLanguage } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { open: openTutorial } = useOnboarding();
 
   return (
     <Screen scroll title={t('more.title')}>
@@ -30,6 +32,8 @@ export function MoreScreen() {
           icon="notifications"
           onPress={() => navigation.navigate('Notifications')}
         />
+        <Divider />
+        <LinkRow label={t('more.howItWorks')} icon="help-circle-outline" onPress={openTutorial} />
       </Card>
 
       {/* Appearance */}

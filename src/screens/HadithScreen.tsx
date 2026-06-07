@@ -60,6 +60,12 @@ export function HadithScreen() {
   const browsing = !query.trim() && !collection && !topic && !savedOnly;
   const open = (id: string) => navigation.navigate('HadithDetail', { id });
 
+  // Translate a topic name (falls back to the English topic if no translation).
+  const topicLabel = (tp: string) => {
+    const v = t(`hadithTopics.${tp.toLowerCase()}`);
+    return v.startsWith('[missing') ? tp : v;
+  };
+
   const dailyHadith = useMemo(() => hadithOfTheDay(), []);
 
   return (
@@ -152,7 +158,7 @@ export function HadithScreen() {
             {TOPICS.map((tp) => (
               <Pressable key={tp} onPress={() => setTopic(tp)} style={styles.topicWrap}>
                 <Card alt style={styles.topic}>
-                  <Text variant="bodyMedium">{tp}</Text>
+                  <Text variant="bodyMedium">{topicLabel(tp)}</Text>
                 </Card>
               </Pressable>
             ))}
@@ -172,7 +178,7 @@ export function HadithScreen() {
             {topic ? (
               <Pressable onPress={() => setTopic(null)} hitSlop={8}>
                 <Text variant="caption" color="primary">
-                  {topic} ✕
+                  {topic ? topicLabel(topic) : ''} ✕
                 </Text>
               </Pressable>
             ) : null}

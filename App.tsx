@@ -18,6 +18,7 @@ import { PrayerProvider } from '@/features/prayer';
 import { SalahProvider } from '@/features/salah';
 import { SavedHadithProvider } from '@/features/hadith';
 import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
+import { OnboardingProvider, OnboardingOverlay } from '@/features/onboarding';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
 /**
@@ -37,6 +38,7 @@ function ThemedApp() {
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <RootNavigator />
       <ReminderScheduler />
+      <OnboardingOverlay />
     </View>
   );
 }
@@ -68,7 +70,9 @@ export default function App() {
             <SalahProvider>
               <RemindersProvider>
                 <SavedHadithProvider>
-                  <ThemedApp />
+                  <OnboardingProvider>
+                    <ThemedApp />
+                  </OnboardingProvider>
                 </SavedHadithProvider>
               </RemindersProvider>
             </SalahProvider>

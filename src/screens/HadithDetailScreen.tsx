@@ -147,7 +147,10 @@ export function HadithDetailScreen() {
           {hadith.topics.map((tp) => (
             <View key={tp} style={[styles.topicTag, { backgroundColor: theme.colors.surfaceContainer }]}>
               <Text variant="caption" color="textMuted">
-                {tp}
+                {(() => {
+                  const v = t(`hadithTopics.${tp.toLowerCase()}`);
+                  return v.startsWith('[missing') ? tp : v;
+                })()}
               </Text>
             </View>
           ))}
