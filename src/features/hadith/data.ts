@@ -186,3 +186,24 @@ export const TOPICS: string[] = (() => {
 export function hadithById(id: string): Hadith | undefined {
   return HADITHS.find((h) => h.id === id);
 }
+
+/**
+ * Curated hadiths sorted shortest-english first, then biased toward the shorter
+ * half so the daily pick reads like a quick narration.
+ */
+const DAILY_POOL: Hadith[] = (() => {
+  const sorted = [...HADITHS].sort((a, b) => a.english.length - b.english.length);
+  const half = Math.ceil(sorted.length / 2);
+  // Weight the shorter half twice so it's favoured but longer ones still appear.
+  return [...sorted.slice(0, half), ...sorted];
+})();
+
+/**
+ * A random-but-stable "hadith of the day": deterministic from the calendar date,
+ * so it stays the same all day and changes the next day. Picks from the curated
+ * {@link HADITHS}, biased toward shorter narrations.
+ */
+export function hadithOfTheDay(date: Date = new Date()): Hadith {
+  const dayIndex = Math.floor(date.getTime() / 86_400_000);
+  return DAILY_POOL[((dayIndex % DAILY_POOL.length) + DAILY_POOL.length) % DAILY_POOL.length];
+}

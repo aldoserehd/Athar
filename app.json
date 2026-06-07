@@ -50,10 +50,14 @@
         {
           "sounds": [
             "./assets/adhan/makkah_30.wav",
+            "./assets/adhan/arkani_30.wav",
             "./assets/adhan/alafasy_30.wav",
             "./assets/adhan/qatami_30.wav",
+            "./assets/adhan/zahrani_30.wav",
+            "./assets/adhan/basit_30.wav",
             "./assets/adhan/menshawy_30.wav",
-            "./assets/adhan/refaat_30.wav"
+            "./assets/adhan/refaat_30.wav",
+            "./assets/adhan/deghreri_30.wav"
           ]
         }
       ],

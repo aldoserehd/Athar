@@ -1,4 +1,4 @@
-export { HADITHS, TOPICS, hadithById } from './data';
+export { HADITHS, TOPICS, hadithById, hadithOfTheDay } from './data';
 export { loadLibrary, findInLibrary, libraryCount } from './corpus';
 export { searchHadiths } from './search';
 export type { SearchOptions } from './search';

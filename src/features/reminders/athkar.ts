@@ -76,3 +76,33 @@ export const ATHKAR: Athkar[] = [
 export function randomAthkar(): Athkar {
   return ATHKAR[Math.floor(Math.random() * ATHKAR.length)];
 }
+
+/**
+ * Returns `n` adhkār with no two consecutive duplicates. The list is shuffled;
+ * when `n` exceeds the list length it cycles through reshuffled passes, ensuring
+ * the first item of each new pass never matches the last item emitted.
+ */
+export function randomAthkarSequence(n: number): Athkar[] {
+  const shuffle = (): Athkar[] => {
+    const arr = [...ATHKAR];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  const out: Athkar[] = [];
+  while (out.length < n) {
+    let pass = shuffle();
+    // Avoid a back-to-back duplicate across pass boundaries.
+    if (out.length > 0 && pass.length > 1 && pass[0].id === out[out.length - 1].id) {
+      [pass[0], pass[1]] = [pass[1], pass[0]];
+    }
+    for (const a of pass) {
+      if (out.length >= n) break;
+      out.push(a);
+    }
+  }
+  return out;
+}

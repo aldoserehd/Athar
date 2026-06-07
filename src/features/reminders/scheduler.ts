@@ -3,7 +3,7 @@ import * as Notifications from 'expo-notifications';
 
 import { ComputedTimes } from '@/features/prayer';
 import { SalahKey } from '@/features/salah';
-import { randomAthkar } from './athkar';
+import { randomAthkarSequence } from './athkar';
 import { reciterName } from './reciters';
 
 export type ReminderSettings = {
@@ -120,12 +120,13 @@ export async function applyReminders(
   // Athkār — next 7 days, one-off, random each day.
   if (settings.athkarEnabled) {
     const now = new Date();
+    const sequence = randomAthkarSequence(7); // one distinct dhikr per day, no repeats
     for (let i = 0; i < 7; i++) {
       const when = new Date(now);
       when.setDate(now.getDate() + i);
       when.setHours(settings.athkarHour, settings.athkarMinute, 0, 0);
       if (when.getTime() <= now.getTime()) continue; // skip past times today
-      const dhikr = randomAthkar();
+      const dhikr = sequence[i];
       await Notifications.scheduleNotificationAsync({
         content: {
           title: `${messages.athkarTitle} ✨`,

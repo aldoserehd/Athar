@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 
@@ -19,7 +19,8 @@ import {
 
 // react-native-maps is a native module absent from Expo Go — load it lazily and
 // only render the map in a development/standalone build.
-const mapsSupported = Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
+const mapsSupported =
+  Platform.OS !== 'web' && Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
 let MosqueMap: React.ComponentType<{
   mosques: Mosque[];
   onSelect: (m: Mosque) => void;

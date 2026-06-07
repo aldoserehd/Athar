@@ -14,6 +14,7 @@ import {
   HADITHS,
   Hadith,
   HadithCard,
+  hadithOfTheDay,
   loadLibrary,
   searchHadiths,
   TOPICS,
@@ -58,6 +59,8 @@ export function HadithScreen() {
 
   const browsing = !query.trim() && !collection && !topic && !savedOnly;
   const open = (id: string) => navigation.navigate('HadithDetail', { id });
+
+  const dailyHadith = useMemo(() => hadithOfTheDay(), []);
 
   return (
     <Screen
@@ -155,9 +158,9 @@ export function HadithScreen() {
             ))}
           </View>
           <Text variant="label" color="textMuted" style={styles.sectionLabel}>
-            {t('hadith.featured')}
+            {t('hadith.hadithOfDay')}
           </Text>
-          <HadithCard hadith={HADITHS[0]} onPress={() => open(HADITHS[0].id)} />
+          <HadithCard hadith={dailyHadith} onPress={() => open(dailyHadith.id)} />
         </>
       ) : (
         <>
