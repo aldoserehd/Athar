@@ -75,7 +75,8 @@
           "cameraPermission": "Athar uses the camera to scan a photo of a hadith and find it in the library."
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "./plugins/withFamilyControls"
     ],
     "extra": {
       "eas": {

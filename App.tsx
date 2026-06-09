@@ -18,6 +18,7 @@ import { PrayerProvider } from '@/features/prayer';
 import { SalahProvider } from '@/features/salah';
 import { SavedHadithProvider } from '@/features/hadith';
 import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
+import { PrayerLockOverlay } from '@/features/lock';
 import { OnboardingProvider, OnboardingOverlay } from '@/features/onboarding';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
@@ -38,6 +39,8 @@ function ThemedApp() {
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <RootNavigator />
       <ReminderScheduler />
+      {/* Prayer-Lock gate sits below onboarding so onboarding always wins. */}
+      <PrayerLockOverlay />
       <OnboardingOverlay />
     </View>
   );

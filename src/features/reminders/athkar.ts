@@ -78,15 +78,35 @@ export function randomAthkar(): Athkar {
 }
 
 /**
- * Returns `n` adhkār with no two consecutive duplicates. The list is shuffled;
- * when `n` exceeds the list length it cycles through reshuffled passes, ensuring
+ * A tiny seeded PRNG (mulberry32). Used so a given day produces a *stable but
+ * different* shuffle — i.e. genuinely varied day to day, yet the same across a
+ * single reschedule pass so we don't double-up if scheduling runs twice.
+ */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Returns `n` adhkār with no two consecutive duplicates. By default it is fully
+ * random (Math.random); pass a numeric `seed` to get a stable-yet-varied order
+ * for that seed (e.g. a day index) so each day shows a fresh selection.
+ *
+ * When `n` exceeds the list length it cycles through reshuffled passes, ensuring
  * the first item of each new pass never matches the last item emitted.
  */
-export function randomAthkarSequence(n: number): Athkar[] {
+export function randomAthkarSequence(n: number, seed?: number): Athkar[] {
+  const rand = seed === undefined ? Math.random : mulberry32(seed);
   const shuffle = (): Athkar[] => {
     const arr = [...ATHKAR];
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(rand() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;

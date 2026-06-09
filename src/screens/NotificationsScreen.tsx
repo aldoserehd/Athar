@@ -16,13 +16,29 @@ const ATHKAR_TIMES = [
   { key: 'night', hour: 21, minute: 30 },
 ] as const;
 
+const ATHKAR_COUNTS = [1, 2, 3, 4] as const;
+const SNOOZE_OPTIONS = [5, 10, 15, 30] as const;
+
 export function NotificationsScreen() {
   const theme = useTheme();
   const t = useT();
   const navigation = useNavigation();
-  const { settings, setAdhanEnabled, togglePrayer, setReciter, setAthkarEnabled, setAthkarTime } =
-    useReminders();
+  const {
+    settings,
+    setAdhanEnabled,
+    togglePrayer,
+    setReciter,
+    setAthkarEnabled,
+    setAthkarTime,
+    setAthkarPerDay,
+    setAthkarRandomize,
+    setInspiringContent,
+    setLockEnabled,
+    toggleLockPrayer,
+    setLockSnooze,
+  } = useReminders();
   const { playing, toggle: previewAdhan } = useAdhanPreview();
+  const lock = settings.lock;
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: t('notifications.title') });
@@ -148,7 +164,7 @@ export function NotificationsScreen() {
       {settings.athkarEnabled ? (
         <>
           <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.timeOfDay')}
+            {t('notifications.startTime')}
           </Text>
           <View style={styles.times}>
             {ATHKAR_TIMES.map((slot) => {
@@ -175,6 +191,136 @@ export function NotificationsScreen() {
               );
             })}
           </View>
+
+          <Text variant="label" color="textMuted" style={styles.section}>
+            {t('notifications.perDay')}
+          </Text>
+          <View style={styles.times}>
+            {ATHKAR_COUNTS.map((n) => {
+              const active = settings.athkarPerDay === n;
+              return (
+                <Pressable
+                  key={n}
+                  onPress={() => setAthkarPerDay(n)}
+                  style={[
+                    styles.timeChip,
+                    {
+                      backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt,
+                      borderColor: active ? theme.colors.primary : theme.colors.border,
+                    },
+                  ]}
+                >
+                  <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                    {n}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <Card padded={false} style={[styles.group, { marginTop: 14 }]}>
+            <View style={styles.toggleRow}>
+              <View style={{ flex: 1, paddingRight: 12 }}>
+                <Text variant="bodyMedium">{t('notifications.randomize')}</Text>
+                <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+                  {t('notifications.randomizeDesc')}
+                </Text>
+              </View>
+              <Switch
+                value={settings.athkarRandomize}
+                onValueChange={setAthkarRandomize}
+                trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
+          </Card>
+        </>
+      ) : null}
+
+      {/* Inspiring content */}
+      <Card style={[styles.rowBetween, { marginTop: 24 }]}>
+        <View style={{ flex: 1, paddingRight: 12 }}>
+          <Text variant="bodyMedium">{t('notifications.inspiring')}</Text>
+          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+            {t('notifications.inspiringDesc')}
+          </Text>
+        </View>
+        <Switch
+          value={settings.inspiringContent}
+          onValueChange={setInspiringContent}
+          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+          thumbColor="#FFFFFF"
+        />
+      </Card>
+
+      {/* Prayer Lock */}
+      <Card style={[styles.rowBetween, { marginTop: 24 }]}>
+        <View style={{ flex: 1, paddingRight: 12 }}>
+          <Text variant="bodyMedium">{t('notifications.prayerLock')}</Text>
+          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+            {t('notifications.prayerLockDesc')}
+          </Text>
+        </View>
+        <Switch
+          value={lock.enabled}
+          onValueChange={setLockEnabled}
+          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+          thumbColor="#FFFFFF"
+        />
+      </Card>
+
+      {lock.enabled ? (
+        <>
+          <Text variant="label" color="textMuted" style={styles.section}>
+            {t('notifications.lockPrayers')}
+          </Text>
+          <Card padded={false} style={styles.group}>
+            {SALAH_ORDER.map((key, i) => (
+              <View key={key}>
+                {i > 0 ? <Divider /> : null}
+                <View style={styles.toggleRow}>
+                  <Text variant="bodyMedium" style={{ flex: 1 }}>
+                    {t(`prayerNames.${key}`)}
+                  </Text>
+                  <Switch
+                    value={lock.prayers[key]}
+                    onValueChange={() => toggleLockPrayer(key)}
+                    trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+                    thumbColor="#FFFFFF"
+                  />
+                </View>
+              </View>
+            ))}
+          </Card>
+
+          <Text variant="label" color="textMuted" style={styles.section}>
+            {t('notifications.snooze')}
+          </Text>
+          <View style={styles.times}>
+            {SNOOZE_OPTIONS.map((m) => {
+              const active = lock.snoozeMinutes === m;
+              return (
+                <Pressable
+                  key={m}
+                  onPress={() => setLockSnooze(m)}
+                  style={[
+                    styles.timeChip,
+                    {
+                      backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt,
+                      borderColor: active ? theme.colors.primary : theme.colors.border,
+                    },
+                  ]}
+                >
+                  <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                    {t('notifications.minutesShort', { minutes: String(m) })}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text variant="caption" color="textFaint" style={{ marginTop: 10 }}>
+            {t('notifications.lockNote')}
+          </Text>
         </>
       ) : null}
 
