@@ -91,7 +91,16 @@ export function searchHadiths(query: string, options: SearchOptions = {}): Hadit
   const scored: { h: Hadith; score: number }[] = [];
   for (const h of pool) {
     const hay = normalize(
-      [h.english, h.topics.join(' '), h.narrator ?? '', h.reference, h.arabic].join(' ')
+      [
+        h.english,
+        h.topics.join(' '),
+        h.narrator ?? '',
+        h.narratorAr ?? '',
+        h.reference,
+        h.arabic,
+        h.explanation ?? '',
+        h.explanationAr ?? '',
+      ].join(' ')
     );
     let score = 0;
     for (const term of terms) {

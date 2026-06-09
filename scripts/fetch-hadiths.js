@@ -4,14 +4,21 @@
  * each of the six collections, aligns them by hadith number, and writes
  * src/features/hadith/corpus.json.
  *
- *   node scripts/fetch-hadiths.js            # default 150 per collection
- *   node scripts/fetch-hadiths.js 500        # 500 per collection
+ *   node scripts/fetch-hadiths.js            # default 500 per collection
+ *   node scripts/fetch-hadiths.js 1000       # 1000 per collection
+ *
+ * The shipped src/features/hadith/corpus.json was generated with a limit of 500
+ * (≈3000 narrations, ~4.7 MB). Re-run this to rebuild/refresh it.
  *
  * Notes:
- *  - This dataset has Arabic + English + (sometimes) gradings, but NOT the
- *    narrator / isnād / topic / plain-explanation fields the curated seed has.
- *    So integrate it as an optional/extended record type and lazy-load it
- *    (it can be several MB) rather than importing it eagerly.
+ *  - This dataset has Arabic + English + (for the Sunan books) named scholarly
+ *    gradings, but NOT the narrator / isnād / topic / plain-explanation fields
+ *    the curated seed has. So it is lazy-loaded (several MB) and merged after
+ *    the rich curated entries (see corpus.ts).
+ *  - GRADING HONESTY: the Bukhari/Muslim editions ship EMPTY grades, so we
+ *    assert `sahih` for those two collections (scholarly consensus). For the
+ *    four Sunan books we read the first named grading and otherwise default to
+ *    `unknown` — we never assert `sahih` without a basis.
  *  - Verify licensing/attribution for any text + translation you ship.
  */
 const fs = require('fs');
@@ -35,7 +42,7 @@ const LABEL = {
   ibnmajah: 'Sunan Ibn Majah',
 };
 
-const LIMIT = Number(process.argv[2]) || 150;
+const LIMIT = Number(process.argv[2]) || 500;
 
 async function getJson(url) {
   const res = await fetch(url);
@@ -43,12 +50,25 @@ async function getJson(url) {
   return res.json();
 }
 
-function normalizeGrade(grades) {
+// Everything in Sahih al-Bukhari and Sahih Muslim is authentic by scholarly
+// consensus — but the fawazahmed0 editions for these two ship EMPTY grades, so
+// we assert `sahih` for them directly rather than letting them fall to unknown.
+const SAHIHAYN = new Set(['bukhari', 'muslim']);
+
+function normalizeGrade(key, grades) {
+  if (SAHIHAYN.has(key)) return 'sahih';
+  // For the four Sunan books, the editions carry named scholarly gradings
+  // (al-Albani, al-Arnaut, Zubair Ali Zai…). Read the first one honestly, and
+  // default to `unknown` when no grading is present rather than asserting sahih.
   const g = (grades && grades[0] && (grades[0].grade || grades[0])) || '';
   const s = String(g).toLowerCase();
-  if (s.includes('sahih') || s.includes('saheeh')) return 'sahih';
+  if (!s) return 'unknown';
+  // Order matters: check daif/weak BEFORE sahih, since "da'if" never contains
+  // "sahih" but a phrase could mention both — weakness is the safer default.
+  if (s.includes('da') || s.includes('weak') || s.includes('munkar') || s.includes('mawdu'))
+    return 'daif';
   if (s.includes('hasan')) return 'hasan';
-  if (s.includes('da') || s.includes('weak')) return 'daif';
+  if (s.includes('sahih') || s.includes('saheeh')) return 'sahih';
   return 'unknown';
 }
 
@@ -72,7 +92,7 @@ function normalizeGrade(grades) {
         reference: `${LABEL[key]} ${h.hadithnumber}`,
         arabic,
         english: h.text,
-        grade: normalizeGrade(h.grades),
+        grade: normalizeGrade(key, h.grades),
         topics: [],
       });
       added += 1;

@@ -2,7 +2,7 @@ export { HADITHS, TOPICS, hadithById, hadithOfTheDay } from './data';
 export { loadLibrary, findInLibrary, libraryCount } from './corpus';
 export { searchHadiths } from './search';
 export type { SearchOptions } from './search';
-export { COLLECTIONS, collectionLabel, GRADE_LABEL } from './types';
+export { COLLECTIONS, collectionLabel, GRADE_LABEL, GRADE_LABEL_AR, referenceArabic } from './types';
 export type { Hadith, CollectionKey, Grade } from './types';
 export { HadithCard } from './components/HadithCard';
 export { GradePill } from './components/GradePill';

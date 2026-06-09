@@ -19,10 +19,16 @@ export type Hadith = {
   topics: string[];
   /** The companion who narrated it (curated entries only). */
   narrator?: string;
+  /** The narrator's name in Arabic (curated entries only). */
+  narratorAr?: string;
   /** Representative chain of transmission (isnād), companion first. */
   chain?: string[];
+  /** The isnād names in Arabic, companion first (curated entries only). */
+  chainAr?: string[];
   /** Plain-language explanation (curated entries only). */
   explanation?: string;
+  /** The plain-language explanation in Arabic (curated entries only). */
+  explanationAr?: string;
 };
 
 export const COLLECTIONS: { key: CollectionKey; label: string; arabic: string }[] = [
@@ -44,3 +50,28 @@ export const GRADE_LABEL: Record<Grade, string> = {
   daif: "Da'if",
   unknown: 'Ungraded',
 };
+
+export const GRADE_LABEL_AR: Record<Grade, string> = {
+  sahih: 'صحيح',
+  hasan: 'حسن',
+  daif: 'ضعيف',
+  unknown: 'غير مصنّف',
+};
+
+/** Western digits 0-9 → Arabic-Indic digits ٠-٩. */
+function toArabicDigits(s: string): string {
+  return s.replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
+}
+
+/**
+ * Derive an Arabic reference from a hadith: the collection's Arabic label plus
+ * the trailing number from {@link Hadith.reference}, rendered with Arabic-Indic
+ * digits — e.g. "صحيح البخاري ١". Falls back to the Arabic label alone if the
+ * reference carries no number.
+ */
+export function referenceArabic(h: Hadith): string {
+  const arabicLabel = COLLECTIONS.find((c) => c.key === h.collection)?.arabic ?? h.collection;
+  const num = h.reference.match(/(\d+)\s*$/)?.[1];
+  if (!num) return arabicLabel;
+  return `حديث ${arabicLabel} ${toArabicDigits(num)}`;
+}
