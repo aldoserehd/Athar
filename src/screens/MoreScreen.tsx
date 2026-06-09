@@ -24,11 +24,11 @@ export function MoreScreen() {
     <Screen scroll title={t('more.title')}>
       {/* Reminders */}
       <Text variant="label" color="textMuted" style={styles.sectionLabel}>
-        REMINDERS
+        {t('more.reminders')}
       </Text>
       <Card padded={false} style={styles.group}>
         <LinkRow
-          label="Adhān voice, reciters & athkār"
+          label={t('more.remindersRow')}
           icon="notifications"
           onPress={() => navigation.navigate('Notifications')}
         />
@@ -94,7 +94,7 @@ export function MoreScreen() {
           Athar · أثر · v{APP_VERSION}
         </Text>
         <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
-          Free &amp; ad-free, for the sake of Allah.
+          {t('more.tagline')}
         </Text>
       </View>
     </Screen>

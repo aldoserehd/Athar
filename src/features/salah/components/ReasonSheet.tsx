@@ -3,6 +3,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { IconButton, Text } from '@/components';
 import { useTheme } from '@/theme';
+import { useT } from '@/i18n/LanguageProvider';
 import { REASONS, ReasonKey } from '../reasons';
 
 type Props = {
@@ -14,6 +15,10 @@ type Props = {
 
 export function ReasonSheet({ visible, prayerLabel, onClose, onPick }: Props) {
   const theme = useTheme();
+  const t = useT();
+  const title = prayerLabel
+    ? t('salahReasons.title', { prayer: prayerLabel })
+    : t('salahReasons.titleNoPrayer');
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <Pressable style={[styles.backdrop, { backgroundColor: theme.colors.overlay }]} onPress={onClose} />
@@ -31,12 +36,12 @@ export function ReasonSheet({ visible, prayerLabel, onClose, onPick }: Props) {
           <View style={styles.grabber} />
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text variant="heading">Why couldn't you pray{prayerLabel ? ` ${prayerLabel}` : ''}?</Text>
+              <Text variant="heading">{title}</Text>
               <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-                Be honest with yourself and with Allah.
+                {t('salahReasons.honest')}
               </Text>
             </View>
-            <IconButton icon="close" accessibilityLabel="Close" onPress={onClose} />
+            <IconButton icon="close" accessibilityLabel={t('common.close')} onPress={onClose} />
           </View>
 
           <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false}>
@@ -53,13 +58,8 @@ export function ReasonSheet({ visible, prayerLabel, onClose, onPick }: Props) {
                 ]}
               >
                 <View style={styles.rowHead}>
-                  <Text variant="bodyMedium">{r.label}</Text>
+                  <Text variant="bodyMedium">{t(`salahReasons.${r.key}`)}</Text>
                   <View style={styles.rowRight}>
-                    {r.arabic ? (
-                      <Text style={{ fontFamily: theme.fonts.arabic, fontSize: 16, color: theme.colors.textMuted }}>
-                        {r.arabic}
-                      </Text>
-                    ) : null}
                     <View
                       style={[
                         styles.tag,
@@ -71,19 +71,18 @@ export function ReasonSheet({ visible, prayerLabel, onClose, onPick }: Props) {
                       ]}
                     >
                       <Text variant="caption" color={r.exempt ? 'onSecondaryContainer' : 'textMuted'}>
-                        {r.exempt ? 'Exempt' : 'Make up'}
+                        {r.exempt ? t('salahReasons.exempt') : t('salahReasons.makeup')}
                       </Text>
                     </View>
                   </View>
                 </View>
                 <Text variant="caption" color="textFaint" style={{ marginTop: 4 }}>
-                  {r.note}
+                  {t(`salahReasons.${r.key}Note`)}
                 </Text>
               </Pressable>
             ))}
             <Text variant="caption" color="textFaint" style={{ marginTop: 6, marginBottom: 4 }}>
-              These are plain-language summaries, not a fatwa — for your situation consult a trusted
-              scholar.
+              {t('salahReasons.disclaimer')}
             </Text>
           </ScrollView>
         </View>

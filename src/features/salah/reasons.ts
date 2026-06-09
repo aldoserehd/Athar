@@ -7,6 +7,8 @@
  *                   when able, per the hadith: "Whoever sleeps through a prayer
  *                   or forgets it, let him pray it when he remembers."
  *
+ * Labels and notes are localized — the UI looks up `salahReasons.<key>` for the
+ * label and `salahReasons.<key>Note` for the note (see src/i18n/translations.ts).
  * These are plain-language summaries, not a fatwa — for your situation consult a
  * trusted scholar.
  */
@@ -22,64 +24,19 @@ export type ReasonKey =
 
 export type Reason = {
   key: ReasonKey;
-  label: string;
-  arabic?: string;
   /** True if the prayer is waived entirely (no make-up owed). */
   exempt: boolean;
-  note: string;
 };
 
 export const REASONS: Reason[] = [
-  {
-    key: 'menstruation',
-    label: 'Menstruation',
-    arabic: 'حَيْض',
-    exempt: true,
-    note: 'A menstruating woman does not pray, and these prayers are not made up.',
-  },
-  {
-    key: 'postnatal',
-    label: 'Postnatal bleeding',
-    arabic: 'نِفَاس',
-    exempt: true,
-    note: 'After childbirth (nifās) the same ruling applies — not prayed and not made up.',
-  },
-  {
-    key: 'overslept',
-    label: 'Overslept / asleep',
-    exempt: false,
-    note: 'Pray it as soon as you wake. It is owed as a make-up (qadāʾ).',
-  },
-  {
-    key: 'forgot',
-    label: 'Forgot',
-    exempt: false,
-    note: 'Pray it as soon as you remember. It is owed as a make-up (qadāʾ).',
-  },
-  {
-    key: 'illness',
-    label: 'Too ill to pray',
-    exempt: false,
-    note: 'Illness allows praying sitting or lying down; if genuinely missed, make it up.',
-  },
-  {
-    key: 'unconscious',
-    label: 'Unconscious / medical',
-    exempt: false,
-    note: 'Anesthesia or unconsciousness — make up the prayers once able, per most scholars.',
-  },
-  {
-    key: 'travel',
-    label: 'Travel or unsafe',
-    exempt: false,
-    note: 'Travel allows shortening/combining; if a prayer was truly missed, make it up.',
-  },
-  {
-    key: 'other',
-    label: 'Another reason',
-    exempt: false,
-    note: 'Recorded as owed. Make it up when you are able, in shāʾ Allah.',
-  },
+  { key: 'menstruation', exempt: true },
+  { key: 'postnatal', exempt: true },
+  { key: 'overslept', exempt: false },
+  { key: 'forgot', exempt: false },
+  { key: 'illness', exempt: false },
+  { key: 'unconscious', exempt: false },
+  { key: 'travel', exempt: false },
+  { key: 'other', exempt: false },
 ];
 
 export function reasonInfo(key: ReasonKey): Reason {

@@ -9,7 +9,7 @@ import { useTheme } from '@/theme';
 import { useT } from '@/i18n/LanguageProvider';
 import type { RootStackParamList } from '@/navigation/types';
 import { formatTime, usePrayer } from '@/features/prayer';
-import { ReasonSheet, reasonInfo, SALAH_ORDER, SalahKey, useSalah } from '@/features/salah';
+import { ReasonSheet, SALAH_ORDER, SalahKey, useSalah } from '@/features/salah';
 import { ensurePermission, useReminders } from '@/features/reminders';
 
 export function SalahScreen() {
@@ -96,8 +96,8 @@ export function SalahScreen() {
                     : entry.status === 'prayed'
                     ? t('salah.prayed')
                     : entry.status === 'excused'
-                    ? `${t('salah.excused')} · ${reasonInfo(entry.reason!).label}`
-                    : `${t('salah.missed')} · ${reasonInfo(entry.reason!).label}`}
+                    ? `${t('salah.excused')} · ${t(`salahReasons.${entry.reason!}`)}`
+                    : `${t('salah.missed')} · ${t(`salahReasons.${entry.reason!}`)}`}
                 </Text>
               </View>
             </View>

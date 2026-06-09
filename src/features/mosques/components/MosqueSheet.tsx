@@ -141,7 +141,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
               <View style={styles.footerActions}>
                 <Pressable
                   style={styles.footerBtn}
-                  onPress={() => Alert.alert('Suggest an edit', 'Community editing arrives with accounts in the next update.')}
+                  onPress={() => Alert.alert(t('mosques.suggestEditTitle'), t('mosques.suggestEditBody'))}
                 >
                   <Ionicons name="create-outline" size={18} color={theme.colors.textMuted} />
                   <Text variant="caption" color="textMuted" style={{ marginLeft: 8 }}>
@@ -152,7 +152,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
                   style={styles.footerBtn}
                   onPress={() => {
                     onReport?.(mosque.id);
-                    Alert.alert('Report listing', 'Thank you — we’ll review this listing.');
+                    Alert.alert(t('mosques.reportTitle'), t('mosques.reportBody'));
                   }}
                 >
                   <Ionicons name="flag-outline" size={18} color={theme.colors.textMuted} />
@@ -163,12 +163,11 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
               </View>
 
               <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 14 }}>
-                Map data © OpenStreetMap contributors · listing not yet community-verified for all
-                fields.
+                {t('mosques.verifyNote')}
               </Text>
             </ScrollView>
           ) : null}
-          <IconButton icon="close" accessibilityLabel="Close" onPress={onClose} style={styles.close} />
+          <IconButton icon="close" accessibilityLabel={t('common.close')} onPress={onClose} style={styles.close} />
         </View>
       </View>
     </Modal>

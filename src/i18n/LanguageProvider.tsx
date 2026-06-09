@@ -49,8 +49,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         I18nManager.allowRTL(wantRtl);
         I18nManager.forceRTL(wantRtl);
         Alert.alert(
-          'Restart needed',
-          'Please close and reopen Athar to apply the new text direction.'
+          i18n.t('more.restartTitle', { locale: code }),
+          i18n.t('more.restartBody', { locale: code })
         );
       }
     },

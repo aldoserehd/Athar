@@ -5,15 +5,24 @@ import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 
 import { Card, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
-import { useT } from '@/i18n/LanguageProvider';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import type { RootStackParamList } from '@/navigation/types';
-import { GradePill, Hadith, hadithById, findInLibrary, loadLibrary, useSavedHadiths } from '@/features/hadith';
+import {
+  GradePill,
+  Hadith,
+  hadithById,
+  findInLibrary,
+  loadLibrary,
+  referenceArabic,
+  useSavedHadiths,
+} from '@/features/hadith';
 
 type DetailRoute = RouteProp<RootStackParamList, 'HadithDetail'>;
 
 export function HadithDetailScreen() {
   const theme = useTheme();
-  const t = useT();
+  const { t, language } = useLanguage();
+  const isAr = language === 'ar';
   const navigation = useNavigation();
   const route = useRoute<DetailRoute>();
   const { id } = route.params;
@@ -49,8 +58,12 @@ export function HadithDetailScreen() {
   }
 
   const saved = isSaved(hadith.id);
-  const share = () =>
-    Share.share({ message: `${hadith.arabic}\n\n“${hadith.english}”\n— ${hadith.reference}` }).catch(() => {});
+  const share = () => {
+    const message = isAr
+      ? `${hadith.arabic}\n— ${referenceArabic(hadith)}`
+      : `${hadith.arabic}\n\n“${hadith.english}”\n— ${hadith.reference}`;
+    Share.share({ message }).catch(() => {});
+  };
 
   return (
     <Screen scroll edges={['left', 'right']} contentStyle={{ paddingBottom: 110 }}>
@@ -67,9 +80,11 @@ export function HadithDetailScreen() {
         {hadith.arabic}
       </Text>
 
-      <Text variant="body" color="textMuted" style={styles.translation}>
-        “{hadith.english}”
-      </Text>
+      {!isAr ? (
+        <Text variant="body" color="textMuted" style={styles.translation}>
+          “{hadith.english}”
+        </Text>
+      ) : null}
 
       {/* Source + grade */}
       <Card style={styles.sourceRow}>
@@ -82,18 +97,18 @@ export function HadithDetailScreen() {
               {t('hadith.source')}
             </Text>
             <Text variant="bodyMedium" color="primary">
-              {hadith.reference}
+              {isAr ? referenceArabic(hadith) : hadith.reference}
             </Text>
           </View>
         </View>
-        <GradePill grade={hadith.grade} />
+        <GradePill grade={hadith.grade} arabic={isAr} />
       </Card>
 
       {hadith.narrator ? (
         <Card style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center' }}>
           <Ionicons name="person-circle-outline" size={22} color={theme.colors.textMuted} />
           <Text variant="body" style={{ marginLeft: 10 }}>
-            {t('hadith.narratedBy', { name: hadith.narrator })}
+            {t('hadith.narratedBy', { name: (isAr && hadith.narratorAr) || hadith.narrator })}
           </Text>
         </Card>
       ) : null}
@@ -103,9 +118,14 @@ export function HadithDetailScreen() {
         {t('hadith.explanation')}
       </Text>
       <Card>
-        <Text variant="body" color={hadith.explanation ? 'text' : 'textMuted'} style={{ lineHeight: 24 }}>
-          {hadith.explanation ?? t('hadith.noExplanation')}
-        </Text>
+        {(() => {
+          const explanation = (isAr && hadith.explanationAr) || hadith.explanation;
+          return (
+            <Text variant="body" color={explanation ? 'text' : 'textMuted'} style={{ lineHeight: 24 }}>
+              {explanation ?? t('hadith.noExplanation')}
+            </Text>
+          );
+        })()}
       </Card>
 
       {/* Chain (collapsible) — curated entries only */}
@@ -124,7 +144,9 @@ export function HadithDetailScreen() {
           </Pressable>
           {chainOpen ? (
             <Card alt style={{ marginTop: 8 }}>
-              {hadith.chain.map((name, i) => (
+              {((isAr && hadith.chainAr && hadith.chainAr.length === hadith.chain.length
+                ? hadith.chainAr
+                : hadith.chain) as string[]).map((name, i) => (
                 <View key={name + i} style={styles.chainRow}>
                   <View style={[styles.chainDot, { borderColor: theme.colors.primary }]}>
                     <Text variant="caption" color="primary">
@@ -169,7 +191,7 @@ export function HadithDetailScreen() {
         <Action
           icon="flag-outline"
           label={t('hadith.report')}
-          onPress={() => Alert.alert('Report narration', 'Thank you — we’ll review this entry for accuracy.')}
+          onPress={() => Alert.alert(t('hadith.reportTitle'), t('hadith.reportBody'))}
         />
       </View>
     </Screen>

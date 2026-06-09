@@ -40,7 +40,7 @@ export function PrayerSettingsSheet({ visible, onClose, onOpenNotifications }: P
           <View style={styles.grabber} />
           <View style={styles.header}>
             <Text variant="heading">{t('settings.prayerSettings')}</Text>
-            <IconButton icon="close" accessibilityLabel="Close" onPress={onClose} />
+            <IconButton icon="close" accessibilityLabel={t('common.close')} onPress={onClose} />
           </View>
 
           <ScrollView style={{ maxHeight: 460 }} showsVerticalScrollIndicator={false}>

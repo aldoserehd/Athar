@@ -77,7 +77,7 @@ export function PrayerScreen() {
           <Logo size={26} />
           <IconButton
             icon="options-outline"
-            accessibilityLabel="Prayer settings"
+            accessibilityLabel={t('settings.prayerSettings')}
             onPress={() => setSettingsOpen(true)}
           />
         </View>
@@ -139,7 +139,7 @@ export function PrayerScreen() {
           style={styles.statCard}
           onPress={() => navigation.navigate('Qibla')}
           accessibilityRole="button"
-          accessibilityLabel="Open qibla compass"
+          accessibilityLabel={t('qibla.title')}
         >
           <Card style={{ flex: 1 }}>
             <View style={styles.statTop}>

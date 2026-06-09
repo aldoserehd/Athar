@@ -3,10 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components';
 import { useTheme } from '@/theme';
-import { Grade, GRADE_LABEL } from '../types';
+import { Grade, GRADE_LABEL, GRADE_LABEL_AR } from '../types';
 
 /** Small coloured chip showing the authentication grade. */
-export function GradePill({ grade }: { grade: Grade }) {
+export function GradePill({ grade, arabic }: { grade: Grade; arabic?: boolean }) {
   const theme = useTheme();
   const color =
     grade === 'sahih'
@@ -20,7 +20,7 @@ export function GradePill({ grade }: { grade: Grade }) {
     <View style={[styles.pill, { borderColor: color }]}>
       <View style={[styles.dot, { backgroundColor: color }]} />
       <Text variant="caption" style={{ color }}>
-        {GRADE_LABEL[grade]}
+        {arabic ? GRADE_LABEL_AR[grade] : GRADE_LABEL[grade]}
       </Text>
     </View>
   );

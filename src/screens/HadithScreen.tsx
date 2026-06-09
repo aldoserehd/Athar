@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Card, Logo, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
-import { useT } from '@/i18n/LanguageProvider';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import type { RootStackParamList } from '@/navigation/types';
 import {
   COLLECTIONS,
@@ -25,7 +25,8 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function HadithScreen() {
   const theme = useTheme();
-  const t = useT();
+  const { t, language } = useLanguage();
+  const isAr = language === 'ar';
   const navigation = useNavigation<Nav>();
   const { saved } = useSavedHadiths();
 
@@ -77,7 +78,7 @@ export function HadithScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Pressable
             onPress={() => navigation.navigate('HadithScan')}
-            accessibilityLabel="Scan a hadith"
+            accessibilityLabel={t('scan.title')}
             hitSlop={8}
           >
             <Ionicons name="scan-outline" size={22} color={theme.colors.primary} />
@@ -129,11 +130,11 @@ export function HadithScreen() {
             setTopic(null);
           }}
         />
-        <Chip label="All" active={!collection && !savedOnly} onPress={() => { setCollection(null); setSavedOnly(false); }} />
+        <Chip label={t('common.all')} active={!collection && !savedOnly} onPress={() => { setCollection(null); setSavedOnly(false); }} />
         {COLLECTIONS.map((c) => (
           <Chip
             key={c.key}
-            label={c.label}
+            label={isAr ? c.arabic : c.label}
             active={collection === c.key}
             onPress={() => {
               setCollection(collection === c.key ? null : c.key);

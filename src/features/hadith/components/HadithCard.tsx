@@ -3,11 +3,20 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Card, Text } from '@/components';
 import { useTheme } from '@/theme';
-import { collectionLabel, Hadith } from '../types';
+import { useLanguage } from '@/i18n/LanguageProvider';
+import { COLLECTIONS, collectionLabel, Hadith, referenceArabic } from '../types';
 import { GradePill } from './GradePill';
 
 export function HadithCard({ hadith, onPress }: { hadith: Hadith; onPress: () => void }) {
   const theme = useTheme();
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
+  const collection = isAr
+    ? COLLECTIONS.find((c) => c.key === hadith.collection)?.arabic ?? collectionLabel(hadith.collection)
+    : collectionLabel(hadith.collection);
+  const reference = isAr
+    ? referenceArabic(hadith)
+    : hadith.reference.replace(/^.*\b(\d+)$/, '#$1');
   return (
     <Pressable onPress={onPress} accessibilityRole="button" style={{ marginBottom: 12 }}>
       <Card>
@@ -23,20 +32,22 @@ export function HadithCard({ hadith, onPress }: { hadith: Hadith; onPress: () =>
         >
           {hadith.arabic}
         </Text>
-        <Text variant="body" color="textMuted" numberOfLines={2} style={{ marginTop: 6, fontStyle: 'italic' }}>
-          “{hadith.english}”
-        </Text>
+        {!isAr ? (
+          <Text variant="body" color="textMuted" numberOfLines={2} style={{ marginTop: 6, fontStyle: 'italic' }}>
+            “{hadith.english}”
+          </Text>
+        ) : null}
         <View style={styles.meta}>
           <View style={styles.left}>
             <Text variant="caption" color="primary" style={{ fontFamily: theme.fonts.semibold }}>
-              {collectionLabel(hadith.collection)}
+              {collection}
             </Text>
             <Text variant="caption" color="textFaint">
               {' · '}
-              {hadith.reference.replace(/^.*\b(\d+)$/, '#$1')}
+              {reference}
             </Text>
           </View>
-          <GradePill grade={hadith.grade} />
+          <GradePill grade={hadith.grade} arabic={isAr} />
         </View>
       </Card>
     </Pressable>
