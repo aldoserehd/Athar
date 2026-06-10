@@ -43,8 +43,8 @@ export function ReminderScheduler() {
     if (!hydrated || !ready) return;
     const messages: ReminderMessages = {
       prayerName: (key: SalahKey) => t(`prayerNames.${key}`),
-      adhanTitle: (name: string) => t('reminders.adhanTitle', { name }),
-      adhanBody: (reciter: string) => t('reminders.adhanBody', { reciter }),
+      adhanTitle: (name: string, time: string) => t('reminders.adhanTitle', { name, time }),
+      adhanBody: t('reminders.adhanBody'),
       athkarTitle: t('reminders.athkarTitle'),
       language,
     };

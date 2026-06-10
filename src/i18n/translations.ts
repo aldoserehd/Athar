@@ -187,8 +187,8 @@ export const translations = {
       offlineNote: 'Reminders are scheduled on your device and work offline.',
     },
     reminders: {
-      adhanTitle: '%{name} · time to pray',
-      adhanBody: 'Adhān — %{reciter}',
+      adhanTitle: '%{name} · %{time}',
+      adhanBody: 'It’s time to pray 🤲',
       athkarTitle: 'A moment of dhikr',
     },
     lock: {
@@ -424,8 +424,8 @@ export const translations = {
       offlineNote: 'التنبيهات مجدولة على جهازك وتعمل دون اتصال.',
     },
     reminders: {
-      adhanTitle: '%{name} · حان وقت الصلاة',
-      adhanBody: 'الأذان — %{reciter}',
+      adhanTitle: '%{name} · %{time}',
+      adhanBody: 'حيّ على الصلاة 🤲',
       athkarTitle: 'لحظة ذِكر',
     },
     lock: {

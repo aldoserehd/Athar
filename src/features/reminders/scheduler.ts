@@ -1,11 +1,19 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 import { ComputedTimes } from '@/features/prayer';
 import { SalahKey } from '@/features/salah';
 import { randomInspiration } from '@/features/inspiration';
 import { randomAthkarSequence } from './athkar';
-import { reciterName } from './reciters';
+
+/**
+ * Custom 30-second adhān clips only play from a real dev/production build (they
+ * are bundled by the expo-notifications config plugin). Expo Go can't bundle
+ * them, so notifications there are silent — fall back to the system sound so the
+ * phone always makes a sound when a reminder arrives.
+ */
+const IS_EXPO_GO = Constants.appOwnership === 'expo';
 
 /** Prayer-Lock options (the cross-platform commitment gate; see lock feature). */
 export type LockSettings = {
@@ -40,8 +48,9 @@ const ANDROID_CHANNEL = 'athar-reminders';
 /** Localized text for the scheduled notifications (built by the caller via t). */
 export type ReminderMessages = {
   prayerName: (key: SalahKey) => string;
-  adhanTitle: (name: string) => string;
-  adhanBody: (reciter: string) => string;
+  adhanTitle: (name: string, time: string) => string;
+  /** Simple fallback body when inspiring content is turned off. */
+  adhanBody: string;
   athkarTitle: string;
   /** Current language code, so inspiration is surfaced in the right language. */
   language: string;
@@ -49,10 +58,32 @@ export type ReminderMessages = {
 
 /** A short inspiring line for a notification body, in the user's language. */
 function inspiringLine(language: string): string {
-  const item = randomInspiration();
-  const text = language === 'ar' ? item.arabic : item.english;
-  const ref = language === 'ar' ? item.referenceAr : item.reference;
+  // Prefer a concise item so the notification stays short and readable.
+  let best = randomInspiration();
+  const len = (it: ReturnType<typeof randomInspiration>) =>
+    (language === 'ar' ? it.arabic : it.english).length;
+  for (let i = 0; i < 3; i++) {
+    const cand = randomInspiration();
+    if (len(cand) < len(best)) best = cand;
+  }
+  const text = language === 'ar' ? best.arabic : best.english;
+  const ref = language === 'ar' ? best.referenceAr : best.reference;
   return `${text}\n— ${ref}`;
+}
+
+/** Compact clock label for a prayer time, localized to Arabic-Indic digits. */
+function clockLabel(d: Date, language: string): string {
+  const h = d.getHours();
+  const m = d.getMinutes().toString().padStart(2, '0');
+  const hour12 = ((h + 11) % 12) + 1;
+  let s = `${hour12}:${m} ${h < 12 ? 'AM' : 'PM'}`;
+  if (language === 'ar') {
+    s = s
+      .replace(/[0-9]/g, (n) => '٠١٢٣٤٥٦٧٨٩'[Number(n)])
+      .replace('AM', 'ص')
+      .replace('PM', 'م');
+  }
+  return s;
 }
 
 /** Local day index (days since epoch) — stable per calendar day for seeding. */
@@ -121,12 +152,14 @@ export async function applyReminders(
   // alert sound (plays on the lock screen). On Android the sound lives on a
   // per-reciter channel; on iOS it's referenced per-notification.
   if (settings.adhanEnabled && times) {
-    const soundFile = `${settings.reciterId}_30.wav`;
+    // Real builds play the bundled 30s adhān clip; Expo Go can't, so it uses the
+    // reliable system sound instead (otherwise the notification is silent).
+    const soundFile = IS_EXPO_GO ? 'default' : `${settings.reciterId}_30.wav`;
     let adhanChannel = channelId;
     if (Platform.OS === 'android') {
       adhanChannel = `adhan-${settings.reciterId}`;
       await Notifications.setNotificationChannelAsync(adhanChannel, {
-        name: `Adhān — ${reciterName(settings.reciterId)}`,
+        name: 'Adhān',
         importance: Notifications.AndroidImportance.HIGH,
         sound: soundFile,
       });
@@ -136,11 +169,11 @@ export async function applyReminders(
       const key = slot.name as SalahKey;
       if (!settings.prayers[key]) continue;
       const adhanBody = settings.inspiringContent
-        ? `${messages.adhanBody(reciterName(settings.reciterId))}\n${inspiringLine(messages.language)}`
-        : messages.adhanBody(reciterName(settings.reciterId));
+        ? inspiringLine(messages.language)
+        : messages.adhanBody;
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: `${messages.adhanTitle(messages.prayerName(key))} 🕌`,
+          title: `🕌 ${messages.adhanTitle(messages.prayerName(key), clockLabel(slot.time, messages.language))}`,
           body: adhanBody,
           sound: soundFile,
           data: { type: 'adhan' },

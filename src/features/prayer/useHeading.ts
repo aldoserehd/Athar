@@ -33,6 +33,10 @@ export function useHeading(active = true): HeadingState {
   const [heading, setHeading] = useState<number | null>(null);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const smoothed = useRef<number | null>(null);
+  // Learned magnetic declination (true − magnetic). The Qibla bearing is from
+  // *true* north, so when the OS only gives us a magnetic heading we must add
+  // this back, otherwise the needle is off by the local declination.
+  const declination = useRef<number | null>(null);
 
   useEffect(() => {
     if (!active) return;
@@ -44,7 +48,19 @@ export function useHeading(active = true): HeadingState {
         await Location.requestForegroundPermissionsAsync();
         sub = await Location.watchHeadingAsync((h) => {
           if (!mounted) return;
-          const raw = h.trueHeading >= 0 ? h.trueHeading : h.magHeading;
+          // Whenever both readings are present, cache the declination so we can
+          // correct magnetic-only readings on devices that don't report true.
+          if (h.trueHeading >= 0 && h.magHeading >= 0) {
+            declination.current = angleDelta(h.magHeading, h.trueHeading);
+          }
+          let raw: number;
+          if (h.trueHeading >= 0) {
+            raw = h.trueHeading;
+          } else if (h.magHeading >= 0) {
+            raw = (h.magHeading + (declination.current ?? 0) + 360) % 360;
+          } else {
+            return;
+          }
           if (raw == null || Number.isNaN(raw)) return;
           setAccuracy(h.accuracy ?? null);
           smoothed.current = smooth(smoothed.current, raw, 0.18);
