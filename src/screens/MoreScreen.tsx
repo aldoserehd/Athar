@@ -22,6 +22,24 @@ export function MoreScreen() {
 
   return (
     <Screen scroll title={t('more.title')}>
+      {/* Worship */}
+      <Text variant="label" color="textMuted" style={styles.sectionLabel}>
+        {t('more.worship').toUpperCase()}
+      </Text>
+      <Card padded={false} style={styles.group}>
+        <LinkRow
+          label={t('athkar.title')}
+          icon="book-outline"
+          onPress={() => navigation.navigate('Athkar')}
+        />
+        <Divider />
+        <LinkRow
+          label={t('witr.title')}
+          icon="star-outline"
+          onPress={() => navigation.navigate('Witr')}
+        />
+      </Card>
+
       {/* Reminders */}
       <Text variant="label" color="textMuted" style={styles.sectionLabel}>
         {t('more.reminders')}

@@ -7,3 +7,6 @@ export { ScanScreen } from './ScanScreen';
 export { NotificationsScreen } from './NotificationsScreen';
 export { MosquesScreen } from './MosquesScreen';
 export { MoreScreen } from './MoreScreen';
+export { AthkarScreen } from './AthkarScreen';
+export { AthkarCategoryScreen } from './AthkarCategoryScreen';
+export { WitrScreen } from './WitrScreen';

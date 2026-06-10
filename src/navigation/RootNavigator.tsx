@@ -17,6 +17,9 @@ import {
   QiblaScreen,
   SalahScreen,
   ScanScreen,
+  AthkarScreen,
+  AthkarCategoryScreen,
+  WitrScreen,
 } from '@/screens';
 import { TABS, TabParamList, TabKey, RootStackParamList } from './types';
 
@@ -110,6 +113,21 @@ export function RootNavigator() {
           name="Notifications"
           component={NotificationsScreen}
           options={{ headerShown: true, title: 'Notifications', headerBackTitle: 'Back' }}
+        />
+        <Stack.Screen
+          name="Athkar"
+          component={AthkarScreen}
+          options={{ headerShown: true, title: 'Athkar', headerBackTitle: 'Back' }}
+        />
+        <Stack.Screen
+          name="AthkarCategory"
+          component={AthkarCategoryScreen}
+          options={{ headerShown: true, title: 'Athkar', headerBackTitle: 'Back' }}
+        />
+        <Stack.Screen
+          name="Witr"
+          component={WitrScreen}
+          options={{ headerShown: true, title: 'Witr', headerBackTitle: 'Back' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

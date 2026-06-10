@@ -1,4 +1,5 @@
 import type { Ionicons } from '@expo/vector-icons';
+import type { AthkarCategoryId } from '@/features/athkar';
 
 export type TabKey = 'Prayer' | 'Salah' | 'Hadith' | 'Mosques' | 'More';
 
@@ -11,6 +12,9 @@ export type RootStackParamList = {
   HadithDetail: { id: string };
   HadithScan: undefined;
   Notifications: undefined;
+  Athkar: undefined;
+  AthkarCategory: { id: AthkarCategoryId };
+  Witr: undefined;
 };
 
 export type TabConfig = {
