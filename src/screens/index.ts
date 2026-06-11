@@ -10,3 +10,5 @@ export { MoreScreen } from './MoreScreen';
 export { AthkarScreen } from './AthkarScreen';
 export { AthkarCategoryScreen } from './AthkarCategoryScreen';
 export { WitrScreen } from './WitrScreen';
+export { TasbihScreen } from './TasbihScreen';
+export { NamesScreen } from './NamesScreen';

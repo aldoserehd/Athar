@@ -20,6 +20,8 @@ import {
   AthkarScreen,
   AthkarCategoryScreen,
   WitrScreen,
+  TasbihScreen,
+  NamesScreen,
 } from '@/screens';
 import { TABS, TabParamList, TabKey, RootStackParamList } from './types';
 
@@ -128,6 +130,16 @@ export function RootNavigator() {
           name="Witr"
           component={WitrScreen}
           options={{ headerShown: true, title: 'Witr', headerBackTitle: 'Back' }}
+        />
+        <Stack.Screen
+          name="Tasbih"
+          component={TasbihScreen}
+          options={{ headerShown: true, title: 'Tasbih', headerBackTitle: 'Back' }}
+        />
+        <Stack.Screen
+          name="Names"
+          component={NamesScreen}
+          options={{ headerShown: true, title: '99 Names', headerBackTitle: 'Back' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

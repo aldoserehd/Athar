@@ -12,6 +12,9 @@ type CardProps = ViewProps & {
 /** Rounded surface container used across the app. */
 export function Card({ alt = false, padded = true, style, children, ...rest }: CardProps) {
   const theme = useTheme();
+  // A soft shadow in light mode gives cards real depth against the warm page;
+  // in dark mode shadows read as noise, so we lean on the border instead.
+  const elevated = theme.scheme === 'light' && !alt;
   return (
     <View
       style={[
@@ -22,6 +25,7 @@ export function Card({ alt = false, padded = true, style, children, ...rest }: C
           borderRadius: theme.radius.lg,
           padding: padded ? theme.spacing.lg : 0,
         },
+        elevated && styles.shadow,
         style,
       ]}
       {...rest}
@@ -34,5 +38,12 @@ export function Card({ alt = false, padded = true, style, children, ...rest }: C
 const styles = StyleSheet.create({
   card: {
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  shadow: {
+    shadowColor: '#3A3128',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
 });

@@ -15,6 +15,8 @@ export type RootStackParamList = {
   Athkar: undefined;
   AthkarCategory: { id: AthkarCategoryId };
   Witr: undefined;
+  Tasbih: undefined;
+  Names: undefined;
 };
 
 export type TabConfig = {

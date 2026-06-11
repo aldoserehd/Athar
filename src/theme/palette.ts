@@ -63,16 +63,17 @@ export type ThemeColors = {
 };
 
 export const lightColors: ThemeColors = {
-  background: '#FCF9F8',
-  surface: '#FCF9F8',
-  surfaceAlt: '#F6F3F2',
-  surfaceContainer: '#F0EDED',
-  surfaceContainerHigh: '#EAE7E7',
-  border: '#D8D5D3',
+  // Warm off-white page so the clean white cards lift off it with real contrast.
+  background: '#F2EEE9',
+  surface: '#FFFFFF',
+  surfaceAlt: '#F7F3EE',
+  surfaceContainer: '#EFE9E2',
+  surfaceContainerHigh: '#E7E0D8',
+  border: '#E7E1D9',
 
   primary: '#0F4C5C',
   onPrimary: '#FFFFFF',
-  primaryContainer: '#D2EBF2',
+  primaryContainer: '#C7E7F0',
   onPrimaryContainer: '#00363F',
 
   secondary: '#7C572D',
@@ -81,10 +82,10 @@ export const lightColors: ThemeColors = {
   accent: '#B5793A',
 
   text: '#1C1B1B',
-  textMuted: '#40484B',
-  textFaint: '#70787C',
-  onSurfaceVariant: '#40484B',
-  outline: '#70787C',
+  textMuted: '#41484B',
+  textFaint: '#767C80',
+  onSurfaceVariant: '#41484B',
+  outline: '#767C80',
 
   success: '#2E7D32',
   danger: '#BA1A1A',

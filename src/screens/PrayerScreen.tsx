@@ -156,6 +156,33 @@ export function PrayerScreen() {
         </Pressable>
       </View>
 
+      {/* Worship quick actions */}
+      <View style={styles.quickRow}>
+        {([
+          { key: 'Athkar' as const, icon: 'book-outline' as const, label: t('quick.athkar') },
+          { key: 'Tasbih' as const, icon: 'ellipse-outline' as const, label: t('quick.tasbih') },
+          { key: 'Names' as const, icon: 'sparkles-outline' as const, label: t('quick.names') },
+          { key: 'Witr' as const, icon: 'star-outline' as const, label: t('quick.witr') },
+        ]).map((q) => (
+          <Pressable
+            key={q.key}
+            style={styles.quickTile}
+            onPress={() => navigation.navigate(q.key)}
+            accessibilityRole="button"
+            accessibilityLabel={q.label}
+          >
+            <Card style={styles.quickCard}>
+              <View style={[styles.quickIcon, { backgroundColor: theme.colors.surfaceContainerHigh }]}>
+                <Ionicons name={q.icon} size={20} color={theme.colors.primary} />
+              </View>
+              <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 8 }}>
+                {q.label}
+              </Text>
+            </Card>
+          </Pressable>
+        ))}
+      </View>
+
       {/* Times list */}
       <View style={styles.listHead}>
         <Text variant="heading">{t('prayer.todaysTimes')}</Text>
@@ -266,8 +293,12 @@ const styles = StyleSheet.create({
   hero: { overflow: 'hidden', marginBottom: 16, paddingVertical: 22 },
   heroGlyph: { position: 'absolute', right: -16, top: -10, opacity: 0.06 },
   heroLabel: { letterSpacing: 1 },
-  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   statCard: { flex: 1 },
+  quickRow: { flexDirection: 'row', gap: 10, marginBottom: 22 },
+  quickTile: { flex: 1 },
+  quickCard: { flex: 1, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4 },
+  quickIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   statTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   bar: { height: 4, borderRadius: 2, marginTop: 10, overflow: 'hidden' },
   barFill: { height: 4, borderRadius: 2 },
