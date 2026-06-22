@@ -32,3 +32,16 @@ yarn-error.*
 
 # Typescript
 *.tsbuildinfo
+
+# Private / business documents — keep off the public repo
+*.pdf
+Athar-Overview.md
+
+# Secrets / signing material (never commit)
+*.keystore
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
