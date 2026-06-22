@@ -6,13 +6,13 @@
     <title>Privacy Policy — Athar</title>
     <meta
       name="description"
-      content="Athar's privacy policy. Athar collects no personal data in its current version; your Qadha tracker stays on your device."
+      content="Athar's privacy policy. Athar collects no personal data; your prayer tracker and settings stay on your device."
     />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -20,138 +20,145 @@
   <body>
     <nav class="nav">
       <div class="wrap nav-inner">
-        <a class="brand" href="index.html"
-          ><img src="logo.png" alt="" class="mark" /> Athar</a
-        >
+        <a class="brand" href="index.html"><img src="logo.png" alt="" class="mark" /> Athar</a>
         <div class="nav-links">
-          <a href="index.html#features">Features</a>
+          <a href="index.html#features" class="hide-sm">Features</a>
           <a href="support.html">Support</a>
-          <a href="terms.html">Terms</a>
+          <a href="index.html#download" class="nav-cta">Get the app</a>
         </div>
       </div>
     </nav>
 
-    <main class="wrap doc">
-      <h1>Privacy Policy</h1>
-      <p class="updated">Last updated: 5 June 2026</p>
+    <header class="doc-hero">
+      <div class="wrap">
+        <span class="eyebrow">★ Legal</span>
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: 5 June 2026</p>
+        <nav class="doc-switch" aria-label="Legal pages">
+          <a href="privacy.html" class="active">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="support.html">Support</a>
+        </nav>
+      </div>
+    </header>
 
-      <p>
-        Athar (“Athar”, “we”, “us”) is a free, ad-free app built to serve the
-        Muslim community. We designed it to be private by default. This policy
-        explains, plainly, what data the app handles and what it does not.
+    <main class="doc">
+      <p class="intro">
+        Athar (“Athar”, “we”, “us”) is a free, ad-free app built to serve the Muslim community.
+        We designed it to be private by default. This policy explains, plainly, what data the app
+        handles — and what it does not.
       </p>
 
       <div class="callout">
-        <strong>The short version:</strong> The current version of Athar
-        collects <strong>no personal information</strong>. Your missed-prayer
-        (Qadha) tracker and your settings are stored only on your device. We run
-        no ads and no third-party analytics or tracking.
+        <p>
+          <strong>The short version:</strong> Athar collects
+          <strong>no personal information</strong>. Your prayer tracker and your settings are stored
+          only on your device. We run no ads and no third-party analytics or tracking.
+        </p>
       </div>
 
       <h2>1. Information we do not collect</h2>
       <ul>
         <li>We do not require an account to use the app.</li>
         <li>We do not collect your name, email, phone number, or contacts.</li>
-        <li>
-          We do not use advertising identifiers, and we do not track you across
-          apps or websites.
-        </li>
+        <li>We do not use advertising identifiers, and we do not track you across apps or websites.</li>
         <li>We do not run third-party analytics or advertising SDKs.</li>
       </ul>
 
       <h2>2. Information stored on your device</h2>
       <p>
-        To make the app work, some data is saved locally on your phone using the
-        device's standard storage. This never leaves your device unless you
-        explicitly back it up through your own iCloud/Google account:
+        To make the app work, some data is saved locally on your phone using the device's standard
+        storage. This never leaves your device unless you explicitly back it up through your own
+        iCloud/Google account:
       </p>
       <ul>
-        <li>
-          <strong>Qadha tracker data</strong> — your prayer backlog and the
-          prayers you've logged as made up.
-        </li>
-        <li><strong>Preferences</strong> — such as your light/dark theme.</li>
+        <li><strong>Prayer &amp; tracker data</strong> — your salah record, prayer backlog, athkār counts and tasbīḥ totals.</li>
+        <li><strong>Preferences</strong> — such as your language, light/dark theme, and reminder settings.</li>
       </ul>
-      <p>
-        You can remove this data at any time by resetting the tracker in the app
-        or by deleting the app.
-      </p>
+      <p>You can remove this data at any time by resetting it in the app or by deleting the app.</p>
 
-      <h2>3. Features added in future versions</h2>
-      <p>
-        As Athar grows, some features will need additional permissions or
-        services. When they ship, this policy will be updated and the app will
-        ask for your consent in context. Planned features and their data use:
-      </p>
+      <h2>3. Permissions the app uses</h2>
       <ul>
         <li>
-          <strong>Prayer times &amp; qibla</strong> — may use your device
-          location <em>on-device</em> to calculate accurate times and direction.
-          Location is not sent to us.
+          <strong>Location</strong> — used <em>on your device</em> to calculate accurate prayer times
+          and the qibla direction. Your location is never sent to us.
         </li>
         <li>
-          <strong>Notifications</strong> — adhan/prayer reminders are scheduled
-          locally on your device.
+          <strong>Notifications</strong> — adhān and athkār reminders are scheduled locally on your
+          device; no server is involved.
         </li>
         <li>
-          <strong>Mosque Wiki &amp; accounts</strong> — to contribute
-          community mosque information you may create an account (email) handled
-          by our backend provider, <strong>Supabase</strong>. Contributions you
-          submit (e.g. mosque details) are shared publicly with other users by
-          design. You will be able to delete your account and contributions from
-          within the app.
+          <strong>Camera / photos</strong> (optional) — only if you choose to scan a photo of a hadith
+          to find it in the library. Images are processed for that purpose and not stored by us.
         </li>
       </ul>
 
-      <h2>4. Children</h2>
+      <h2>4. Features added in future versions</h2>
       <p>
-        Athar is suitable for general audiences and does not knowingly collect
-        personal information from children. Since the current version collects
-        no personal data, no information is gathered from users of any age.
+        As Athar grows, some features will need additional services. When they ship, this policy will
+        be updated and the app will ask for your consent in context. For example, contributing to a
+        community <strong>Mosque Wiki</strong> may require an account (email) handled by our backend
+        provider, <strong>Supabase</strong>. Contributions you submit (e.g. mosque details) are shared
+        publicly with other users by design, and you will be able to delete your account and
+        contributions from within the app.
       </p>
 
-      <h2>5. Data security</h2>
+      <h2>5. Children</h2>
       <p>
-        On-device data is protected by your device's own security. Where future
-        features transmit data (e.g. account email), we use encrypted (HTTPS)
-        connections and reputable providers.
+        Athar is suitable for general audiences and does not knowingly collect personal information from
+        children. Since the app collects no personal data, no information is gathered from users of any age.
       </p>
 
-      <h2>6. Your rights</h2>
+      <h2>6. Data security</h2>
       <p>
-        Because we hold no personal data about you today, there is nothing for
-        us to export or delete on our servers. When account features launch, you
-        will be able to access and delete your account data directly in the app,
-        and you may contact us for help at any time.
+        On-device data is protected by your device's own security. Where future features transmit data
+        (e.g. an account email), we use encrypted (HTTPS) connections and reputable providers.
       </p>
 
-      <h2>7. Changes to this policy</h2>
+      <h2>7. Your rights</h2>
       <p>
-        We may update this policy as the app evolves. Material changes will be
-        reflected here with a new “last updated” date.
+        Because we hold no personal data about you today, there is nothing for us to export or delete on
+        our servers. When account features launch, you will be able to access and delete your account data
+        directly in the app, and you may contact us for help at any time.
       </p>
 
-      <h2>8. Contact</h2>
+      <h2>8. Changes to this policy</h2>
+      <p>
+        We may update this policy as the app evolves. Material changes will be reflected here with a new
+        “last updated” date.
+      </p>
+
+      <h2>9. Contact</h2>
       <p>
         Questions about privacy? Email us at
         <a href="mailto:salam@try-athar.com">salam@try-athar.com</a>.
       </p>
+
+      <a class="back-home" href="index.html">← Back to home</a>
     </main>
 
     <footer>
-      <div class="wrap">
-        <div class="foot-inner">
-          <a class="brand" href="index.html"
-            ><img src="logo.png" alt="" class="mark" /> Athar</a
-          >
-          <div class="foot-links">
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
+      <div class="wrap foot-inner">
+        <div class="foot-brand">
+          <a class="brand" href="index.html"><img src="logo.png" alt="" class="mark" /> Athar</a>
+          <p>© <span id="year">2026</span> Athar · أثر — a trace, a transmitted tradition. Free &amp; ad-free, for the sake of Allah.</p>
+        </div>
+        <div class="foot-cols">
+          <div class="foot-col">
+            <span class="head">Product</span>
+            <a href="index.html#features">Features</a>
+            <a href="index.html#showcase">Showcase</a>
             <a href="support.html">Support</a>
-            <a href="mailto:salam@try-athar.com">salam@try-athar.com</a>
+          </div>
+          <div class="foot-col">
+            <span class="head">Legal</span>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Use</a>
+            <a href="mailto:salam@try-athar.com">Contact</a>
           </div>
         </div>
       </div>
     </footer>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
   </body>
 </html>

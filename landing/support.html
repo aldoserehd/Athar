@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -20,94 +20,105 @@
   <body>
     <nav class="nav">
       <div class="wrap nav-inner">
-        <a class="brand" href="index.html"
-          ><img src="logo.png" alt="" class="mark" /> Athar</a
-        >
+        <a class="brand" href="index.html"><img src="logo.png" alt="" class="mark" /> Athar</a>
         <div class="nav-links">
-          <a href="index.html#features">Features</a>
+          <a href="index.html#features" class="hide-sm">Features</a>
           <a href="privacy.html">Privacy</a>
-          <a href="terms.html">Terms</a>
+          <a href="index.html#download" class="nav-cta">Get the app</a>
         </div>
       </div>
     </nav>
 
-    <main class="wrap doc">
-      <h1>Support</h1>
-      <p class="updated">We're glad to help.</p>
+    <header class="doc-hero">
+      <div class="wrap">
+        <span class="eyebrow">★ Help center</span>
+        <h1>Support</h1>
+        <p class="updated">We're glad to help — bi-idhnillāh.</p>
+        <nav class="doc-switch" aria-label="Legal pages">
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="support.html" class="active">Support</a>
+        </nav>
+      </div>
+    </header>
 
-      <div class="callout">
-        <strong>Contact:</strong> Email
-        <a href="mailto:salam@try-athar.com">salam@try-athar.com</a> and we'll reply as
-        soon as we can, inshaAllah. For reports of objectionable content in the
-        Mosque Wiki, we act within 24 hours.
+    <main class="doc">
+      <div class="contact-grid">
+        <div class="contact-card">
+          <span class="label">Email us</span>
+          <a class="value" href="mailto:salam@try-athar.com">salam@try-athar.com</a>
+          <p style="margin:0;font-size:14px;">We reply as soon as we can, inshaAllah.</p>
+        </div>
+        <div class="contact-card">
+          <span class="label">Report content</span>
+          <span class="value">Within 24 hours</span>
+          <p style="margin:0;font-size:14px;">Objectionable Mosque Wiki content is reviewed within a day.</p>
+        </div>
       </div>
 
       <h2>Frequently asked questions</h2>
-
-      <h3>Is Athar really free?</h3>
-      <p>
-        Yes. Athar is completely free and ad-free, offered as sadaqah jariyah.
-        There are no subscriptions, no in-app purchases, and no ads.
-      </p>
-
-      <h3>Do I need an account?</h3>
-      <p>
-        No. The Qadha tracker and other core tools work without any account and
-        without an internet connection. An optional account will only be needed
-        later to contribute to the community Mosque Wiki.
-      </p>
-
-      <h3>Where is my Qadha data stored?</h3>
-      <p>
-        Entirely on your device. We don't upload it. If you delete the app, the
-        data is removed with it, so consider noting your backlog before
-        reinstalling.
-      </p>
-
-      <h3>How is the prayer backlog estimated?</h3>
-      <p>
-        When you set up by time period, Athar applies one missed prayer per day
-        across the span you enter (treating a year as about 354 days). It's a
-        starting estimate — you can fine-tune each prayer's count manually at any
-        time.
-      </p>
-
-      <h3>How do I report a problem with a mosque listing?</h3>
-      <p>
-        Once the Mosque Wiki launches, every listing has a “Report” option. You
-        can also email us directly and we'll review it promptly.
-      </p>
-
-      <h3>How do I delete my account?</h3>
-      <p>
-        When accounts are available, you'll be able to delete your account and
-        all associated data from within the app's settings. You can also email
-        us to request deletion.
-      </p>
+      <div class="faq">
+        <div class="faq-item">
+          <h3>Is Athar really free?</h3>
+          <p>Yes. Athar is completely free and ad-free, offered as sadaqah jāriyah. There are no subscriptions, no in-app purchases, and no ads.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Do I need an account?</h3>
+          <p>No. The prayer tracker, athkār, qibla and other core tools work without any account and without an internet connection. An optional account will only be needed later to contribute to the community Mosque Wiki.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Where is my data stored?</h3>
+          <p>Entirely on your device. We don't upload it. If you delete the app, the data is removed with it — so consider noting your prayer backlog before reinstalling.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Why isn't my adhān making a sound?</h3>
+          <p>Make sure notifications are allowed for Athar in your phone settings, and that your ringer/Do-Not-Disturb isn't silencing it. The custom adhān audio plays in the full app build; if you're testing an early preview, the system notification sound is used instead.</p>
+        </div>
+        <div class="faq-item">
+          <h3>The qibla seems off — what do I do?</h3>
+          <p>Calibrate your phone's compass by moving it in a figure-8 motion, and keep it away from metal or magnets. Athar corrects for magnetic declination automatically once your compass has a good reading.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How do I report a problem with a mosque listing?</h3>
+          <p>Once the Mosque Wiki launches, every listing has a “Report” option. You can also email us directly and we'll review it promptly.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How do I delete my account?</h3>
+          <p>When accounts are available, you'll be able to delete your account and all associated data from within the app's settings. You can also email us to request deletion.</p>
+        </div>
+      </div>
 
       <h2>Feedback</h2>
       <p>
-        Suggestions, corrections to hadith data, or ideas for features are very
-        welcome. Please write to
-        <a href="mailto:salam@try-athar.com">salam@try-athar.com</a>. JazakAllahu
-        khayran.
+        Suggestions, corrections to hadith data, or ideas for features are very welcome. Please write to
+        <a href="mailto:salam@try-athar.com">salam@try-athar.com</a>. JazakAllāhu khayran.
       </p>
+
+      <a class="back-home" href="index.html">← Back to home</a>
     </main>
 
     <footer>
-      <div class="wrap">
-        <div class="foot-inner">
-          <a class="brand" href="index.html"
-            ><img src="logo.png" alt="" class="mark" /> Athar</a
-          >
-          <div class="foot-links">
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
+      <div class="wrap foot-inner">
+        <div class="foot-brand">
+          <a class="brand" href="index.html"><img src="logo.png" alt="" class="mark" /> Athar</a>
+          <p>© <span id="year">2026</span> Athar · أثر — a trace, a transmitted tradition. Free &amp; ad-free, for the sake of Allah.</p>
+        </div>
+        <div class="foot-cols">
+          <div class="foot-col">
+            <span class="head">Product</span>
+            <a href="index.html#features">Features</a>
+            <a href="index.html#showcase">Showcase</a>
             <a href="support.html">Support</a>
-            <a href="mailto:salam@try-athar.com">salam@try-athar.com</a>
+          </div>
+          <div class="foot-col">
+            <span class="head">Legal</span>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Use</a>
+            <a href="mailto:salam@try-athar.com">Contact</a>
           </div>
         </div>
       </div>
     </footer>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
   </body>
 </html>
