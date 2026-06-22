@@ -11,7 +11,7 @@ The site is the static `landing/` folder. No build step.
 
 ### 1. Buy the domain
 - Sign in at <https://dash.cloudflare.com> → **Domain Registration → Register Domain**.
-- Search `athar.app` (or a fallback: `athar.app` → `getathar.app`, `athar.co`, `atharapp.com`).
+- Search `try-athar.com` (or a fallback: `try-athar.com` → `gettry-athar.com`, `athar.co`, `atharapp.com`).
   - `.app` is a Google TLD and **requires HTTPS** (HSTS-preloaded). Cloudflare gives free HTTPS, so this is fine.
 - Buy it. Cloudflare sells at-cost (no markup) and auto-manages DNS.
 
@@ -28,14 +28,14 @@ Option A — **Git (recommended, auto-deploys on every push):**
 Option B — **Direct upload (no Git):** Workers & Pages → Create → Pages → Upload assets → drag the `landing/` folder.
 
 ### 3. Connect the domain
-- In the Pages project → **Custom domains → Set up a domain** → enter `athar.app` and `www.athar.app`.
+- In the Pages project → **Custom domains → Set up a domain** → enter `try-athar.com` and `www.try-athar.com`.
 - Cloudflare wires the DNS automatically (same account). HTTPS issues within minutes.
 - Clean URLs work out of the box: `/privacy` serves `privacy.html` (matches the in-app links).
 
 ### 4. Verify
-- [ ] `https://athar.app` loads, EN/AR toggle works, screenshots show.
-- [ ] `https://athar.app/privacy`, `/terms`, `/support` resolve.
-- [ ] `mailto:salam@athar.app` — set up email (Cloudflare Email Routing, free: forward `salam@athar.app` → your Gmail).
+- [ ] `https://try-athar.com` loads, EN/AR toggle works, screenshots show.
+- [ ] `https://try-athar.com/privacy`, `/terms`, `/support` resolve.
+- [ ] `mailto:salam@try-athar.com` — set up email (Cloudflare Email Routing, free: forward `salam@try-athar.com` → your Gmail).
 
 ---
 
@@ -69,8 +69,8 @@ eas submit -p ios --latest       # uploads to App Store Connect / TestFlight
 - [ ] Description (EN + AR), keywords
 - [ ] Screenshots — already in `landing/screenshots/` (need device-frame sizes per store)
 - [ ] App icon — `assets/icon.png` ✅
-- [ ] **Privacy Policy URL** → `https://athar.app/privacy` ✅
-- [ ] Support URL → `https://athar.app/support` ✅
+- [ ] **Privacy Policy URL** → `https://try-athar.com/privacy` ✅
+- [ ] Support URL → `https://try-athar.com/support` ✅
 - [ ] Data Safety form (Play) / App Privacy (Apple): declare "no data collected" — Athar stores
       tracker + settings on-device only (see `docs/APP_STORE_COMPLIANCE.md`).
 - [ ] Content rating questionnaire (will rate 4+/Everyone).

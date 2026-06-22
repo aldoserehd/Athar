@@ -70,11 +70,11 @@ export function MoreScreen() {
       {/* About / legal */}
       <SectionLabel>{t('more.about')}</SectionLabel>
       <Card padded={false} style={styles.group}>
-        <LinkRow label={t('more.privacy')} icon="lock-closed-outline" onPress={() => Linking.openURL('https://athar.app/privacy')} />
+        <LinkRow label={t('more.privacy')} icon="lock-closed-outline" onPress={() => Linking.openURL('https://try-athar.com/privacy')} />
         <Divider />
-        <LinkRow label={t('more.terms')} icon="document-text-outline" onPress={() => Linking.openURL('https://athar.app/terms')} />
+        <LinkRow label={t('more.terms')} icon="document-text-outline" onPress={() => Linking.openURL('https://try-athar.com/terms')} />
         <Divider />
-        <LinkRow label={t('more.feedback')} icon="mail-outline" onPress={() => Linking.openURL('mailto:salam@athar.app')} />
+        <LinkRow label={t('more.feedback')} icon="mail-outline" onPress={() => Linking.openURL('mailto:salam@try-athar.com')} />
       </Card>
 
       <View style={styles.footer}>

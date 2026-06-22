@@ -14,10 +14,10 @@ in `/landing` and must be live before submission.
 
 | Field            | URL                          | Phase |
 | ---------------- | ---------------------------- | ----- |
-| Privacy Policy   | https://athar.app/privacy    | now   |
-| Support URL      | https://athar.app/support    | now   |
-| Marketing URL    | https://athar.app            | now   |
-| Terms of Use     | https://athar.app/terms      | now   |
+| Privacy Policy   | https://try-athar.com/privacy    | now   |
+| Support URL      | https://try-athar.com/support    | now   |
+| Marketing URL    | https://try-athar.com            | now   |
+| Terms of Use     | https://try-athar.com/terms      | now   |
 
 > Update the in-app links in `src/screens/MoreScreen.tsx` and the domain in the
 > landing pages if the final domain differs.
@@ -67,7 +67,7 @@ following the day the Mosque Wiki goes live (Phase 3):
    queue or automated checks on submissions).
 2. A **mechanism for users to flag/report** objectionable content.
 3. A **mechanism to block abusive users**.
-4. **Published contact** so users can reach us (the `salam@athar.app` support
+4. **Published contact** so users can reach us (the `salam@try-athar.com` support
    address + Support URL).
 5. Act on reports and **remove content within 24 hours**, removing the offending
    user if needed.

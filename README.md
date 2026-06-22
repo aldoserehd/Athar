@@ -108,7 +108,7 @@ Always read colors via `useTheme().colors.*` — never hardcode hex in component
 See [`docs/APP_STORE_COMPLIANCE.md`](docs/APP_STORE_COMPLIANCE.md) for a
 phase-by-phase Apple review checklist. The `landing/` site provides the
 **Privacy Policy**, **Terms**, and **Support** URLs Apple requires for every
-listing. Deploy it (e.g. to `athar.app`) and point App Store Connect at the
+listing. Deploy it (e.g. to `try-athar.com`) and point App Store Connect at the
 matching URLs.
 
 ## Roadmap
