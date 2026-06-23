@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import { Card, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 import { useT } from '@/i18n/LanguageProvider';
 import { SALAH_ORDER } from '@/features/salah';
-import { ensurePermission, RECITERS, useAdhanPreview, useReminders } from '@/features/reminders';
+import { ensurePermission, RECITERS, reciterName, useAdhanPreview, useReminders } from '@/features/reminders';
 
 const ATHKAR_TIMES = [
   { key: 'morning', hour: 8, minute: 0 },
@@ -45,66 +45,57 @@ export function NotificationsScreen() {
   }, [navigation, t]);
 
   async function toggleAdhan(v: boolean) {
-    if (v) {
-      const ok = await ensurePermission();
-      if (!ok) return;
-    }
+    if (v && !(await ensurePermission())) return;
     setAdhanEnabled(v);
   }
   async function toggleAthkar(v: boolean) {
-    if (v) {
-      const ok = await ensurePermission();
-      if (!ok) return;
-    }
+    if (v && !(await ensurePermission())) return;
     setAthkarEnabled(v);
   }
 
   return (
-    <Screen scroll edges={['left', 'right']} contentStyle={{ paddingTop: 16 }}>
-      {/* Adhan master */}
-      <Card style={styles.rowBetween}>
-        <View style={{ flex: 1, paddingRight: 12 }}>
-          <Text variant="bodyMedium">{t('notifications.adhanReminders')}</Text>
-          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-            {t('notifications.adhanDesc')}
-          </Text>
-        </View>
-        <Switch
-          value={settings.adhanEnabled}
-          onValueChange={toggleAdhan}
-          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-          thumbColor="#FFFFFF"
-        />
-      </Card>
+    <Screen scroll edges={['left', 'right']} contentStyle={{ paddingTop: 12 }}>
+      <Text variant="caption" color="textFaint" style={{ marginBottom: 14 }}>
+        {t('notifications.lead')}
+      </Text>
 
-      {settings.adhanEnabled ? (
-        <>
-          <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.prayers')}
-          </Text>
-          <Card padded={false} style={styles.group}>
-            {SALAH_ORDER.map((key, i) => (
-              <View key={key}>
-                {i > 0 ? <Divider /> : null}
-                <View style={styles.toggleRow}>
-                  <Text variant="bodyMedium" style={{ flex: 1 }}>
-                    {t(`prayerNames.${key}`)}
-                  </Text>
-                  <Switch
-                    value={settings.prayers[key]}
-                    onValueChange={() => togglePrayer(key)}
-                    trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-                    thumbColor="#FFFFFF"
-                  />
-                </View>
+      {/* ───── Adhān reminders ───── */}
+      <Section
+        icon="notifications"
+        tint={theme.colors.primary}
+        title={t('notifications.adhanReminders')}
+        subtitle={t('notifications.adhanDesc')}
+        value={settings.adhanEnabled}
+        onValueChange={toggleAdhan}
+        defaultOpen
+      >
+        <Label>{t('notifications.prayers')}</Label>
+        <View style={styles.inner}>
+          {SALAH_ORDER.map((key, i) => (
+            <View key={key}>
+              {i > 0 ? <Divider /> : null}
+              <View style={styles.toggleRow}>
+                <Text variant="bodyMedium" style={{ flex: 1 }}>
+                  {t(`prayerNames.${key}`)}
+                </Text>
+                <Switch
+                  value={settings.prayers[key]}
+                  onValueChange={() => togglePrayer(key)}
+                  trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+                  thumbColor="#FFFFFF"
+                />
               </View>
-            ))}
-          </Card>
+            </View>
+          ))}
+        </View>
 
-          <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.adhanVoice')}
-          </Text>
-          <Card padded={false} style={styles.group}>
+        {/* Reciter — nested collapsible to keep the list out of the way */}
+        <Collapsible
+          icon="musical-notes-outline"
+          title={t('notifications.adhanVoice')}
+          value={reciterName(settings.reciterId)}
+        >
+          <View style={styles.inner}>
             {RECITERS.map((r, i) => {
               const active = settings.reciterId === r.id;
               return (
@@ -117,11 +108,7 @@ export function NotificationsScreen() {
                       style={[styles.playBtn, { backgroundColor: theme.colors.surfaceContainerHigh }]}
                       accessibilityLabel={`Preview ${r.name}`}
                     >
-                      <Ionicons
-                        name={playing === r.id ? 'stop' : 'play'}
-                        size={16}
-                        color={theme.colors.primary}
-                      />
+                      <Ionicons name={playing === r.id ? 'stop' : 'play'} size={15} color={theme.colors.primary} />
                     </Pressable>
                     <View style={{ flex: 1, marginLeft: 12 }}>
                       <Text variant="bodyMedium">{r.name}</Text>
@@ -129,205 +116,273 @@ export function NotificationsScreen() {
                         {r.place}
                       </Text>
                     </View>
-                    {active ? (
-                      <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
-                    ) : (
-                      <View style={{ width: 22 }} />
-                    )}
+                    {active ? <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} /> : <View style={{ width: 22 }} />}
                   </Pressable>
                 </View>
               );
             })}
-          </Card>
+          </View>
           <Text variant="caption" color="textFaint" style={{ marginTop: 8 }}>
             {t('notifications.voiceNote')}
           </Text>
-        </>
-      ) : null}
+        </Collapsible>
+      </Section>
 
-      {/* Athkar */}
-      <Card style={[styles.rowBetween, { marginTop: 24 }]}>
-        <View style={{ flex: 1, paddingRight: 12 }}>
-          <Text variant="bodyMedium">{t('notifications.dailyAthkar')}</Text>
-          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-            {t('notifications.athkarDesc')}
-          </Text>
-        </View>
-        <Switch
-          value={settings.athkarEnabled}
-          onValueChange={toggleAthkar}
-          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-          thumbColor="#FFFFFF"
-        />
-      </Card>
-
-      {settings.athkarEnabled ? (
-        <>
-          <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.startTime')}
-          </Text>
-          <View style={styles.times}>
-            {ATHKAR_TIMES.map((slot) => {
-              const active = settings.athkarHour === slot.hour && settings.athkarMinute === slot.minute;
-              return (
-                <Pressable
-                  key={slot.key}
-                  onPress={() => setAthkarTime(slot.hour, slot.minute)}
-                  style={[
-                    styles.timeChip,
-                    {
-                      backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt,
-                      borderColor: active ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text variant="label" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
-                    {t(`notifications.${slot.key}`)}
-                  </Text>
-                  <Text variant="caption" style={{ color: active ? theme.colors.onPrimary : theme.colors.textFaint }}>
-                    {String(slot.hour).padStart(2, '0')}:{String(slot.minute).padStart(2, '0')}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.perDay')}
-          </Text>
-          <View style={styles.times}>
-            {ATHKAR_COUNTS.map((n) => {
-              const active = settings.athkarPerDay === n;
-              return (
-                <Pressable
-                  key={n}
-                  onPress={() => setAthkarPerDay(n)}
-                  style={[
-                    styles.timeChip,
-                    {
-                      backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt,
-                      borderColor: active ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
-                    {n}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <Card padded={false} style={[styles.group, { marginTop: 14 }]}>
-            <View style={styles.toggleRow}>
-              <View style={{ flex: 1, paddingRight: 12 }}>
-                <Text variant="bodyMedium">{t('notifications.randomize')}</Text>
-                <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-                  {t('notifications.randomizeDesc')}
+      {/* ───── Daily athkār ───── */}
+      <Section
+        icon="book"
+        tint={theme.colors.primary}
+        title={t('notifications.dailyAthkar')}
+        subtitle={t('notifications.athkarDesc')}
+        value={settings.athkarEnabled}
+        onValueChange={toggleAthkar}
+      >
+        <Label>{t('notifications.startTime')}</Label>
+        <View style={styles.chips}>
+          {ATHKAR_TIMES.map((slot) => {
+            const active = settings.athkarHour === slot.hour && settings.athkarMinute === slot.minute;
+            return (
+              <Pressable
+                key={slot.key}
+                onPress={() => setAthkarTime(slot.hour, slot.minute)}
+                style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
+              >
+                <Text variant="label" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                  {t(`notifications.${slot.key}`)}
                 </Text>
-              </View>
-              <Switch
-                value={settings.athkarRandomize}
-                onValueChange={setAthkarRandomize}
-                trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-                thumbColor="#FFFFFF"
-              />
-            </View>
-          </Card>
-        </>
-      ) : null}
-
-      {/* Inspiring content */}
-      <Card style={[styles.rowBetween, { marginTop: 24 }]}>
-        <View style={{ flex: 1, paddingRight: 12 }}>
-          <Text variant="bodyMedium">{t('notifications.inspiring')}</Text>
-          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-            {t('notifications.inspiringDesc')}
-          </Text>
+                <Text variant="caption" style={{ color: active ? theme.colors.onPrimary : theme.colors.textFaint }}>
+                  {String(slot.hour).padStart(2, '0')}:{String(slot.minute).padStart(2, '0')}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
-        <Switch
-          value={settings.inspiringContent}
-          onValueChange={setInspiringContent}
-          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-          thumbColor="#FFFFFF"
-        />
-      </Card>
 
-      {/* Prayer Lock */}
-      <Card style={[styles.rowBetween, { marginTop: 24 }]}>
-        <View style={{ flex: 1, paddingRight: 12 }}>
-          <Text variant="bodyMedium">{t('notifications.prayerLock')}</Text>
-          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-            {t('notifications.prayerLockDesc')}
-          </Text>
+        <Label>{t('notifications.perDay')}</Label>
+        <View style={styles.chips}>
+          {ATHKAR_COUNTS.map((n) => {
+            const active = settings.athkarPerDay === n;
+            return (
+              <Pressable
+                key={n}
+                onPress={() => setAthkarPerDay(n)}
+                style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
+              >
+                <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                  {n}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
-        <Switch
-          value={lock.enabled}
-          onValueChange={setLockEnabled}
-          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-          thumbColor="#FFFFFF"
-        />
-      </Card>
 
-      {lock.enabled ? (
-        <>
-          <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.lockPrayers')}
-          </Text>
-          <Card padded={false} style={styles.group}>
-            {SALAH_ORDER.map((key, i) => (
-              <View key={key}>
-                {i > 0 ? <Divider /> : null}
-                <View style={styles.toggleRow}>
-                  <Text variant="bodyMedium" style={{ flex: 1 }}>
-                    {t(`prayerNames.${key}`)}
-                  </Text>
-                  <Switch
-                    value={lock.prayers[key]}
-                    onValueChange={() => toggleLockPrayer(key)}
-                    trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-                    thumbColor="#FFFFFF"
-                  />
-                </View>
-              </View>
-            ))}
-          </Card>
-
-          <Text variant="label" color="textMuted" style={styles.section}>
-            {t('notifications.snooze')}
-          </Text>
-          <View style={styles.times}>
-            {SNOOZE_OPTIONS.map((m) => {
-              const active = lock.snoozeMinutes === m;
-              return (
-                <Pressable
-                  key={m}
-                  onPress={() => setLockSnooze(m)}
-                  style={[
-                    styles.timeChip,
-                    {
-                      backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt,
-                      borderColor: active ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
-                    {t('notifications.minutesShort', { minutes: String(m) })}
-                  </Text>
-                </Pressable>
-              );
-            })}
+        <View style={[styles.toggleRow, { paddingHorizontal: 0, marginTop: 6 }]}>
+          <View style={{ flex: 1, paddingRight: 12 }}>
+            <Text variant="bodyMedium">{t('notifications.randomize')}</Text>
+            <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+              {t('notifications.randomizeDesc')}
+            </Text>
           </View>
-          <Text variant="caption" color="textFaint" style={{ marginTop: 10 }}>
-            {t('notifications.lockNote')}
-          </Text>
-        </>
-      ) : null}
+          <Switch
+            value={settings.athkarRandomize}
+            onValueChange={setAthkarRandomize}
+            trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+      </Section>
 
-      <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 24 }}>
+      {/* ───── Inspiring reminders (simple toggle, no sub-options) ───── */}
+      <Section
+        icon="sparkles"
+        tint={theme.colors.accent}
+        title={t('notifications.inspiring')}
+        subtitle={t('notifications.inspiringDesc')}
+        value={settings.inspiringContent}
+        onValueChange={setInspiringContent}
+      />
+
+      {/* ───── Prayer Focus ───── */}
+      <Section
+        icon="moon"
+        tint={theme.colors.primary}
+        title={t('notifications.prayerLock')}
+        subtitle={t('notifications.prayerLockDesc')}
+        value={lock.enabled}
+        onValueChange={setLockEnabled}
+      >
+        <Label>{t('notifications.prayerFocusHowTitle')}</Label>
+        <View style={[styles.howCard, { backgroundColor: theme.colors.surfaceContainer }]}>
+          {[t('notifications.prayerFocusStep1'), t('notifications.prayerFocusStep2'), t('notifications.prayerFocusStep3')].map((step, i) => (
+            <View key={i} style={[styles.stepRow, i > 0 && { marginTop: 12 }]}>
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]}>
+                <Text variant="caption" style={{ color: theme.colors.onPrimary, fontWeight: '700' }}>{i + 1}</Text>
+              </View>
+              <Text variant="body" color="textMuted" style={{ flex: 1, marginLeft: 12, lineHeight: 21 }}>
+                {step}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <Label>{t('notifications.lockPrayers')}</Label>
+        <View style={styles.inner}>
+          {SALAH_ORDER.map((key, i) => (
+            <View key={key}>
+              {i > 0 ? <Divider /> : null}
+              <View style={styles.toggleRow}>
+                <Text variant="bodyMedium" style={{ flex: 1 }}>
+                  {t(`prayerNames.${key}`)}
+                </Text>
+                <Switch
+                  value={lock.prayers[key]}
+                  onValueChange={() => toggleLockPrayer(key)}
+                  trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+                  thumbColor="#FFFFFF"
+                />
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <Label>{t('notifications.snooze')}</Label>
+        <View style={styles.chips}>
+          {SNOOZE_OPTIONS.map((m) => {
+            const active = lock.snoozeMinutes === m;
+            return (
+              <Pressable
+                key={m}
+                onPress={() => setLockSnooze(m)}
+                style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
+              >
+                <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                  {t('notifications.minutesShort', { minutes: String(m) })}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <Text variant="caption" color="textFaint" style={{ marginTop: 10 }}>
+          {t('notifications.lockNote')}
+        </Text>
+      </Section>
+
+      <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 18 }}>
         {t('notifications.offlineNote')}
       </Text>
     </Screen>
+  );
+}
+
+/**
+ * A settings category: a compact card with an icon, title, master switch, and an
+ * expand chevron that reveals its sub-options (only when the feature is on, and
+ * only if it has any). Collapsed by default so the whole page is scannable.
+ */
+function Section({
+  icon,
+  tint,
+  title,
+  subtitle,
+  value,
+  onValueChange,
+  defaultOpen,
+  children,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  tint: string;
+  title: string;
+  subtitle: string;
+  value: boolean;
+  onValueChange: (v: boolean) => void;
+  defaultOpen?: boolean;
+  children?: React.ReactNode;
+}) {
+  const theme = useTheme();
+  const [open, setOpen] = useState(!!defaultOpen);
+  const expandable = !!children && value;
+
+  function handleToggle(v: boolean) {
+    onValueChange(v);
+    if (v) setOpen(true); // reveal options the moment it's enabled
+  }
+
+  return (
+    <Card padded={false} style={styles.section}>
+      <View style={styles.header}>
+        <View style={[styles.iconWrap, { backgroundColor: theme.colors.surfaceContainerHigh }]}>
+          <Ionicons name={icon} size={20} color={tint} />
+        </View>
+        <Pressable
+          style={{ flex: 1 }}
+          disabled={!expandable}
+          onPress={() => setOpen((o) => !o)}
+        >
+          <Text variant="bodyMedium">{title}</Text>
+          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+            {subtitle}
+          </Text>
+        </Pressable>
+        {expandable ? (
+          <Pressable onPress={() => setOpen((o) => !o)} hitSlop={8} style={{ marginRight: 8 }}>
+            <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={theme.colors.textFaint} />
+          </Pressable>
+        ) : null}
+        <Switch
+          value={value}
+          onValueChange={handleToggle}
+          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+          thumbColor="#FFFFFF"
+        />
+      </View>
+      {expandable && open ? (
+        <View style={[styles.body, { borderTopColor: theme.colors.border }]}>{children}</View>
+      ) : null}
+    </Card>
+  );
+}
+
+/** A label-less nested collapsible (e.g. the reciter picker) showing its current value. */
+function Collapsible({
+  icon,
+  title,
+  value,
+  children,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  value: string;
+  children: React.ReactNode;
+}) {
+  const theme = useTheme();
+  const [open, setOpen] = useState(false);
+  return (
+    <View style={{ marginTop: 14 }}>
+      <Pressable
+        onPress={() => setOpen((o) => !o)}
+        style={[styles.collapsibleHead, { backgroundColor: theme.colors.surfaceContainer }]}
+      >
+        <Ionicons name={icon} size={18} color={theme.colors.textMuted} />
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Text variant="bodyMedium">{title}</Text>
+          {!open ? (
+            <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
+              {value}
+            </Text>
+          ) : null}
+        </View>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={theme.colors.textFaint} />
+      </Pressable>
+      {open ? <View style={{ marginTop: 8 }}>{children}</View> : null}
+    </View>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <Text variant="label" color="textMuted" style={styles.label}>
+      {children}
+    </Text>
   );
 }
 
@@ -337,11 +392,18 @@ function Divider() {
 }
 
 const styles = StyleSheet.create({
-  rowBetween: { flexDirection: 'row', alignItems: 'center' },
-  section: { letterSpacing: 0.5, marginTop: 22, marginBottom: 10 },
-  group: { overflow: 'hidden' },
-  toggleRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 },
+  section: { marginBottom: 12, overflow: 'hidden' },
+  header: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
+  iconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  body: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: 14, paddingTop: 6, paddingBottom: 16 },
+  label: { letterSpacing: 0.5, marginTop: 16, marginBottom: 8 },
+  inner: { borderRadius: 12, overflow: 'hidden' },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12 },
   playBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  times: { flexDirection: 'row', gap: 10 },
-  timeChip: { flex: 1, alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderRadius: 14, paddingVertical: 12, gap: 2 },
+  chips: { flexDirection: 'row', gap: 8 },
+  chip: { flex: 1, alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderRadius: 12, paddingVertical: 11, gap: 2 },
+  collapsibleHead: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12 },
+  howCard: { borderRadius: 12, padding: 14 },
+  stepRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  stepDot: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
 });

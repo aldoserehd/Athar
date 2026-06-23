@@ -11,6 +11,11 @@ import {
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
+import {
+  Tajawal_400Regular,
+  Tajawal_500Medium,
+  Tajawal_700Bold,
+} from '@expo-google-fonts/tajawal';
 
 import { ThemeProvider, useTheme } from '@/theme';
 import { LanguageProvider } from '@/i18n/LanguageProvider';
@@ -54,6 +59,9 @@ export default function App() {
     Inter_700Bold,
     Amiri_400Regular,
     Amiri_700Bold,
+    Tajawal_400Regular,
+    Tajawal_500Medium,
+    Tajawal_700Bold,
   });
 
   const onReady = useCallback(() => {

@@ -95,6 +95,7 @@
         <nav class="hidden md:flex items-center gap-9 text-[12px] eyebrow font-semibold">
           <a href="#features" class="text-on-surface-variant hover:text-on-surface transition-colors" data-i18n="navFeatures">Features</a>
           <a href="#showcase" class="text-on-surface-variant hover:text-on-surface transition-colors" data-i18n="navShowcase">Showcase</a>
+          <a href="#focus" class="text-on-surface-variant hover:text-on-surface transition-colors" data-i18n="navFocus">Focus</a>
           <a href="#philosophy" class="text-on-surface-variant hover:text-on-surface transition-colors" data-i18n="navPhilosophy">Philosophy</a>
           <a href="support.html" class="text-on-surface-variant hover:text-on-surface transition-colors" data-i18n="navSupport">Support</a>
         </nav>
@@ -114,6 +115,7 @@
         <nav class="px-6 py-4 flex flex-col gap-1 text-sm font-semibold">
           <a href="#features" class="py-3 border-b border-white/5 text-on-surface-variant hover:text-on-surface" data-i18n="navFeatures">Features</a>
           <a href="#showcase" class="py-3 border-b border-white/5 text-on-surface-variant hover:text-on-surface" data-i18n="navShowcase">Showcase</a>
+          <a href="#focus" class="py-3 border-b border-white/5 text-on-surface-variant hover:text-on-surface" data-i18n="navFocus">Focus</a>
           <a href="#philosophy" class="py-3 border-b border-white/5 text-on-surface-variant hover:text-on-surface" data-i18n="navPhilosophy">Philosophy</a>
           <a href="support.html" class="py-3 border-b border-white/5 text-on-surface-variant hover:text-on-surface" data-i18n="navSupport">Support</a>
           <a href="privacy.html" class="py-3 border-b border-white/5 text-on-surface-variant hover:text-on-surface" data-i18n="footPrivacy">Privacy Policy</a>
@@ -231,6 +233,67 @@
         </div>
       </section>
 
+      <!-- Prayer Focus -->
+      <section id="focus" class="max-w-[1200px] mx-auto px-6 py-16">
+        <div class="rounded-3xl p-10 md:p-16 border border-white/5 relative overflow-hidden" style="background:#010f1f">
+          <div class="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 blur-[120px]"></div>
+          <div class="relative grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] eyebrow font-bold">
+                <span class="material-symbols-outlined text-sm fill">self_improvement</span>
+                <span data-i18n="focusEyebrow">PRAYER FOCUS</span>
+              </div>
+              <h2 class="text-3xl md:text-4xl font-bold leading-tight">
+                <span data-i18n="focusTitle">Put the phone down.</span>
+                <span class="text-primary" data-i18n="focusTitleAccent">Answer the call.</span>
+              </h2>
+              <p class="text-on-surface-variant text-lg" data-i18n="focusDesc">
+                When enabled, Athar gently takes over your screen right after the adhān — a full-screen
+                reminder with an inspiring verse that invites you to pause and pray. You're always free
+                to snooze or give a reason; it never traps you.
+              </p>
+              <div class="space-y-4 pt-2">
+                <div class="flex gap-4 items-start">
+                  <span class="flex-none w-7 h-7 rounded-full bg-primary text-on-primary grid place-items-center text-sm font-bold">1</span>
+                  <p class="text-on-surface-variant" data-i18n="focusStep1">Right after the adhān, a full-screen reminder appears.</p>
+                </div>
+                <div class="flex gap-4 items-start">
+                  <span class="flex-none w-7 h-7 rounded-full bg-primary text-on-primary grid place-items-center text-sm font-bold">2</span>
+                  <p class="text-on-surface-variant" data-i18n="focusStep2">It shows the prayer with an inspiring ayah or hadith.</p>
+                </div>
+                <div class="flex gap-4 items-start">
+                  <span class="flex-none w-7 h-7 rounded-full bg-primary text-on-primary grid place-items-center text-sm font-bold">3</span>
+                  <p class="text-on-surface-variant" data-i18n="focusStep3">Tap “I prayed”, snooze, or give a reason — never trapped.</p>
+                </div>
+              </div>
+              <p class="text-muted text-sm pt-2" data-i18n="focusNote">Optional &amp; off by default. A mindful reminder — not a hard app-blocker.</p>
+            </div>
+
+            <!-- Focus overlay mock -->
+            <div class="justify-self-center w-[260px] sm:w-[300px]">
+              <div class="iphone relative">
+                <div class="notch"></div>
+                <div class="iphone-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;text-align:center;background:linear-gradient(180deg,#0e1c2d,#051424)">
+                  <div class="w-20 h-20 rounded-full grid place-items-center mb-5" style="background:rgba(144,208,227,0.15)">
+                    <span class="material-symbols-outlined text-primary" style="font-size:42px">dark_mode</span>
+                  </div>
+                  <div class="text-secondary text-[10px] eyebrow font-bold" data-i18n="focusMockEyebrow">IT'S TIME FOR</div>
+                  <div class="text-2xl font-bold mt-1" data-i18n="focusMockPrayer">Asr</div>
+                  <div class="mt-5 p-4 rounded-2xl w-full" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                    <div class="font-arabic text-2xl leading-relaxed" dir="rtl">حَيَّ عَلَى الصَّلَاة</div>
+                    <div class="text-xs text-on-surface-variant mt-2" data-i18n="focusMockQuote">“Hasten to prayer, hasten to success.”</div>
+                  </div>
+                  <div class="mt-5 w-full space-y-2">
+                    <div class="bg-primary text-on-primary rounded-full py-2.5 text-sm font-bold" data-i18n="focusMockPrayed">I prayed</div>
+                    <div class="rounded-full py-2.5 text-sm text-on-surface-variant" style="background:#1d2b3c" data-i18n="focusMockSnooze">Remind me in 10 min</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Philosophy -->
       <section id="philosophy" class="max-w-[1200px] mx-auto px-6 py-16">
         <div class="rounded-3xl p-10 md:p-16 border border-white/5 relative overflow-hidden" style="background:#010f1f">
@@ -305,7 +368,17 @@
       };
       const I18N = {
         en: {
-          navFeatures: 'FEATURES', navShowcase: 'SHOWCASE', navPhilosophy: 'PHILOSOPHY', navSupport: 'SUPPORT', getApp: 'Get the app',
+          navFeatures: 'FEATURES', navShowcase: 'SHOWCASE', navFocus: 'FOCUS', navPhilosophy: 'PHILOSOPHY', navSupport: 'SUPPORT', getApp: 'Get the app',
+          focusEyebrow: 'PRAYER FOCUS',
+          focusTitle: 'Put the phone down.', focusTitleAccent: 'Answer the call.',
+          focusDesc: "When enabled, Athar gently takes over your screen right after the adhān — a full-screen reminder with an inspiring verse that invites you to pause and pray. You're always free to snooze or give a reason; it never traps you.",
+          focusStep1: 'Right after the adhān, a full-screen reminder appears.',
+          focusStep2: 'It shows the prayer with an inspiring ayah or hadith.',
+          focusStep3: 'Tap “I prayed”, snooze, or give a reason — never trapped.',
+          focusNote: 'Optional & off by default. A mindful reminder — not a hard app-blocker.',
+          focusMockEyebrow: "IT'S TIME FOR", focusMockPrayer: 'Asr',
+          focusMockQuote: '“Hasten to prayer, hasten to success.”',
+          focusMockPrayed: 'I prayed', focusMockSnooze: 'Remind me in 10 min',
           heroEyebrow: 'SCHOLARLY & SERENE', heroTitle: 'Your scholarly', heroTitleAccent: 'Islamic companion.',
           heroDesc: 'Prayer times & qibla, a salah tracker with adhān, a searchable hadith library you can scan from a photo, and a community mosque finder. Minimalist, intentional, ad-free.',
           comingSoon: 'COMING SOON TO',
@@ -330,7 +403,17 @@
           footPrivacy: 'Privacy Policy', footTerms: 'Terms of Use', footSupport: 'Support', footContact: 'Contact',
         },
         ar: {
-          navFeatures: 'المزايا', navShowcase: 'جولة', navPhilosophy: 'فلسفتنا', navSupport: 'الدعم', getApp: 'حمّل التطبيق',
+          navFeatures: 'المزايا', navShowcase: 'جولة', navFocus: 'التركيز', navPhilosophy: 'فلسفتنا', navSupport: 'الدعم', getApp: 'حمّل التطبيق',
+          focusEyebrow: 'وضع التركيز للصلاة',
+          focusTitle: 'ضع الهاتف جانبًا.', focusTitleAccent: 'لَبِّ النداء.',
+          focusDesc: 'عند تفعيله، يملأ أثر شاشتك بلُطف بعد الأذان مباشرةً — تذكير مع آية مُلهمة يدعوك للتوقف وأداء الصلاة. يمكنك دائمًا التأجيل أو ذكر سبب؛ ولا يحبسك أبدًا.',
+          focusStep1: 'بعد الأذان مباشرةً يظهر تذكير يملأ الشاشة.',
+          focusStep2: 'يعرض الصلاة مع آية أو حديث مُلهم.',
+          focusStep3: 'اضغط «لقد صلّيت»، أو أجِّل، أو اذكر سببًا — لا تُحبَس أبدًا.',
+          focusNote: 'اختياري ومُعطّل افتراضيًا. تذكير لطيف — وليس قفلًا صارمًا للتطبيقات.',
+          focusMockEyebrow: 'حان وقت', focusMockPrayer: 'العصر',
+          focusMockQuote: '«حيَّ على الصلاة، حيَّ على الفلاح».',
+          focusMockPrayed: 'لقد صلّيت', focusMockSnooze: 'ذكّرني بعد ١٠ دقائق',
           heroEyebrow: 'عِلمٌ وسكينة', heroTitle: 'رفيقك في', heroTitleAccent: 'طريق العِلم.',
           heroDesc: 'مواقيت الصلاة والقبلة، ومتابعة للصلاة مع الأذان، ومكتبة أحاديث قابلة للبحث تَعثُر على الحديث من صورته، ودليل مساجد مجتمعي. بساطةٌ وهدوءٌ بلا إعلانات.',
           comingSoon: 'قريبًا على',
