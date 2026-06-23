@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.athar.app",
+      "bundleIdentifier": "com.tryathar.app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Athar uses your location to calculate accurate prayer times and the qibla direction for where you are.",
         "NSCameraUsageDescription": "Athar uses the camera to scan a photo of a hadith and find it in the library.",
@@ -26,7 +26,7 @@
       }
     },
     "android": {
-      "package": "com.athar.app",
+      "package": "com.tryathar.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0c465b"
