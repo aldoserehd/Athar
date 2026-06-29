@@ -21,7 +21,16 @@ export function NamesScreen() {
     <Screen scroll edges={['left', 'right']} contentStyle={{ paddingBottom: 32 }}>
       {/* Intro */}
       <Card style={{ marginTop: 8, marginBottom: 14, alignItems: 'center' }}>
-        <Text style={{ fontFamily: theme.fonts.arabic, fontSize: 26, color: theme.colors.primary }}>
+        <Text
+          align="center"
+          style={{
+            fontFamily: theme.fonts.arabic,
+            fontSize: 26,
+            lineHeight: 42,
+            includeFontPadding: false,
+            color: theme.colors.primary,
+          }}
+        >
           أَسْمَاءُ اللَّهِ الْحُسْنَى
         </Text>
         <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 8, lineHeight: 18 }}>
@@ -44,7 +53,15 @@ export function NamesScreen() {
               {isAr ? name.arMeaning : name.en}
             </Text>
           </View>
-          <Text style={{ fontFamily: theme.fonts.arabic, fontSize: 26, color: theme.colors.text }}>
+          <Text
+            style={{
+              fontFamily: theme.fonts.arabic,
+              fontSize: 26,
+              lineHeight: 40,
+              includeFontPadding: false,
+              color: theme.colors.text,
+            }}
+          >
             {name.arabic}
           </Text>
         </Card>

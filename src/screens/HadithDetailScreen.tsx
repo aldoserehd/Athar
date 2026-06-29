@@ -72,6 +72,7 @@ export function HadithDetailScreen() {
           fontFamily: theme.fonts.arabic,
           fontSize: 28,
           lineHeight: 52,
+          includeFontPadding: false,
           color: theme.colors.text,
           textAlign: 'right',
           marginTop: 8,

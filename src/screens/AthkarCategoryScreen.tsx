@@ -90,6 +90,7 @@ export function AthkarCategoryScreen() {
                   fontFamily: theme.fonts.arabic,
                   fontSize: 22,
                   lineHeight: 42,
+                  includeFontPadding: false,
                   color: theme.colors.text,
                   textAlign: 'right',
                 }}

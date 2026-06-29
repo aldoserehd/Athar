@@ -95,7 +95,7 @@ export function TasbihScreen() {
               <Text
                 variant="caption"
                 color={active ? theme.colors.onPrimary : 'textMuted'}
-                style={{ fontFamily: theme.fonts.arabic, fontSize: 15 }}
+                style={{ fontFamily: theme.fonts.arabic, fontSize: 15, lineHeight: 24, includeFontPadding: false }}
               >
                 {p.arabic}
               </Text>
@@ -115,10 +115,19 @@ export function TasbihScreen() {
           <Text variant="caption" color="textFaint" style={{ marginBottom: 6 }}>
             {target > 0 ? t('tasbih.ofTarget', { target }) : t('tasbih.free')}
           </Text>
-          <Text style={[theme.type.counter, { fontSize: 72, lineHeight: 78, color: theme.colors.primary }]}>
+          <Text style={[theme.type.counter, { fontSize: 72, lineHeight: 80, includeFontPadding: false, color: theme.colors.primary }]}>
             {count}
           </Text>
-          <Text style={{ fontFamily: theme.fonts.arabic, fontSize: 24, color: theme.colors.text, marginTop: 6 }}>
+          <Text
+            style={{
+              fontFamily: theme.fonts.arabic,
+              fontSize: 24,
+              lineHeight: 38,
+              includeFontPadding: false,
+              color: theme.colors.text,
+              marginTop: 6,
+            }}
+          >
             {phrase.arabic}
           </Text>
           <Text variant="caption" color="textMuted" style={{ marginTop: 4 }}>

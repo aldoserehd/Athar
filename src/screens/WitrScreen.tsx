@@ -91,6 +91,7 @@ export function WitrScreen() {
             fontFamily: theme.fonts.arabic,
             fontSize: 22,
             lineHeight: 44,
+            includeFontPadding: false,
             color: theme.colors.text,
             textAlign: 'right',
           }}
