@@ -66,7 +66,11 @@ export function ReminderScheduler() {
   // Play the full adhān when its notification arrives while the app is open.
   useEffect(() => {
     const sub = Notifications.addNotificationReceivedListener((n) => {
-      if (n.request.content.data?.type === 'adhan') playAdhanOnce(reciterRef.current);
+      const data = n.request.content.data;
+      if (data?.type === 'adhan') {
+        // Play this prayer's chosen reciter (falls back to the default voice).
+        playAdhanOnce(typeof data.reciter === 'string' ? data.reciter : reciterRef.current);
+      }
     });
     return () => sub.remove();
   }, []);

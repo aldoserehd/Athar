@@ -20,10 +20,20 @@ const DEFAULT_LOCK: LockSettings = {
   graceMinutes: 0,
 };
 
+/** Out-of-the-box adhān voice. Nasser al-Qatami by default. */
+const DEFAULT_RECITER = 'qatami';
+
 const DEFAULTS: ReminderSettings = {
   adhanEnabled: false,
   prayers: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true },
-  reciterId: 'makkah',
+  reciterId: DEFAULT_RECITER,
+  prayerReciters: {
+    fajr: DEFAULT_RECITER,
+    dhuhr: DEFAULT_RECITER,
+    asr: DEFAULT_RECITER,
+    maghrib: DEFAULT_RECITER,
+    isha: DEFAULT_RECITER,
+  },
   athkarEnabled: false,
   athkarHour: 9,
   athkarMinute: 0,
@@ -40,6 +50,7 @@ type RemindersContextValue = {
   setAdhanEnabled: (v: boolean) => void;
   togglePrayer: (key: SalahKey) => void;
   setReciter: (id: string) => void;
+  setPrayerReciter: (key: SalahKey, id: string) => void;
   setAthkarEnabled: (v: boolean) => void;
   setAthkarTime: (hour: number, minute: number) => void;
   setAthkarPerDay: (n: number) => void;
@@ -67,6 +78,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
           ...DEFAULTS,
           ...stored,
           prayers: { ...DEFAULTS.prayers, ...stored.prayers },
+          prayerReciters: { ...DEFAULTS.prayerReciters, ...stored.prayerReciters },
           lock: { ...DEFAULT_LOCK, ...stored.lock, prayers: { ...DEFAULT_LOCK.prayers, ...stored.lock?.prayers } },
         });
       })
@@ -83,7 +95,22 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
     (key: SalahKey) => setSettings((s) => ({ ...s, prayers: { ...s.prayers, [key]: !s.prayers[key] } })),
     []
   );
-  const setReciter = useCallback((id: string) => setSettings((s) => ({ ...s, reciterId: id })), []);
+  // Setting the default voice applies it to every prayer (the simple "one voice
+  // for all" case); per-prayer overrides can then tweak individual prayers.
+  const setReciter = useCallback(
+    (id: string) =>
+      setSettings((s) => ({
+        ...s,
+        reciterId: id,
+        prayerReciters: { fajr: id, dhuhr: id, asr: id, maghrib: id, isha: id },
+      })),
+    []
+  );
+  const setPrayerReciter = useCallback(
+    (key: SalahKey, id: string) =>
+      setSettings((s) => ({ ...s, prayerReciters: { ...s.prayerReciters, [key]: id } })),
+    []
+  );
   const setAthkarEnabled = useCallback((v: boolean) => setSettings((s) => ({ ...s, athkarEnabled: v })), []);
   const setAthkarTime = useCallback(
     (hour: number, minute: number) => setSettings((s) => ({ ...s, athkarHour: hour, athkarMinute: minute })),
@@ -117,6 +144,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
       setAdhanEnabled,
       togglePrayer,
       setReciter,
+      setPrayerReciter,
       setAthkarEnabled,
       setAthkarTime,
       setAthkarPerDay,
@@ -133,6 +161,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
       setAdhanEnabled,
       togglePrayer,
       setReciter,
+      setPrayerReciter,
       setAthkarEnabled,
       setAthkarTime,
       setAthkarPerDay,

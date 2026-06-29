@@ -171,6 +171,10 @@ export const translations = {
       adhanDesc: 'A notification at each prayer time.',
       prayers: 'PRAYERS',
       adhanVoice: 'ADHĀN VOICE',
+      adhanVoiceHint: 'The default call — applied to every prayer.',
+      perPrayerVoice: 'Sound for each prayer',
+      perPrayerVoiceHint: 'Give each prayer its own adhān, so you know which prayer is calling even from another room.',
+      mixed: 'Mixed',
       voiceNote:
         "The reciter's voice plays once short adhān clips are bundled. iOS limits alert sounds to 30 seconds; until then the default tone is used and the full adhān can play in-app.",
       dailyAthkar: 'Daily athkār',
@@ -474,6 +478,10 @@ export const translations = {
       adhanDesc: 'تنبيه عند كل وقت صلاة.',
       prayers: 'الصلوات',
       adhanVoice: 'صوت الأذان',
+      adhanVoiceHint: 'الصوت الافتراضي — يُطبَّق على كل الصلوات.',
+      perPrayerVoice: 'صوت كل صلاة',
+      perPrayerVoiceHint: 'اجعل لكل صلاة أذانها الخاص، لتعرف أيّ صلاة تُنادي حتى من غرفة أخرى.',
+      mixed: 'متنوّع',
       voiceNote:
         'يُشغَّل صوت القارئ عند إضافة مقاطع أذان قصيرة. يحدّ iOS صوت التنبيه بـ30 ثانية؛ حتى ذلك يُستخدم الصوت الافتراضي ويمكن تشغيل الأذان كاملًا داخل التطبيق.',
       dailyAthkar: 'الأذكار اليومية',

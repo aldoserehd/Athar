@@ -3,9 +3,10 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
 import { computeTimes, ComputedTimes, MadhabKey, MethodKey } from '@/features/prayer';
-import { SalahKey } from '@/features/salah';
+import { SalahKey, SALAH_ORDER } from '@/features/salah';
 import { randomInspiration } from '@/features/inspiration';
 import { randomAthkarSequence } from './athkar';
+import { reciterName } from './reciters';
 
 /**
  * Custom 30-second adhān clips only play from a real dev/production build (they
@@ -40,7 +41,10 @@ export type LockSettings = {
 export type ReminderSettings = {
   adhanEnabled: boolean;
   prayers: Record<SalahKey, boolean>;
+  /** Default adhān voice (applied to all prayers, and to any without an override). */
   reciterId: string;
+  /** Per-prayer adhān voice — each prayer can use a different reciter's call. */
+  prayerReciters: Record<SalahKey, string>;
   athkarEnabled: boolean;
   athkarHour: number;
   athkarMinute: number;
@@ -228,18 +232,29 @@ export async function applyReminders(
   // lock screen): on Android it lives on a per-reciter channel; on iOS it's
   // referenced per-notification.
   if (settings.adhanEnabled && calc) {
-    // Real builds play the bundled 30s adhān clip; Expo Go can't, so it uses the
-    // reliable system sound instead (otherwise the notification is silent).
-    const soundFile = IS_EXPO_GO ? 'default' : `${settings.reciterId}_30.wav`;
-    let adhanChannel = channelId;
+    // Each prayer can use its own reciter's call (falls back to the default voice).
+    // Real builds play that reciter's bundled 30s adhān clip as the alert sound, so
+    // it's unmistakably the adhān even from another room; Expo Go can't bundle custom
+    // sounds, so it uses the reliable system sound instead.
+    const reciterFor = (key: SalahKey) => settings.prayerReciters?.[key] ?? settings.reciterId;
+    const soundFor = (recId: string) => (IS_EXPO_GO ? 'default' : `${recId}_30.wav`);
+
+    // On Android the sound is fixed per channel, so create one channel per distinct
+    // reciter used by an enabled prayer, up front.
+    const channelForReciter: Record<string, string> = {};
     if (Platform.OS === 'android') {
-      adhanChannel = `adhan-${settings.reciterId}`;
-      await Notifications.setNotificationChannelAsync(adhanChannel, {
-        name: 'Adhān',
-        importance: Notifications.AndroidImportance.HIGH,
-        sound: soundFile,
-      });
+      const distinct = new Set(SALAH_ORDER.filter((k) => settings.prayers[k]).map(reciterFor));
+      for (const recId of distinct) {
+        const ch = `adhan-${recId}`;
+        await Notifications.setNotificationChannelAsync(ch, {
+          name: `Adhān — ${reciterName(recId)}`,
+          importance: Notifications.AndroidImportance.HIGH,
+          sound: soundFor(recId),
+        });
+        channelForReciter[recId] = ch;
+      }
     }
+
     for (let day = 0; day < HORIZON_DAYS; day++) {
       const ct = dayTimes[day];
       if (!ct) continue;
@@ -248,6 +263,7 @@ export async function applyReminders(
         const key = slot.name as SalahKey;
         if (!settings.prayers[key]) continue;
         if (slot.time.getTime() <= now.getTime()) continue; // skip past times
+        const recId = reciterFor(key);
         const adhanBody = settings.inspiringContent
           ? inspiringLine(messages.language)
           : messages.adhanBody;
@@ -255,13 +271,13 @@ export async function applyReminders(
           content: {
             title: `🕌 ${messages.adhanTitle(messages.prayerName(key), clockLabel(slot.time, messages.language))}`,
             body: adhanBody,
-            sound: soundFile,
-            data: { type: 'adhan' },
+            sound: soundFor(recId),
+            data: { type: 'adhan', reciter: recId },
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
             date: slot.time,
-            channelId: adhanChannel,
+            channelId: Platform.OS === 'android' ? channelForReciter[recId] : channelId,
           },
         });
       }

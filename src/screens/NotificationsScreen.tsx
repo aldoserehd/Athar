@@ -20,6 +20,14 @@ const ATHKAR_COUNTS = [1, 2, 3, 4] as const;
 const ATHKAR_MODES = ['afterPrayer', 'night', 'spread'] as const;
 const SNOOZE_OPTIONS = [5, 10, 15, 30] as const;
 
+const PRAYER_VOICE_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
+  fajr: 'partly-sunny-outline',
+  dhuhr: 'sunny-outline',
+  asr: 'partly-sunny-outline',
+  maghrib: 'moon-outline',
+  isha: 'moon-outline',
+};
+
 export function NotificationsScreen() {
   const theme = useTheme();
   const t = useT();
@@ -29,6 +37,7 @@ export function NotificationsScreen() {
     setAdhanEnabled,
     togglePrayer,
     setReciter,
+    setPrayerReciter,
     setAthkarEnabled,
     setAthkarTime,
     setAthkarPerDay,
@@ -91,42 +100,54 @@ export function NotificationsScreen() {
           ))}
         </View>
 
-        {/* Reciter — nested collapsible to keep the list out of the way */}
+        {/* Default adhān voice — applies to every prayer at once */}
         <Collapsible
           icon="musical-notes-outline"
           title={t('notifications.adhanVoice')}
           value={reciterName(settings.reciterId)}
         >
-          <View style={styles.inner}>
-            {RECITERS.map((r, i) => {
-              const active = settings.reciterId === r.id;
-              return (
-                <View key={r.id}>
-                  {i > 0 ? <Divider /> : null}
-                  <Pressable onPress={() => setReciter(r.id)} style={styles.toggleRow}>
-                    <Pressable
-                      onPress={() => previewAdhan(r.id)}
-                      hitSlop={8}
-                      style={[styles.playBtn, { backgroundColor: theme.colors.surfaceContainerHigh }]}
-                      accessibilityLabel={`Preview ${r.name}`}
-                    >
-                      <Ionicons name={playing === r.id ? 'stop' : 'play'} size={15} color={theme.colors.primary} />
-                    </Pressable>
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                      <Text variant="bodyMedium">{r.name}</Text>
-                      <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
-                        {r.place}
-                      </Text>
-                    </View>
-                    {active ? <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} /> : <View style={{ width: 22 }} />}
-                  </Pressable>
-                </View>
-              );
-            })}
-          </View>
+          <Text variant="caption" color="textFaint" style={{ marginBottom: 8 }}>
+            {t('notifications.adhanVoiceHint')}
+          </Text>
+          <ReciterPicker
+            selectedId={settings.reciterId}
+            onSelect={setReciter}
+            playing={playing}
+            onPreview={previewAdhan}
+          />
           <Text variant="caption" color="textFaint" style={{ marginTop: 8 }}>
             {t('notifications.voiceNote')}
           </Text>
+        </Collapsible>
+
+        {/* Per-prayer adhān voice — tweak each prayer individually */}
+        <Collapsible
+          icon="options-outline"
+          title={t('notifications.perPrayerVoice')}
+          value={
+            SALAH_ORDER.every((k) => settings.prayerReciters[k] === settings.prayerReciters.fajr)
+              ? reciterName(settings.prayerReciters.fajr)
+              : t('notifications.mixed')
+          }
+        >
+          <Text variant="caption" color="textFaint" style={{ marginBottom: 4 }}>
+            {t('notifications.perPrayerVoiceHint')}
+          </Text>
+          {SALAH_ORDER.map((key) => (
+            <Collapsible
+              key={key}
+              icon={PRAYER_VOICE_ICON[key]}
+              title={t(`prayerNames.${key}`)}
+              value={reciterName(settings.prayerReciters[key])}
+            >
+              <ReciterPicker
+                selectedId={settings.prayerReciters[key]}
+                onSelect={(id) => setPrayerReciter(key, id)}
+                playing={playing}
+                onPreview={previewAdhan}
+              />
+            </Collapsible>
+          ))}
         </Collapsible>
       </Section>
 
@@ -420,6 +441,54 @@ function Label({ children }: { children: React.ReactNode }) {
 function Divider() {
   const theme = useTheme();
   return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: theme.colors.border, marginLeft: 16 }} />;
+}
+
+/** The reciter list with per-row preview — reused for the default voice and each prayer. */
+function ReciterPicker({
+  selectedId,
+  onSelect,
+  playing,
+  onPreview,
+}: {
+  selectedId: string;
+  onSelect: (id: string) => void;
+  playing: string | null;
+  onPreview: (id: string) => void;
+}) {
+  const theme = useTheme();
+  return (
+    <View style={styles.inner}>
+      {RECITERS.map((r, i) => {
+        const active = selectedId === r.id;
+        return (
+          <View key={r.id}>
+            {i > 0 ? <Divider /> : null}
+            <Pressable onPress={() => onSelect(r.id)} style={styles.toggleRow}>
+              <Pressable
+                onPress={() => onPreview(r.id)}
+                hitSlop={8}
+                style={[styles.playBtn, { backgroundColor: theme.colors.surfaceContainerHigh }]}
+                accessibilityLabel={`Preview ${r.name}`}
+              >
+                <Ionicons name={playing === r.id ? 'stop' : 'play'} size={15} color={theme.colors.primary} />
+              </Pressable>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text variant="bodyMedium">{r.name}</Text>
+                <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
+                  {r.place}
+                </Text>
+              </View>
+              {active ? (
+                <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} />
+              ) : (
+                <View style={{ width: 22 }} />
+              )}
+            </Pressable>
+          </View>
+        );
+      })}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
