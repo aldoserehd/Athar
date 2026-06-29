@@ -17,6 +17,7 @@ const ATHKAR_TIMES = [
 ] as const;
 
 const ATHKAR_COUNTS = [1, 2, 3, 4] as const;
+const ATHKAR_MODES = ['afterPrayer', 'night', 'spread'] as const;
 const SNOOZE_OPTIONS = [5, 10, 15, 30] as const;
 
 export function NotificationsScreen() {
@@ -32,6 +33,7 @@ export function NotificationsScreen() {
     setAthkarTime,
     setAthkarPerDay,
     setAthkarRandomize,
+    setAthkarMode,
     setInspiringContent,
     setLockEnabled,
     toggleLockPrayer,
@@ -137,44 +139,73 @@ export function NotificationsScreen() {
         value={settings.athkarEnabled}
         onValueChange={toggleAthkar}
       >
-        <Label>{t('notifications.startTime')}</Label>
+        <Label>{t('notifications.athkarMode')}</Label>
         <View style={styles.chips}>
-          {ATHKAR_TIMES.map((slot) => {
-            const active = settings.athkarHour === slot.hour && settings.athkarMinute === slot.minute;
+          {ATHKAR_MODES.map((mode) => {
+            const active = settings.athkarMode === mode;
             return (
               <Pressable
-                key={slot.key}
-                onPress={() => setAthkarTime(slot.hour, slot.minute)}
+                key={mode}
+                onPress={() => setAthkarMode(mode)}
                 style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
               >
                 <Text variant="label" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
-                  {t(`notifications.${slot.key}`)}
-                </Text>
-                <Text variant="caption" style={{ color: active ? theme.colors.onPrimary : theme.colors.textFaint }}>
-                  {String(slot.hour).padStart(2, '0')}:{String(slot.minute).padStart(2, '0')}
+                  {t(`notifications.mode_${mode}`)}
                 </Text>
               </Pressable>
             );
           })}
         </View>
+        <Text variant="caption" color="textFaint" style={{ marginTop: 8 }}>
+          {t(`notifications.modeDesc_${settings.athkarMode}`)}
+        </Text>
 
-        <Label>{t('notifications.perDay')}</Label>
-        <View style={styles.chips}>
-          {ATHKAR_COUNTS.map((n) => {
-            const active = settings.athkarPerDay === n;
-            return (
-              <Pressable
-                key={n}
-                onPress={() => setAthkarPerDay(n)}
-                style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
-              >
-                <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
-                  {n}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        {settings.athkarMode === 'spread' ? (
+          <>
+            <Label>{t('notifications.startTime')}</Label>
+            <View style={styles.chips}>
+              {ATHKAR_TIMES.map((slot) => {
+                const active = settings.athkarHour === slot.hour && settings.athkarMinute === slot.minute;
+                return (
+                  <Pressable
+                    key={slot.key}
+                    onPress={() => setAthkarTime(slot.hour, slot.minute)}
+                    style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
+                  >
+                    <Text variant="label" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                      {t(`notifications.${slot.key}`)}
+                    </Text>
+                    <Text variant="caption" style={{ color: active ? theme.colors.onPrimary : theme.colors.textFaint }}>
+                      {String(slot.hour).padStart(2, '0')}:{String(slot.minute).padStart(2, '0')}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </>
+        ) : null}
+
+        {settings.athkarMode !== 'afterPrayer' ? (
+          <>
+            <Label>{t('notifications.perDay')}</Label>
+            <View style={styles.chips}>
+              {ATHKAR_COUNTS.map((n) => {
+                const active = settings.athkarPerDay === n;
+                return (
+                  <Pressable
+                    key={n}
+                    onPress={() => setAthkarPerDay(n)}
+                    style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
+                  >
+                    <Text variant="bodyMedium" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
+                      {n}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </>
+        ) : null}
 
         <View style={[styles.toggleRow, { paddingHorizontal: 0, marginTop: 6 }]}>
           <View style={{ flex: 1, paddingRight: 12 }}>

@@ -14,6 +14,7 @@ import {
   methodInfo,
   PrayerSettingsSheet,
   PrayerSlot,
+  sunnahTimes,
   usePrayer,
 } from '@/features/prayer';
 import { useSalah } from '@/features/salah';
@@ -66,6 +67,21 @@ export function PrayerScreen() {
     if (!times) return null;
     return countdownParts(times.next.time.getTime() - now.getTime());
   }, [times, now]);
+
+  // Last third of the night — the best time for Qiyām/Tahajjud and Witr.
+  const lastThird = useMemo(() => {
+    if (!times) return null;
+    try {
+      return sunnahTimes(
+        place.latitude,
+        place.longitude,
+        settings.method,
+        settings.madhab
+      ).lastThirdOfTheNight;
+    } catch {
+      return null;
+    }
+  }, [times, place.latitude, place.longitude, settings.method, settings.madhab]);
 
   return (
     <Screen
@@ -207,6 +223,29 @@ export function PrayerScreen() {
           hour12={settings.hour12}
         />
       ))}
+
+      {/* Last third of the night — best time for Qiyām/Tahajjud & Witr. */}
+      {lastThird ? (
+        <View
+          style={[
+            styles.prayerRow,
+            { backgroundColor: theme.colors.surfaceAlt, borderColor: theme.colors.border },
+          ]}
+        >
+          <View style={styles.prayerLeft}>
+            <Ionicons name="cloudy-night-outline" size={20} color={theme.colors.accent} />
+            <View style={{ marginLeft: 14 }}>
+              <Text variant="body">{t('prayer.lastThird')}</Text>
+              <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
+                {t('prayer.qiyamHint')}
+              </Text>
+            </View>
+          </View>
+          <Text variant="body" style={{ color: theme.colors.textMuted }}>
+            {formatTime(lastThird, settings.hour12)}
+          </Text>
+        </View>
+      ) : null}
 
       {permissionDenied ? (
         <Pressable onPress={refreshLocation}>

@@ -1,5 +1,5 @@
 export { PrayerProvider, usePrayer } from './PrayerContext';
-export { computeTimes, formatTime, qiblaFor } from './calc';
+export { computeTimes, sunnahTimes, formatTime, qiblaFor } from './calc';
 export { useHeading, angleDelta } from './useHeading';
 export { CompassRose, FixedPointer } from './components/CompassRose';
 export type { PrayerName, PrayerSlot, ComputedTimes } from './calc';

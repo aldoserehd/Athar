@@ -59,28 +59,61 @@ export type LocationResult = {
 
 /**
  * Resolve the device location for prayer-time calculation:
- *  1. request permission,
- *  2. read current position + reverse-geocode the city,
+ *  1. ensure permission (request only if not already granted),
+ *  2. read the real position — a fast last-known fix first, then a fresh GPS
+ *     reading — and reverse-geocode the city,
  *  3. on denial/failure fall back to the last cached place, then Makkah.
+ *
+ * Prayer times depend entirely on the coordinates, so using the device's *real*
+ * location (rather than the Makkah default) is what makes the times correct in
+ * every country. The caller recomputes whenever this resolves a new place.
  */
 export async function resolveLocation(): Promise<LocationResult> {
+  let granted = false;
   try {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
+    // Don't re-prompt if permission was already granted in a previous session.
+    const existing = await Location.getForegroundPermissionsAsync();
+    granted = existing.granted;
+    if (!granted) {
+      const req = await Location.requestForegroundPermissionsAsync();
+      granted = req.granted;
+    }
+    if (!granted) {
       const cached = await loadCachedPlace();
       return { place: cached ?? MAKKAH, granted: false };
     }
 
-    const pos = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
-    const { latitude, longitude } = pos.coords;
-    const city = await cityNameFor(latitude, longitude);
-    const place: GeoPlace = { latitude, longitude, city, isFallback: false };
+    // A last-known fix returns almost instantly (important indoors / where a GPS
+    // lock is slow); then try for a fresh, more accurate reading.
+    let coords: { latitude: number; longitude: number } | null = null;
+    try {
+      const last = await Location.getLastKnownPositionAsync();
+      if (last) coords = { latitude: last.coords.latitude, longitude: last.coords.longitude };
+    } catch {
+      /* best-effort */
+    }
+    try {
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      coords = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+    } catch {
+      /* keep the last-known fix if the fresh read failed */
+    }
+
+    if (!coords) {
+      // Permission is granted but no position is available yet — keep any real
+      // cached place rather than jumping to the Makkah default.
+      const cached = await loadCachedPlace();
+      return { place: cached ?? MAKKAH, granted: true };
+    }
+
+    const city = await cityNameFor(coords.latitude, coords.longitude);
+    const place: GeoPlace = { ...coords, city, isFallback: false };
     await cachePlace(place);
     return { place, granted: true };
   } catch {
     const cached = await loadCachedPlace();
-    return { place: cached ?? MAKKAH, granted: false };
+    return { place: cached ?? MAKKAH, granted };
   }
 }

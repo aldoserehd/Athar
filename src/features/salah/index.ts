@@ -8,9 +8,3 @@ export {
   todayKey,
 } from './types';
 export type { SalahKey, SalahStatus, SalahEntry, DayRecord } from './types';
-export {
-  ensureNotificationPermission,
-  scheduleReminders,
-  cancelReminders,
-} from './notifications';
-export type { ReminderSlot } from './notifications';

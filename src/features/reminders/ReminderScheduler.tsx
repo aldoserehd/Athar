@@ -6,7 +6,7 @@ import { usePrayer } from '@/features/prayer';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { SalahKey } from '@/features/salah';
 import { useReminders } from './RemindersContext';
-import { applyReminders, ReminderMessages } from './scheduler';
+import { applyReminders, PrayerCalc, ReminderMessages } from './scheduler';
 import { playAdhanOnce } from './adhanPlayer';
 
 /** Local calendar day as a stable string, so we reschedule on day rollover. */
@@ -23,7 +23,7 @@ function dayStamp(): string {
  */
 export function ReminderScheduler() {
   const { settings, hydrated } = useReminders();
-  const { times, ready } = usePrayer();
+  const { place, settings: prayerSettings, ready } = usePrayer();
   const { t, language } = useLanguage();
   const sig = useRef('');
   const reciterRef = useRef(settings.reciterId);
@@ -48,14 +48,20 @@ export function ReminderScheduler() {
       athkarTitle: t('reminders.athkarTitle'),
       language,
     };
-    const timeSig = times
-      ? times.slots.map((s) => `${s.name}:${s.time.getHours()}:${s.time.getMinutes()}`).join(',')
-      : 'none';
-    const next = JSON.stringify(settings) + '|' + timeSig + '|' + language + '|' + day;
+    // Schedule from the location + method/madhab so we can compute each future
+    // day's real prayer times (one-off triggers), not just today's clock time.
+    const calc: PrayerCalc = {
+      latitude: place.latitude,
+      longitude: place.longitude,
+      method: prayerSettings.method,
+      madhab: prayerSettings.madhab,
+    };
+    const calcSig = `${calc.latitude},${calc.longitude},${calc.method},${calc.madhab}`;
+    const next = JSON.stringify(settings) + '|' + calcSig + '|' + language + '|' + day;
     if (next === sig.current) return;
     sig.current = next;
-    applyReminders(settings, times, messages);
-  }, [settings, hydrated, ready, times, language, t, day]);
+    applyReminders(settings, calc, messages);
+  }, [settings, hydrated, ready, place, prayerSettings.method, prayerSettings.madhab, language, t, day]);
 
   // Play the full adhān when its notification arrives while the app is open.
   useEffect(() => {

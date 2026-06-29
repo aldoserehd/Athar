@@ -9,7 +9,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SalahKey } from '@/features/salah';
-import { LockSettings, ReminderSettings } from './scheduler';
+import { AthkarMode, LockSettings, ReminderSettings } from './scheduler';
 
 const STORAGE_KEY = 'athar.reminders.v1';
 
@@ -29,6 +29,7 @@ const DEFAULTS: ReminderSettings = {
   athkarMinute: 0,
   athkarPerDay: 1,
   athkarRandomize: true,
+  athkarMode: 'spread',
   inspiringContent: true,
   lock: DEFAULT_LOCK,
 };
@@ -43,6 +44,7 @@ type RemindersContextValue = {
   setAthkarTime: (hour: number, minute: number) => void;
   setAthkarPerDay: (n: number) => void;
   setAthkarRandomize: (v: boolean) => void;
+  setAthkarMode: (mode: AthkarMode) => void;
   setInspiringContent: (v: boolean) => void;
   setLockEnabled: (v: boolean) => void;
   toggleLockPrayer: (key: SalahKey) => void;
@@ -92,6 +94,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
     []
   );
   const setAthkarRandomize = useCallback((v: boolean) => setSettings((s) => ({ ...s, athkarRandomize: v })), []);
+  const setAthkarMode = useCallback((mode: AthkarMode) => setSettings((s) => ({ ...s, athkarMode: mode })), []);
   const setInspiringContent = useCallback((v: boolean) => setSettings((s) => ({ ...s, inspiringContent: v })), []);
   const setLockEnabled = useCallback(
     (v: boolean) => setSettings((s) => ({ ...s, lock: { ...s.lock, enabled: v } })),
@@ -118,6 +121,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
       setAthkarTime,
       setAthkarPerDay,
       setAthkarRandomize,
+      setAthkarMode,
       setInspiringContent,
       setLockEnabled,
       toggleLockPrayer,
@@ -133,6 +137,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
       setAthkarTime,
       setAthkarPerDay,
       setAthkarRandomize,
+      setAthkarMode,
       setInspiringContent,
       setLockEnabled,
       toggleLockPrayer,
