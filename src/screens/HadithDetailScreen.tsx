@@ -11,6 +11,7 @@ import {
   GradePill,
   Hadith,
   hadithById,
+  fetchHadithById,
   findInLibrary,
   loadLibrary,
   referenceArabic,
@@ -35,13 +36,25 @@ export function HadithDetailScreen() {
   const [hadith, setHadith] = useState<Hadith | undefined>(() => hadithById(id) ?? findInLibrary(id));
   const [chainOpen, setChainOpen] = useState(false);
 
-  // Resolve from the full library in case it's a bulk-corpus narration.
+  // Resolve from the full bundled library in case it's a bulk-corpus narration;
+  // if it isn't bundled, try the optional online CDN as a last resort (a tiny,
+  // no-key fetch that simply no-ops when offline — the offline path is unchanged).
   useEffect(() => {
     if (hadith) return;
     let active = true;
-    loadLibrary().then((lib) => {
-      if (active) setHadith(lib.find((h) => h.id === id));
-    });
+    loadLibrary()
+      .then((lib) => {
+        const found = lib.find((h) => h.id === id);
+        if (active && found) {
+          setHadith(found);
+          return undefined;
+        }
+        return fetchHadithById(id);
+      })
+      .then((online) => {
+        if (active && online) setHadith(online);
+      })
+      .catch(() => {});
     return () => {
       active = false;
     };

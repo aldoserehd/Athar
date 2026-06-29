@@ -16,6 +16,7 @@ import {
   HadithCard,
   hadithOfTheDay,
   loadLibrary,
+  searchFullCollectionOnline,
   searchHadiths,
   TOPICS,
   useSavedHadiths,
@@ -37,6 +38,12 @@ export function HadithScreen() {
   const [library, setLibrary] = useState<Hadith[]>(HADITHS);
   const [loading, setLoading] = useState(true);
 
+  // Optional online "search the full collection" layer (no key, graceful
+  // fallback). Purely additive on top of the offline results below.
+  const [onlineResults, setOnlineResults] = useState<Hadith[]>([]);
+  const [onlineLoading, setOnlineLoading] = useState(false);
+  const [onlineSearched, setOnlineSearched] = useState(false);
+
   // Lazily load the full bundled corpus (thousands of narrations).
   useEffect(() => {
     let active = true;
@@ -52,6 +59,27 @@ export function HadithScreen() {
     () => searchHadiths(query, { collection, topic, library, limit: 60 }),
     [query, collection, topic, library]
   );
+
+  // Reset the online layer whenever the offline query/filters change.
+  useEffect(() => {
+    setOnlineResults([]);
+    setOnlineSearched(false);
+  }, [query, collection, topic]);
+
+  const searchOnline = async () => {
+    if (!collection || !query.trim()) return;
+    setOnlineLoading(true);
+    const more = await searchFullCollectionOnline(query, collection, { topic, limit: 60 });
+    const seen = new Set(results.map((h) => h.id));
+    setOnlineResults(more.filter((h) => !seen.has(h.id)));
+    setOnlineSearched(true);
+    setOnlineLoading(false);
+  };
+
+  const collectionLabelFor = (key: CollectionKey) => {
+    const c = COLLECTIONS.find((x) => x.key === key);
+    return (isAr ? c?.arabic : c?.label) ?? key;
+  };
 
   const savedList = useMemo(
     () => saved.map((id) => library.find((h) => h.id === id)).filter((h): h is Hadith => !!h),
@@ -189,6 +217,49 @@ export function HadithScreen() {
           ) : (
             results.map((h) => <HadithCard key={h.id} hadith={h} onPress={() => open(h.id)} />)
           )}
+
+          {/* Optional: search the full collection online (no key; offline-safe). */}
+          {collection && query.trim() ? (
+            <View style={styles.online}>
+              {onlineResults.length > 0 ? (
+                <>
+                  <Text variant="label" color="textMuted" style={styles.sectionLabel}>
+                    {t('hadith.onlineResults')}
+                  </Text>
+                  {onlineResults.map((h) => (
+                    <HadithCard key={h.id} hadith={h} onPress={() => open(h.id)} />
+                  ))}
+                </>
+              ) : null}
+              {onlineSearched && onlineResults.length === 0 ? (
+                <Text variant="caption" color="textFaint" align="center" style={{ marginBottom: 10 }}>
+                  {t('hadith.onlineNone')}
+                </Text>
+              ) : null}
+              <Pressable
+                onPress={searchOnline}
+                disabled={onlineLoading}
+                style={[
+                  styles.onlineBtn,
+                  { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceAlt },
+                ]}
+              >
+                {onlineLoading ? (
+                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                ) : (
+                  <Ionicons name="globe-outline" size={18} color={theme.colors.primary} />
+                )}
+                <Text variant="bodyMedium" color="primary">
+                  {onlineLoading
+                    ? t('hadith.searchingOnline')
+                    : t('hadith.searchOnline', { book: collectionLabelFor(collection) })}
+                </Text>
+              </Pressable>
+              <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 8 }}>
+                {t('hadith.onlineNote')}
+              </Text>
+            </View>
+          ) : null}
         </>
       )}
 
@@ -253,5 +324,16 @@ const styles = StyleSheet.create({
   topicWrap: { width: '47.8%' },
   topic: { paddingVertical: 18, alignItems: 'flex-start' },
   resultsHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
+  online: { marginTop: 18 },
+  onlineBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
   footer: { marginTop: 14, alignItems: 'center' },
 });

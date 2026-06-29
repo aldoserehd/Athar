@@ -9,3 +9,4 @@ export { GradePill } from './components/GradePill';
 export { SavedHadithProvider, useSavedHadiths } from './SavedContext';
 export { recognizeText, matchHadith } from './ocr';
 export type { OcrLang, Match } from './ocr';
+export { searchFullCollectionOnline, fetchHadithById, loadOnlineCollection } from './online';
