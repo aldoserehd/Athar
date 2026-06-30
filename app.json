@@ -76,7 +76,8 @@
         }
       ],
       "expo-audio",
-      "./plugins/withFamilyControls"
+      "./plugins/withFamilyControls",
+      "./plugins/withoutMediaPlaybackPermission"
     ],
     "extra": {
       "eas": {
