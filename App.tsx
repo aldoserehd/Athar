@@ -23,6 +23,7 @@ import { PrayerProvider } from '@/features/prayer';
 import { SalahProvider } from '@/features/salah';
 import { SavedHadithProvider } from '@/features/hadith';
 import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
+import { AthkarProgressProvider } from '@/features/athkar';
 import { PrayerLockOverlay } from '@/features/lock';
 import { OnboardingProvider, OnboardingOverlay } from '@/features/onboarding';
 import { RootNavigator } from '@/navigation/RootNavigator';
@@ -81,9 +82,11 @@ export default function App() {
             <SalahProvider>
               <RemindersProvider>
                 <SavedHadithProvider>
-                  <OnboardingProvider>
-                    <ThemedApp />
-                  </OnboardingProvider>
+                  <AthkarProgressProvider>
+                    <OnboardingProvider>
+                      <ThemedApp />
+                    </OnboardingProvider>
+                  </AthkarProgressProvider>
                 </SavedHadithProvider>
               </RemindersProvider>
             </SalahProvider>

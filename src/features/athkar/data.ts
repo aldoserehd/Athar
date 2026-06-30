@@ -154,6 +154,52 @@ const morning: Dhikr[] = [
     repeat: 10,
     reference: 'Bukhari · Muslim',
   },
+  // NOTE: append-only below — the `evening` array references `morning` by index.
+  {
+    id: 'fitrat-islam-morning',
+    arabic:
+      'أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَعَلَى كَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ',
+    translation:
+      'We have entered the morning upon the natural way of Islam, the word of sincerity, the religion of our Prophet Muhammad ﷺ, and the faith of our father Ibrāhīm, upright and Muslim, and he was not of the idolaters.',
+    repeat: 1,
+    reference: 'Ahmad',
+  },
+  {
+    id: 'nimah-morning',
+    arabic:
+      'اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ',
+    translation:
+      'O Allah, whatever blessing has come to me or to any of Your creation this morning is from You alone, with no partner. To You belong all praise and all thanks.',
+    repeat: 1,
+    reference: 'Abu Dawud',
+  },
+  {
+    id: 'shahada-morning',
+    arabic:
+      'اللَّهُمَّ إِنِّي أَصْبَحْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ',
+    translation:
+      'O Allah, I have entered the morning calling You to witness, and the bearers of Your Throne, Your angels and all Your creation, that You are Allah — none has the right to be worshipped but You alone, with no partner — and that Muhammad is Your servant and Messenger.',
+    repeat: 4,
+    reference: 'Abu Dawud',
+  },
+  {
+    id: 'subhanallah-adad-morning',
+    arabic:
+      'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ',
+    translation:
+      'Glory and praise be to Allah, as much as the number of His creation, as much as pleases Him, as much as the weight of His Throne, and as much as the ink of His words.',
+    repeat: 3,
+    reference: 'Muslim',
+  },
+  {
+    id: 'ilm-nafi-morning',
+    arabic:
+      'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا',
+    translation:
+      'O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.',
+    repeat: 1,
+    reference: 'Ibn Majah',
+  },
 ];
 
 const evening: Dhikr[] = [
@@ -192,6 +238,42 @@ const evening: Dhikr[] = [
   morning[7], // ʿafw wa ʿāfiyah
   morning[8], // bismillāh alladhī lā yaḍurr
   morning[11], // subḥānallāh wa biḥamdihi ×100
+  {
+    id: 'fitrat-islam-evening',
+    arabic:
+      'أَمْسَيْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَعَلَى كَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ',
+    translation:
+      'We have entered the evening upon the natural way of Islam, the word of sincerity, the religion of our Prophet Muhammad ﷺ, and the faith of our father Ibrāhīm, upright and Muslim, and he was not of the idolaters.',
+    repeat: 1,
+    reference: 'Ahmad',
+  },
+  {
+    id: 'nimah-evening',
+    arabic:
+      'اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ',
+    translation:
+      'O Allah, whatever blessing has come to me or to any of Your creation this evening is from You alone, with no partner. To You belong all praise and all thanks.',
+    repeat: 1,
+    reference: 'Abu Dawud',
+  },
+  {
+    id: 'shahada-evening',
+    arabic:
+      'اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ',
+    translation:
+      'O Allah, I have entered the evening calling You to witness, and the bearers of Your Throne, Your angels and all Your creation, that You are Allah — none has the right to be worshipped but You alone, with no partner — and that Muhammad is Your servant and Messenger.',
+    repeat: 4,
+    reference: 'Abu Dawud',
+  },
+  {
+    id: 'sayyid-al-bashar-evening',
+    arabic:
+      'يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ',
+    translation:
+      'O Ever-Living, O Sustainer, by Your mercy I seek relief. Set right all my affairs and do not leave me to myself even for the blink of an eye.',
+    repeat: 1,
+    reference: 'al-Hakim · an-Nasa’i',
+  },
 ];
 
 const afterPrayer: Dhikr[] = [
@@ -396,4 +478,71 @@ export const ATHKAR_CATEGORIES: AthkarCategory[] = [
 
 export function athkarCategory(id: AthkarCategoryId): AthkarCategory | undefined {
   return ATHKAR_CATEGORIES.find((c) => c.id === id);
+}
+
+/**
+ * Short, uplifting verses & hadiths on the virtue of remembrance (dhikr) — shown
+ * on the Athkar hub and when a set is completed, to encourage the heart.
+ */
+export type DhikrQuote = {
+  arabic: string;
+  english: string;
+  reference: string;
+  referenceAr: string;
+};
+
+export const DHIKR_QUOTES: DhikrQuote[] = [
+  {
+    arabic: 'فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ',
+    english: 'So remember Me; I will remember you. And be grateful to Me and do not deny Me.',
+    reference: 'Al-Baqarah 2:152',
+    referenceAr: 'البقرة ١٥٢',
+  },
+  {
+    arabic: 'الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ',
+    english: 'Those who believe, and whose hearts find rest in the remembrance of Allah — verily, in the remembrance of Allah do hearts find rest.',
+    reference: "Ar-Ra'd 13:28",
+    referenceAr: 'الرعد ٢٨',
+  },
+  {
+    arabic: 'يَا أَيُّهَا الَّذِينَ آمَنُوا اذْكُرُوا اللَّهَ ذِكْرًا كَثِيرًا',
+    english: 'O you who believe! Remember Allah with much remembrance.',
+    reference: 'Al-Ahzab 33:41',
+    referenceAr: 'الأحزاب ٤١',
+  },
+  {
+    arabic: 'مَثَلُ الَّذِي يَذْكُرُ رَبَّهُ وَالَّذِي لَا يَذْكُرُ رَبَّهُ مَثَلُ الْحَيِّ وَالْمَيِّتِ',
+    english: 'The likeness of the one who remembers his Lord and the one who does not is like the living and the dead.',
+    reference: 'Bukhari',
+    referenceAr: 'البخاري',
+  },
+  {
+    arabic: 'أَلَا أُنَبِّئُكُمْ بِخَيْرِ أَعْمَالِكُمْ … قَالَ: ذِكْرُ اللَّهِ تَعَالَى',
+    english: '“Shall I not tell you of the best of your deeds…?” He said: “The remembrance of Allah.”',
+    reference: 'Tirmidhi',
+    referenceAr: 'الترمذي',
+  },
+  {
+    arabic: 'لَا يَزَالُ لِسَانُكَ رَطْبًا مِنْ ذِكْرِ اللَّهِ',
+    english: 'Let your tongue remain moist with the remembrance of Allah.',
+    reference: 'Tirmidhi',
+    referenceAr: 'الترمذي',
+  },
+  {
+    arabic: 'كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ … سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+    english: 'Two words light on the tongue, heavy on the Scale: “Subḥān Allāhi wa biḥamdihi, Subḥān Allāhi-l-ʿAẓīm.”',
+    reference: 'Bukhari · Muslim',
+    referenceAr: 'البخاري ومسلم',
+  },
+  {
+    arabic: 'مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ، حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ',
+    english: 'Whoever says “Subḥān Allāhi wa biḥamdihi” a hundred times a day, his sins are wiped away even if like the foam of the sea.',
+    reference: 'Bukhari · Muslim',
+    referenceAr: 'البخاري ومسلم',
+  },
+];
+
+/** A quote chosen by a stable index (e.g. day of year) so it changes daily. */
+export function dhikrQuote(index: number): DhikrQuote {
+  return DHIKR_QUOTES[((index % DHIKR_QUOTES.length) + DHIKR_QUOTES.length) % DHIKR_QUOTES.length];
 }

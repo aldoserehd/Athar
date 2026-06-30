@@ -224,6 +224,11 @@ export const translations = {
       allComplete: 'All complete — may Allah accept it 🤲',
       reset: 'Reset',
       tapHint: 'Tap each card to count your repetitions.',
+      completedTitle: 'Completed — taqabbal Allāh 🤲',
+      dayStreak: '%{n}-day streak',
+      startStreak: 'Start your streak',
+      doneToday: 'done today',
+      completedToday: 'Completed today ✓',
     },
     witr: {
       title: 'Witr Prayer',
@@ -531,6 +536,11 @@ export const translations = {
       allComplete: 'تمّت كل الأذكار — تقبّل الله 🤲',
       reset: 'إعادة',
       tapHint: 'اضغط على كل بطاقة لِعدّ التكرار.',
+      completedTitle: 'أتممتَها — تقبّل الله 🤲',
+      dayStreak: '%{n} يوم متتالٍ',
+      startStreak: 'ابدأ سلسلتك',
+      doneToday: 'تمّت اليوم',
+      completedToday: 'تمّت اليوم ✓',
     },
     witr: {
       title: 'صلاة الوتر',
