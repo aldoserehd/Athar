@@ -52,9 +52,12 @@
 
       <div class="callout">
         <p>
-          <strong>The short version:</strong> Athar collects
-          <strong>no personal information</strong>. Your prayer tracker and your settings are stored
-          only on your device. We run no ads and no third-party analytics or tracking.
+          <strong>The short version:</strong> Athar has <strong>no accounts, no ads, and no
+          tracking</strong>, and we keep <strong>no servers or database of your activity</strong>.
+          Your prayer tracker, athkār progress and settings stay on your device. A few
+          <strong>optional</strong> features (the photo hadith-scan, the mosque finder, and online
+          hadith search) send data to third-party services to function — never tied to your identity
+          and never stored by us. The details are below.
         </p>
       </div>
 
@@ -90,18 +93,41 @@
         </li>
         <li>
           <strong>Camera / photos</strong> (optional) — only if you choose to scan a photo of a hadith
-          to find it in the library. Images are processed for that purpose and not stored by us.
+          to find it in the library (see “Third-party services” below).
         </li>
       </ul>
 
-      <h2>4. Features added in future versions</h2>
+      <h2>4. Third-party services (optional features)</h2>
       <p>
-        As Athar grows, some features will need additional services. When they ship, this policy will
-        be updated and the app will ask for your consent in context. For example, contributing to a
-        community <strong>Mosque Wiki</strong> may require an account (email) handled by our backend
-        provider, <strong>Supabase</strong>. Contributions you submit (e.g. mosque details) are shared
-        publicly with other users by design, and you will be able to delete your account and
-        contributions from within the app.
+        Athar keeps no servers of its own. To make a few <strong>optional</strong> features work, the
+        app sends the minimum data needed directly to well-known third-party services. This data is
+        used only to serve your request, is <strong>not tied to any account or identifier</strong>, and
+        is not stored by us:
+      </p>
+      <ul>
+        <li>
+          <strong>Hadith photo-scan → OCR.space.</strong> When you choose to scan a hadith, the photo
+          you select is sent over an encrypted connection to the OCR.space text-recognition service to
+          read its text. On-device Arabic text recognition isn’t available, which is why this step uses
+          an external service. The photo is used only to return the recognised text.
+        </li>
+        <li>
+          <strong>Mosque finder → OpenStreetMap.</strong> When you open the mosque finder, your
+          location is sent to the OpenStreetMap (Overpass) service to look up nearby mosques. It is used
+          only to return that list.
+        </li>
+        <li>
+          <strong>Online hadith search (optional) → public CDN.</strong> If you tap “search all
+          collections online,” your search term is sent to a public content-delivery network (jsDelivr)
+          to fetch matching narrations. Normal in-app browsing and search work fully offline without
+          this.
+        </li>
+      </ul>
+      <p>
+        None of these involve an account, advertising, analytics, or tracking. A future community
+        <strong>Mosque Wiki</strong> may add an optional account (email) handled by our provider
+        <strong>Supabase</strong>; if it ships, this policy will be updated and the app will ask for
+        your consent in context.
       </p>
 
       <h2>5. Children</h2>
