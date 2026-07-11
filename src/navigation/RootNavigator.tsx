@@ -1,8 +1,8 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme, Theme as NavTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTheme } from '@/theme';
@@ -39,6 +39,10 @@ const SCREENS: Record<TabKey, React.ComponentType> = {
 function AppTabs() {
   const theme = useTheme();
   const t = useT();
+  // Respect the device's bottom safe-area (Android gesture/3-button nav bar,
+  // iPhone home indicator) so the system bar never overlaps the tab bar.
+  const insets = useSafeAreaInsets();
+  const bottomInset = Math.max(insets.bottom, 8);
   return (
     <Tab.Navigator
       screenOptions={({ route }) => {
@@ -52,9 +56,9 @@ function AppTabs() {
             backgroundColor: theme.colors.surface,
             borderTopColor: theme.colors.border,
             borderTopWidth: 0.5,
-            height: Platform.OS === 'ios' ? 88 : 64,
+            height: 60 + bottomInset,
             paddingTop: 8,
-            paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+            paddingBottom: bottomInset,
           },
           tabBarLabelStyle: { fontFamily: theme.fonts.medium, fontSize: 11 },
           tabBarIcon: ({ focused, color, size }) => (

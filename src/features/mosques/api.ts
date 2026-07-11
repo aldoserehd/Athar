@@ -166,11 +166,14 @@ export async function fetchMosques(
   }
 
   if (origin) {
+    // With a real location we always use live OpenStreetMap results — even an
+    // empty list — so the user never sees mosques from a different city. The
+    // bundled sample (London) is only for the no-location dev case.
     try {
       const osm = await fetchNearbyOsmMosques(origin);
-      if (osm.length > 0) return { data: osm, source: 'osm' };
+      return { data: osm, source: 'osm' };
     } catch {
-      /* fall through */
+      return { data: [], source: 'osm' };
     }
   }
 

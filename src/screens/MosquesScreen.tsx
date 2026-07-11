@@ -11,7 +11,6 @@ import {
   FACILITIES,
   fetchMosques,
   Mosque,
-  MOSQUES,
   MosqueSheet,
   MosqueSource,
   reportMosque,
@@ -40,10 +39,11 @@ export function MosquesScreen() {
   const { place } = usePrayer();
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Mosque | null>(null);
-  const [mosques, setMosques] = useState<Mosque[]>(MOSQUES);
-  const [source, setSource] = useState<MosqueSource>('sample');
+  const [mosques, setMosques] = useState<Mosque[]>([]);
+  const [source, setSource] = useState<MosqueSource>('osm');
   const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -58,7 +58,7 @@ export function MosquesScreen() {
     return () => {
       active = false;
     };
-  }, [place.latitude, place.longitude]);
+  }, [place.latitude, place.longitude, reloadKey]);
 
   const sourceLabel =
     source === 'live' ? t('mosques.community') : source === 'osm' ? t('mosques.openstreetmap') : t('mosques.sample');
@@ -73,15 +73,16 @@ export function MosquesScreen() {
     return [...list].sort((a, b) => a.distanceKm - b.distanceKm);
   }, [query, mosques]);
 
-  const region = useMemo(() => {
-    const first = mosques[0];
-    return {
-      latitude: first?.latitude ?? 51.5074,
-      longitude: first?.longitude ?? -0.1278,
-      latitudeDelta: 0.15,
-      longitudeDelta: 0.15,
-    };
-  }, [mosques]);
+  // Centre the map on the user's actual location (never a hard-coded city).
+  const region = useMemo(
+    () => ({
+      latitude: place.latitude,
+      longitude: place.longitude,
+      latitudeDelta: 0.12,
+      longitudeDelta: 0.12,
+    }),
+    [place.latitude, place.longitude]
+  );
 
   const canMap = mapsSupported && MosqueMap !== null;
 
@@ -156,6 +157,24 @@ export function MosquesScreen() {
           </Text>
         </View>
       </View>
+
+      {!loading && results.length === 0 ? (
+        <Card alt style={styles.empty}>
+          <Ionicons name="location-outline" size={28} color={theme.colors.textMuted} />
+          <Text variant="bodyMedium" align="center" style={{ marginTop: 10 }}>
+            {t('mosques.emptyTitle')}
+          </Text>
+          <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 6, maxWidth: 280 }}>
+            {t('mosques.emptyBody')}
+          </Text>
+          <Pressable onPress={() => setReloadKey((k) => k + 1)} style={[styles.retry, { borderColor: theme.colors.primary }]}>
+            <Ionicons name="refresh" size={16} color={theme.colors.primary} />
+            <Text variant="caption" color="primary" style={{ marginLeft: 6 }}>
+              {t('mosques.retry')}
+            </Text>
+          </Pressable>
+        </Card>
+      ) : null}
 
       {results.map((m) => (
         <Pressable key={m.id} onPress={() => setSelected(m)} style={{ marginBottom: 12 }}>
@@ -241,4 +260,6 @@ const styles = StyleSheet.create({
   cardMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 },
   metaItem: { flexDirection: 'row', alignItems: 'center' },
   facilityIcons: { flexDirection: 'row', alignItems: 'center' },
+  empty: { alignItems: 'center', paddingVertical: 28 },
+  retry: { flexDirection: 'row', alignItems: 'center', marginTop: 14, borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
 });
