@@ -11,7 +11,7 @@ import { LANGUAGES } from '@/i18n';
 import { useOnboarding } from '@/features/onboarding';
 import type { RootStackParamList } from '@/navigation/types';
 
-const APP_VERSION = '0.1.0';
+const APP_VERSION = '1.0.0';
 
 export function MoreScreen() {
   const theme = useTheme();
