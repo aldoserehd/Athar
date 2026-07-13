@@ -25,7 +25,7 @@ import { SavedHadithProvider } from '@/features/hadith';
 import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
 import { AthkarProgressProvider } from '@/features/athkar';
 import { PrayerLockOverlay } from '@/features/lock';
-import { OnboardingProvider, OnboardingOverlay } from '@/features/onboarding';
+import { OnboardingProvider, OnboardingOverlay, TourOverlay } from '@/features/onboarding';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
 /**
@@ -47,6 +47,7 @@ function ThemedApp() {
       <ReminderScheduler />
       {/* Prayer-Lock gate sits below onboarding so onboarding always wins. */}
       <PrayerLockOverlay />
+      <TourOverlay />
       <OnboardingOverlay />
     </View>
   );

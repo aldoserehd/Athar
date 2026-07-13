@@ -40,7 +40,7 @@ export function OnboardingOverlay() {
   const { t, language, setLanguage } = useLanguage();
   const { preference, setPreference } = useThemeControls();
   const { setAdhanEnabled } = useReminders();
-  const { visible, complete } = useOnboarding();
+  const { visible, complete, skipAll } = useOnboarding();
   const [index, setIndex] = useState(0);
   const [notifsOn, setNotifsOn] = useState(false);
 
@@ -62,7 +62,7 @@ export function OnboardingOverlay() {
         {/* Top bar: logo + skip */}
         <View style={styles.top}>
           <Logo size={30} />
-          <Pressable onPress={complete} hitSlop={8}>
+          <Pressable onPress={skipAll} hitSlop={8}>
             <Text variant="label" color="textMuted">
               {t('onboarding.skip')}
             </Text>

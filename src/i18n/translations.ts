@@ -319,6 +319,16 @@ export const translations = {
       mosquesTitle: 'Find mosques near you',
       mosquesBody: 'Discover nearby mosques with jamāʿah times and facilities, and get directions in a tap.',
     },
+    tour: {
+      skip: 'Skip tour',
+      next: 'Next',
+      done: 'Done',
+      prayer: 'Your prayer times, a live countdown, and quick shortcuts to worship tools.',
+      salah: 'Tick off each prayer as you pray it and track any make-ups (qaḍāʾ).',
+      hadith: 'Search thousands of authentic, graded hadith from the six books.',
+      mosques: 'Find mosques near you with jamāʿah times and directions.',
+      more: 'Athkār, tasbīḥ, the 99 Names, and all your settings & language live here.',
+    },
     more: {
       title: 'More', appearance: 'Appearance', system: 'System', light: 'Light', dark: 'Dark',
       language: 'Language', about: 'About', privacy: 'Privacy Policy', terms: 'Terms of Use', feedback: 'Send feedback',
@@ -645,6 +655,16 @@ export const translations = {
       scanBody: 'رأيت حديثًا على ورقة أو شاشة؟ التقط صورة وسيقرؤه أثر ويجده في المكتبة — مع مصدره ودرجته. فقط اضغط أيقونة المسح في تبويب الحديث.',
       mosquesTitle: 'اعثر على المساجد القريبة',
       mosquesBody: 'اكتشف المساجد القريبة مع مواقيت الجماعة والمرافق، واحصل على الاتجاهات بضغطة.',
+    },
+    tour: {
+      skip: 'تخطّي الجولة',
+      next: 'التالي',
+      done: 'تمّ',
+      prayer: 'مواقيت صلاتك، وعدّ تنازلي حيّ، واختصارات سريعة لأدوات العبادة.',
+      salah: 'سجّل كل صلاة عند أدائها وتابِع ما عليك من قضاء.',
+      hadith: 'ابحث في آلاف الأحاديث الصحيحة المخرّجة من الكتب الستة.',
+      mosques: 'اعثر على المساجد القريبة مع مواقيت الجماعة والاتجاهات.',
+      more: 'الأذكار والمسبحة وأسماء الله الحسنى وكل الإعدادات واللغة هنا.',
     },
     more: {
       title: 'المزيد', appearance: 'المظهر', system: 'النظام', light: 'فاتح', dark: 'داكن',
