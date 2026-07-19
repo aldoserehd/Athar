@@ -76,7 +76,6 @@
         }
       ],
       "expo-audio",
-      "./plugins/withFamilyControls",
       "./plugins/withoutMediaPlaybackPermission"
     ],
     "extra": {
