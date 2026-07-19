@@ -22,7 +22,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Athar uses your location to calculate accurate prayer times and the qibla direction for where you are.",
         "NSCameraUsageDescription": "Athar uses the camera to scan a photo of a hadith and find it in the library.",
-        "NSPhotoLibraryUsageDescription": "Athar lets you choose a photo of a hadith to scan and find it in the library."
+        "NSPhotoLibraryUsageDescription": "Athar lets you choose a photo of a hadith to scan and find it in the library.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

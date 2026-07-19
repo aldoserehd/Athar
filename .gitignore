@@ -37,6 +37,11 @@ yarn-error.*
 *.pdf
 Athar-Overview.md
 
+# Marketing / media assets (large, not part of the app)
+*.zip
+Athar-12-Final-Ads/
+voiceovers/
+
 # Secrets / signing material (never commit)
 *.keystore
 *.jks
