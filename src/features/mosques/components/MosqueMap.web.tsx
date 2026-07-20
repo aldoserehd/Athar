@@ -4,15 +4,14 @@ import { Mosque } from '../types';
 
 type Props = {
   mosques: Mosque[];
-  onSelect: (m: Mosque) => void;
-  region: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number };
+  center: { latitude: number; longitude: number };
+  onSelect: (id: string) => void;
+  height?: number;
 };
 
 /**
- * Web stub. `react-native-maps` is a native-only module and can't be bundled for
- * web, so on web we render nothing here (the list view is shown instead). Metro
- * resolves this `.web` file on the web platform, keeping react-native-maps out
- * of the web bundle entirely.
+ * Web stub — the WebView map is native-only, so on web we render nothing and the
+ * list view is shown instead. Metro resolves this `.web` file on web.
  */
 export function MosqueMap(_props: Props) {
   return null;

@@ -10,6 +10,7 @@ import {
   FACILITIES,
   fetchMosques,
   Mosque,
+  MosqueMap,
   MosqueSheet,
   MosqueSource,
   reportMosque,
@@ -84,6 +85,18 @@ export function MosquesScreen() {
             <Ionicons name="close-circle" size={18} color={theme.colors.textFaint} />
           </Pressable>
         ) : null}
+      </View>
+
+      {/* Interactive map — your location + nearby mosque pins (Leaflet/OSM, no key) */}
+      <View style={{ marginBottom: 16 }}>
+        <MosqueMap
+          center={{ latitude: place.latitude, longitude: place.longitude }}
+          mosques={results}
+          onSelect={(id) => {
+            const m = mosques.find((x) => x.id === id);
+            if (m) setSelected(m);
+          }}
+        />
       </View>
 
       <View style={styles.sectionRow}>
