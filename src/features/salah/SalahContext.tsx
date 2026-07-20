@@ -143,7 +143,25 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
   const makeUpOne = useCallback(() => setMakeupOwed((m) => Math.max(0, m - 1)), []);
 
   const setRemindersEnabled = useCallback((value: boolean) => setRemindersState(value), []);
-  const setAutoMissed = useCallback((value: boolean) => setAutoMissedState(value), []);
+  const setAutoMissed = useCallback((value: boolean) => {
+    setAutoMissedState(value);
+    // Turning it off reverts the auto-marked (reason-less) missed prayers back to
+    // pending, so the user isn't left with entries they didn't choose.
+    if (!value) {
+      setRecord((prev) => {
+        let reverted = 0;
+        const entries = { ...prev.entries };
+        SALAH_ORDER.forEach((k) => {
+          if (entries[k].status === 'missed' && !entries[k].reason) {
+            entries[k] = { status: 'pending' };
+            reverted += 1;
+          }
+        });
+        if (reverted > 0) setMakeupOwed((m) => Math.max(0, m - reverted));
+        return reverted > 0 ? { ...prev, entries } : prev;
+      });
+    }
+  }, []);
 
   const { prayedToday, requiredToday } = useMemo(() => {
     let prayed = 0;

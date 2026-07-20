@@ -112,8 +112,12 @@ export function SalahScreen() {
                     : entry.status === 'prayed'
                     ? t('salah.prayed')
                     : entry.status === 'excused'
-                    ? `${t('salah.excused')} · ${t(`salahReasons.${entry.reason!}`)}`
-                    : `${t('salah.missed')} · ${t(`salahReasons.${entry.reason!}`)}`}
+                    ? entry.reason
+                      ? `${t('salah.excused')} · ${t(`salahReasons.${entry.reason}`)}`
+                      : t('salah.excused')
+                    : entry.reason
+                    ? `${t('salah.missed')} · ${t(`salahReasons.${entry.reason}`)}`
+                    : t('salah.missed')}
                 </Text>
               </View>
             </View>
