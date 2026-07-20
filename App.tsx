@@ -26,6 +26,7 @@ import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
 import { AthkarProgressProvider } from '@/features/athkar';
 import { PrayerLockOverlay } from '@/features/lock';
 import { OnboardingProvider, OnboardingOverlay, TourOverlay } from '@/features/onboarding';
+import { SplashOverlay } from '@/features/splash';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
 /**
@@ -50,6 +51,8 @@ function ThemedApp() {
       <PrayerLockOverlay />
       <TourOverlay />
       <OnboardingOverlay />
+      {/* Branded launch splash sits on top of everything, then fades out. */}
+      <SplashOverlay />
     </View>
   );
 }
