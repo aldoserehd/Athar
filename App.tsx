@@ -20,7 +20,7 @@ import {
 import { ThemeProvider, useTheme } from '@/theme';
 import { LanguageProvider } from '@/i18n/LanguageProvider';
 import { PrayerProvider } from '@/features/prayer';
-import { SalahProvider } from '@/features/salah';
+import { SalahProvider, SalahAutoMarker } from '@/features/salah';
 import { SavedHadithProvider } from '@/features/hadith';
 import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
 import { AthkarProgressProvider } from '@/features/athkar';
@@ -45,6 +45,7 @@ function ThemedApp() {
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <RootNavigator />
       <ReminderScheduler />
+      <SalahAutoMarker />
       {/* Prayer-Lock gate sits below onboarding so onboarding always wins. */}
       <PrayerLockOverlay />
       <TourOverlay />

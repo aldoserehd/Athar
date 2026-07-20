@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Card, Screen, Text } from '@/components';
@@ -47,14 +47,11 @@ export function MosquesScreen() {
     source === 'live' ? theme.colors.success : source === 'osm' ? theme.colors.primary : theme.colors.textFaint;
 
   function openDirections(m: Mosque) {
-    const label = encodeURIComponent(m.name);
-    const url =
-      Platform.OS === 'ios'
-        ? `https://maps.apple.com/?daddr=${m.latitude},${m.longitude}&q=${label}`
-        : `geo:${m.latitude},${m.longitude}?q=${m.latitude},${m.longitude}(${label})`;
-    Linking.openURL(url).catch(() =>
-      Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${m.latitude},${m.longitude}`)
-    );
+    // Google Maps universal link — opens the Google Maps app if installed (both
+    // iOS and Android), otherwise Google Maps in the browser.
+    Linking.openURL(
+      `https://www.google.com/maps/dir/?api=1&destination=${m.latitude},${m.longitude}`
+    ).catch(() => {});
   }
 
   const results = useMemo(() => {

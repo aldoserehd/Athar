@@ -17,7 +17,7 @@ export function SalahScreen() {
   const t = useT();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { times, settings } = usePrayer();
-  const { record, prayedToday, requiredToday, makeupOwed, markPrayed, markReason, undo, makeUpOne } =
+  const { record, prayedToday, requiredToday, makeupOwed, markPrayed, markReason, undo, makeUpOne, autoMissed, setAutoMissed } =
     useSalah();
   const { settings: reminders, setAdhanEnabled } = useReminders();
 
@@ -69,6 +69,22 @@ export function SalahScreen() {
         <Switch
           value={reminders.adhanEnabled}
           onValueChange={toggleReminders}
+          trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
+          thumbColor="#FFFFFF"
+        />
+      </Card>
+
+      {/* Auto-count missed prayers (opt-in) */}
+      <Card style={styles.reminder}>
+        <View style={styles.reminderText}>
+          <Text variant="bodyMedium">{t('salah.autoMissed')}</Text>
+          <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+            {t('salah.autoMissedDesc')}
+          </Text>
+        </View>
+        <Switch
+          value={autoMissed}
+          onValueChange={setAutoMissed}
           trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
           thumbColor="#FFFFFF"
         />

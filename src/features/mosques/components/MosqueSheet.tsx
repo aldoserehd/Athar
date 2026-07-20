@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Card, IconButton, Text } from '@/components';
@@ -28,15 +28,12 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
 
   function directions() {
     if (!mosque) return;
-    const { latitude, longitude, name } = mosque;
-    const label = encodeURIComponent(name);
-    const url =
-      Platform.OS === 'ios'
-        ? `https://maps.apple.com/?daddr=${latitude},${longitude}&q=${label}`
-        : `geo:${latitude},${longitude}?q=${latitude},${longitude}(${label})`;
-    Linking.openURL(url).catch(() =>
-      Linking.openURL(`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=17/${latitude}/${longitude}`)
-    );
+    const { latitude, longitude } = mosque;
+    // Google Maps universal link — opens the Google Maps app if installed on
+    // iOS/Android, otherwise Google Maps in the browser.
+    Linking.openURL(
+      `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
+    ).catch(() => {});
   }
 
   return (

@@ -1,4 +1,5 @@
 export { SalahProvider, useSalah } from './SalahContext';
+export { SalahAutoMarker } from './SalahAutoMarker';
 export { ReasonSheet } from './components/ReasonSheet';
 export { REASONS, reasonInfo } from './reasons';
 export type { ReasonKey, Reason } from './reasons';

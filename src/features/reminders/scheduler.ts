@@ -269,7 +269,7 @@ export async function applyReminders(
           : messages.adhanBody;
         await Notifications.scheduleNotificationAsync({
           content: {
-            title: `🕌 ${messages.adhanTitle(messages.prayerName(key), clockLabel(slot.time, messages.language))}`,
+            title: messages.adhanTitle(messages.prayerName(key), clockLabel(slot.time, messages.language)),
             body: adhanBody,
             sound: soundFor(recId),
             data: { type: 'adhan', reciter: recId },

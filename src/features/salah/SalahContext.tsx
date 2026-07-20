@@ -25,6 +25,8 @@ type Persisted = {
   record: DayRecord;
   makeupOwed: number;
   remindersEnabled: boolean;
+  /** When on, a prayer whose window has ended without being logged is counted as missed. */
+  autoMissed: boolean;
 };
 
 function owes(entry: SalahEntry): boolean {
@@ -44,9 +46,14 @@ type SalahContextValue = {
   markReason: (key: SalahKey, reason: ReasonKey) => void;
   /** Reset a prayer back to unlogged. */
   undo: (key: SalahKey) => void;
+  /** Mark a prayer as missed (owes a make-up) — used by the auto-missed tracker. */
+  markMissed: (key: SalahKey) => void;
   /** Log one owed prayer as made up. */
   makeUpOne: () => void;
   setRemindersEnabled: (value: boolean) => void;
+  /** Whether un-logged prayers are automatically counted as missed. */
+  autoMissed: boolean;
+  setAutoMissed: (value: boolean) => void;
 };
 
 const SalahContext = createContext<SalahContextValue | undefined>(undefined);
@@ -55,6 +62,7 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
   const [record, setRecord] = useState<DayRecord>(() => emptyDay(todayKey()));
   const [makeupOwed, setMakeupOwed] = useState(0);
   const [remindersEnabled, setRemindersState] = useState(false);
+  const [autoMissed, setAutoMissedState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   // Hydrate, rolling over to a fresh day if the stored record is from the past.
@@ -68,6 +76,7 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(raw) as Partial<Persisted>;
           setMakeupOwed(Math.max(0, parsed.makeupOwed ?? 0));
           setRemindersState(!!parsed.remindersEnabled);
+          setAutoMissedState(!!parsed.autoMissed);
           if (parsed.record && parsed.record.date === today) {
             setRecord({ ...emptyDay(today), ...parsed.record });
           } else {
@@ -85,9 +94,9 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
   // Persist after hydration.
   useEffect(() => {
     if (!hydrated) return;
-    const payload: Persisted = { record, makeupOwed, remindersEnabled };
+    const payload: Persisted = { record, makeupOwed, remindersEnabled, autoMissed };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => {});
-  }, [record, makeupOwed, remindersEnabled, hydrated]);
+  }, [record, makeupOwed, remindersEnabled, autoMissed, hydrated]);
 
   // Keep "today" fresh if the app stays open past midnight.
   useEffect(() => {
@@ -120,9 +129,21 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
 
   const undo = useCallback((key: SalahKey) => setEntry(key, 'pending'), [setEntry]);
 
+  // Only marks a still-pending prayer; never overrides a prayed/excused entry.
+  const markMissed = useCallback(
+    (key: SalahKey) =>
+      setRecord((prev) => {
+        if (prev.entries[key].status !== 'pending') return prev;
+        setMakeupOwed((m) => Math.max(0, m + 1));
+        return { ...prev, entries: { ...prev.entries, [key]: { status: 'missed' } } };
+      }),
+    []
+  );
+
   const makeUpOne = useCallback(() => setMakeupOwed((m) => Math.max(0, m - 1)), []);
 
   const setRemindersEnabled = useCallback((value: boolean) => setRemindersState(value), []);
+  const setAutoMissed = useCallback((value: boolean) => setAutoMissedState(value), []);
 
   const { prayedToday, requiredToday } = useMemo(() => {
     let prayed = 0;
@@ -146,8 +167,11 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
       markPrayed,
       markReason,
       undo,
+      markMissed,
       makeUpOne,
       setRemindersEnabled,
+      autoMissed,
+      setAutoMissed,
     }),
     [
       record,
@@ -159,8 +183,11 @@ export function SalahProvider({ children }: { children: React.ReactNode }) {
       markPrayed,
       markReason,
       undo,
+      markMissed,
       makeUpOne,
       setRemindersEnabled,
+      autoMissed,
+      setAutoMissed,
     ]
   );
 
