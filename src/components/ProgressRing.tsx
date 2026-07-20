@@ -16,6 +16,9 @@ type ProgressRingProps = {
   caption?: string;
   trackColor?: string;
   progressColor?: string;
+  /** Override the center value / caption colors (e.g. on a dark hero). */
+  labelColor?: string;
+  captionColor?: string;
 };
 
 /**
@@ -30,6 +33,8 @@ export function ProgressRing({
   caption,
   trackColor,
   progressColor,
+  labelColor,
+  captionColor,
 }: ProgressRingProps) {
   const theme = useTheme();
   const clamped = Math.max(0, Math.min(1, progress));
@@ -64,9 +69,9 @@ export function ProgressRing({
       </Svg>
       {(centerLabel || caption) && (
         <View style={{ position: 'absolute', alignItems: 'center' }}>
-          {centerLabel ? <Text variant="display">{centerLabel}</Text> : null}
+          {centerLabel ? <Text variant="display" color={labelColor}>{centerLabel}</Text> : null}
           {caption ? (
-            <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+            <Text variant="caption" color={captionColor ?? 'textMuted'} style={{ marginTop: 2 }}>
               {caption}
             </Text>
           ) : null}

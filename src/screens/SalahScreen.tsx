@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Button, Card, Logo, ProgressRing, Screen, Text } from '@/components';
+import { Button, Card, GradientHero, HERO_TEXT, Logo, ProgressRing, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 import { useT } from '@/i18n/LanguageProvider';
 import type { RootStackParamList } from '@/navigation/types';
@@ -37,23 +37,37 @@ export function SalahScreen() {
 
   return (
     <Screen scroll title={t('salah.title')} subtitle={t('salah.subtitle')} headerRight={<Logo size={26} />}>
-      {/* Summary */}
-      <Card style={styles.summary}>
-        <ProgressRing
-          progress={progress}
-          size={150}
-          centerLabel={`${prayedToday}/${requiredToday}`}
-          caption={t('common.today')}
-          progressColor={theme.colors.primary}
-        />
-        <Text variant="body" color="textMuted" align="center" style={{ marginTop: 16 }}>
-          {requiredToday === 0
-            ? t('salah.allExcused')
-            : prayedToday === requiredToday
-            ? t('salah.allDone')
-            : t('salah.tapEach')}
-        </Text>
-      </Card>
+      {/* Summary — premium gradient hero */}
+      <GradientHero glyph="checkmark-done-circle" style={styles.summaryHero}>
+        <View style={styles.summaryInner}>
+          <ProgressRing
+            progress={progress}
+            size={148}
+            strokeWidth={12}
+            centerLabel={`${prayedToday}/${requiredToday}`}
+            caption={t('common.today')}
+            trackColor={HERO_TEXT.track}
+            progressColor={HERO_TEXT.sky}
+            labelColor={HERO_TEXT.primary}
+            captionColor={HERO_TEXT.faint}
+          />
+          <Text align="center" style={{ color: HERO_TEXT.muted, marginTop: 16, fontSize: 15, lineHeight: 22 }}>
+            {requiredToday === 0
+              ? t('salah.allExcused')
+              : prayedToday === requiredToday
+              ? t('salah.allDone')
+              : t('salah.tapEach')}
+          </Text>
+          {makeupOwed > 0 ? (
+            <View style={[styles.makeupPill, { backgroundColor: HERO_TEXT.chip }]}>
+              <Ionicons name="refresh" size={13} color={HERO_TEXT.accent} />
+              <Text style={{ color: HERO_TEXT.primary, fontSize: 13, marginLeft: 6 }}>
+                {t('salah.makeupOwed')}: {makeupOwed.toLocaleString()}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      </GradientHero>
 
       {/* Reminders */}
       <Card style={styles.reminder}>
@@ -183,7 +197,9 @@ function StatusDot({ status }: { status: string }) {
 }
 
 const styles = StyleSheet.create({
-  summary: { alignItems: 'center', paddingVertical: 26, marginBottom: 16 },
+  summaryHero: { marginBottom: 16 },
+  summaryInner: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20 },
+  makeupPill: { flexDirection: 'row', alignItems: 'center', marginTop: 14, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
   reminder: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   reminderText: { flex: 1, paddingRight: 12 },
   sectionLabel: { letterSpacing: 0.5, marginTop: 16, marginBottom: 10 },

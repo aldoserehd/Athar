@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Card, Screen, Text } from '@/components';
+import { Card, GradientHero, HERO_TEXT, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { ATHKAR_CATEGORIES, dhikrQuote, useAthkarProgress } from '@/features/athkar';
@@ -26,38 +26,38 @@ export function AthkarScreen() {
 
   return (
     <Screen scroll edges={['left', 'right']} contentStyle={{ paddingBottom: 32 }}>
-      {/* Daily inspiring quote from Quran / Sunnah */}
-      <Card style={[styles.quote, { backgroundColor: theme.colors.surfaceAlt }]} alt>
-        <Text style={{ fontFamily: theme.fonts.arabic, fontSize: 19, lineHeight: 36, textAlign: 'center', color: theme.colors.text }}>
-          {quote.arabic}
-        </Text>
-        {!isAr ? (
-          <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 8, lineHeight: 18 }}>
-            “{quote.english}”
+      {/* Daily quote + progress — premium hero */}
+      <GradientHero glyph="sparkles">
+        <View style={styles.heroInner}>
+          <Text style={{ fontFamily: theme.fonts.arabic, fontSize: 20, lineHeight: 38, textAlign: 'center', color: HERO_TEXT.primary }}>
+            {quote.arabic}
           </Text>
-        ) : null}
-        <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 8 }}>
-          {isAr ? quote.referenceAr : quote.reference}
-        </Text>
-      </Card>
+          {!isAr ? (
+            <Text align="center" style={{ color: HERO_TEXT.muted, marginTop: 10, fontSize: 13, lineHeight: 19 }}>
+              “{quote.english}”
+            </Text>
+          ) : null}
+          <Text align="center" style={{ color: HERO_TEXT.faint, marginTop: 8, fontSize: 12 }}>
+            {isAr ? quote.referenceAr : quote.reference}
+          </Text>
 
-      {/* Today's progress + streak */}
-      <View style={styles.statsRow}>
-        <Card style={styles.statCard}>
-          <Text variant="title">🔥 {streak}</Text>
-          <Text variant="caption" color="textFaint" style={{ marginTop: 4 }}>
-            {streak > 0 ? t('athkar.dayStreak', { n: streak }) : t('athkar.startStreak')}
-          </Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text variant="title">
-            {completedCount}/{ATHKAR_CATEGORIES.length}
-          </Text>
-          <Text variant="caption" color="textFaint" style={{ marginTop: 4 }}>
-            {t('athkar.doneToday')}
-          </Text>
-        </Card>
-      </View>
+          <View style={[styles.heroStats, { borderTopColor: 'rgba(255,255,255,0.14)' }]}>
+            <View style={styles.heroStat}>
+              <Text style={{ color: HERO_TEXT.primary, fontSize: 22, fontFamily: theme.fonts.bold }}>🔥 {streak}</Text>
+              <Text style={{ color: HERO_TEXT.faint, fontSize: 11, marginTop: 2 }}>
+                {streak > 0 ? t('athkar.dayStreak', { n: streak }) : t('athkar.startStreak')}
+              </Text>
+            </View>
+            <View style={[styles.heroDivider, { backgroundColor: 'rgba(255,255,255,0.14)' }]} />
+            <View style={styles.heroStat}>
+              <Text style={{ color: HERO_TEXT.primary, fontSize: 22, fontFamily: theme.fonts.bold }}>
+                {completedCount}/{ATHKAR_CATEGORIES.length}
+              </Text>
+              <Text style={{ color: HERO_TEXT.faint, fontSize: 11, marginTop: 2 }}>{t('athkar.doneToday')}</Text>
+            </View>
+          </View>
+        </View>
+      </GradientHero>
 
       {ATHKAR_CATEGORIES.map((cat) => {
         const doneItems = cat.items.filter((it) => (counts[it.id] ?? 0) >= it.repeat).length;
@@ -118,9 +118,10 @@ export function AthkarScreen() {
 }
 
 const styles = StyleSheet.create({
-  quote: { marginTop: 8, marginBottom: 14, paddingVertical: 18 },
-  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 18 },
-  statCard: { flex: 1, alignItems: 'center', paddingVertical: 16 },
+  heroInner: { paddingVertical: 22, paddingHorizontal: 22 },
+  heroStats: { flexDirection: 'row', alignItems: 'center', marginTop: 18, paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth },
+  heroStat: { flex: 1, alignItems: 'center' },
+  heroDivider: { width: StyleSheet.hairlineWidth, height: 34 },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   icon: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   sectionLabel: { letterSpacing: 0.5, marginTop: 14, marginBottom: 10 },
