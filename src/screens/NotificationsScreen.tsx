@@ -9,13 +9,6 @@ import { useT } from '@/i18n/LanguageProvider';
 import { SALAH_ORDER } from '@/features/salah';
 import { ensurePermission, RECITERS, reciterName, useAdhanPreview, useReminders } from '@/features/reminders';
 
-const ATHKAR_TIMES = [
-  { key: 'morning', hour: 8, minute: 0 },
-  { key: 'midday', hour: 13, minute: 0 },
-  { key: 'evening', hour: 19, minute: 0 },
-  { key: 'night', hour: 21, minute: 30 },
-] as const;
-
 const ATHKAR_COUNTS = [1, 2, 3, 4] as const;
 const ATHKAR_MODES = ['afterPrayer', 'night', 'spread'] as const;
 const SNOOZE_OPTIONS = [5, 10, 15, 30] as const;
@@ -39,9 +32,7 @@ export function NotificationsScreen() {
     setReciter,
     setPrayerReciter,
     setAthkarEnabled,
-    setAthkarTime,
     setAthkarPerDay,
-    setAthkarRandomize,
     setAthkarMode,
     setInspiringContent,
     setLockEnabled,
@@ -181,31 +172,6 @@ export function NotificationsScreen() {
           {t(`notifications.modeDesc_${settings.athkarMode}`)}
         </Text>
 
-        {settings.athkarMode === 'spread' ? (
-          <>
-            <Label>{t('notifications.startTime')}</Label>
-            <View style={styles.chips}>
-              {ATHKAR_TIMES.map((slot) => {
-                const active = settings.athkarHour === slot.hour && settings.athkarMinute === slot.minute;
-                return (
-                  <Pressable
-                    key={slot.key}
-                    onPress={() => setAthkarTime(slot.hour, slot.minute)}
-                    style={[styles.chip, { backgroundColor: active ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: active ? theme.colors.primary : theme.colors.border }]}
-                  >
-                    <Text variant="label" style={{ color: active ? theme.colors.onPrimary : theme.colors.textMuted }}>
-                      {t(`notifications.${slot.key}`)}
-                    </Text>
-                    <Text variant="caption" style={{ color: active ? theme.colors.onPrimary : theme.colors.textFaint }}>
-                      {String(slot.hour).padStart(2, '0')}:{String(slot.minute).padStart(2, '0')}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </>
-        ) : null}
-
         {settings.athkarMode !== 'afterPrayer' ? (
           <>
             <Label>{t('notifications.perDay')}</Label>
@@ -227,21 +193,6 @@ export function NotificationsScreen() {
             </View>
           </>
         ) : null}
-
-        <View style={[styles.toggleRow, { paddingHorizontal: 0, marginTop: 6 }]}>
-          <View style={{ flex: 1, paddingRight: 12 }}>
-            <Text variant="bodyMedium">{t('notifications.randomize')}</Text>
-            <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
-              {t('notifications.randomizeDesc')}
-            </Text>
-          </View>
-          <Switch
-            value={settings.athkarRandomize}
-            onValueChange={setAthkarRandomize}
-            trackColor={{ true: theme.colors.primary, false: theme.colors.surfaceContainerHigh }}
-            thumbColor="#FFFFFF"
-          />
-        </View>
       </Section>
 
       {/* ───── Inspiring reminders (simple toggle, no sub-options) ───── */}
