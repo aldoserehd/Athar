@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -8,7 +9,7 @@ import type { RootStackParamList } from '@/navigation/types';
 
 import { Card, IconButton, Logo, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
-import { useT } from '@/i18n/LanguageProvider';
+import { useT, useLanguage } from '@/i18n/LanguageProvider';
 import {
   formatTime,
   methodInfo,
@@ -59,6 +60,8 @@ export function PrayerScreen() {
     usePrayer();
   const salah = useSalah();
   const t = useT();
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const now = useNow();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -66,6 +69,24 @@ export function PrayerScreen() {
   const remaining = useMemo(() => {
     if (!times) return null;
     return countdownParts(times.next.time.getTime() - now.getTime());
+  }, [times, now]);
+
+  // Fraction of the current interval elapsed (previous prayer → next), 0..1.
+  const intervalProgress = useMemo(() => {
+    if (!times) return 0;
+    const nowMs = now.getTime();
+    const nextMs = times.next.time.getTime();
+    const past = times.slots
+      .filter((s) => s.isPrayer && s.time.getTime() <= nowMs)
+      .map((s) => s.time.getTime());
+    let prevMs = past.length ? Math.max(...past) : null;
+    if (prevMs == null) {
+      const midnight = new Date(now);
+      midnight.setHours(0, 0, 0, 0);
+      prevMs = midnight.getTime();
+    }
+    const frac = (nowMs - prevMs) / Math.max(1, nextMs - prevMs);
+    return Math.max(0, Math.min(1, frac));
   }, [times, now]);
 
   // Last third of the night — the best time for Qiyām/Tahajjud and Witr.
@@ -103,37 +124,61 @@ export function PrayerScreen() {
         {t('prayer.greeting')} · {t(`prayer.${greetingKey()}`)}
       </Text>
 
-      {/* Next prayer countdown */}
-      <Card style={styles.hero}>
-        <View style={styles.heroGlyph}>
-          <Ionicons name="time-outline" size={120} color={theme.colors.primary} />
-        </View>
+      {/* Next prayer countdown — premium gradient hero */}
+      <View style={styles.hero}>
+        <LinearGradient
+          colors={['#15697F', '#0E4353', '#062A33']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <Ionicons name="moon" size={150} color="rgba(255,255,255,0.06)" style={styles.heroGlyph} />
         {!ready || !times ? (
-          <View style={{ paddingVertical: 24 }}>
-            <ActivityIndicator color={theme.colors.primary} />
+          <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+            <ActivityIndicator color="#FFFFFF" />
           </View>
         ) : (
-          <>
-            <Text variant="label" color="textMuted" style={styles.heroLabel}>
-              {t('prayer.nextIs')} {t(`prayerNames.${times.next.name}`).toUpperCase()}
-            </Text>
-            <Text variant="display" color="primary" style={{ marginTop: 2 }}>
-              {remaining
-                ? `${String(remaining.h).padStart(2, '0')}:${String(remaining.m).padStart(2, '0')}:${String(
-                    remaining.s
-                  ).padStart(2, '0')}`
-                : '--:--:--'}
-            </Text>
-            <Text variant="body" color="textMuted" style={{ marginTop: 4 }}>
-              {t('prayer.nextAt', {
-                name: t(`prayerNames.${times.next.name}`),
+          <View style={styles.heroInner}>
+            <View style={styles.heroTop}>
+              <View style={styles.heroIcon}>
+                <Ionicons name={PRAYER_ICON[times.next.name]} size={16} color="#FFFFFF" />
+              </View>
+              <Text style={[styles.heroEyebrow, isAr && { letterSpacing: 0, fontFamily: 'Tajawal_500Medium' }]}>
+                {isAr
+                  ? `${t('prayer.nextIs')} · ${t(`prayerNames.${times.next.name}`)}`
+                  : `${t('prayer.nextIs').toUpperCase()} · ${t(`prayerNames.${times.next.name}`).toUpperCase()}`}
+              </Text>
+            </View>
+
+            <View style={styles.countdownRow}>
+              {([
+                { v: remaining?.h ?? 0, l: t('prayer.hrs') },
+                { v: remaining?.m ?? 0, l: t('prayer.min') },
+                { v: remaining?.s ?? 0, l: t('prayer.sec') },
+              ] as const).map((seg, i) => (
+                <React.Fragment key={seg.l}>
+                  {i > 0 ? <Text style={styles.countdownColon}>:</Text> : null}
+                  <View style={styles.countdownCell}>
+                    <Text style={styles.countdownNum}>{String(seg.v).padStart(2, '0')}</Text>
+                    <Text style={styles.countdownLabel}>{seg.l}</Text>
+                  </View>
+                </React.Fragment>
+              ))}
+            </View>
+
+            <View style={styles.heroBar}>
+              <View style={[styles.heroBarFill, { width: `${Math.round(intervalProgress * 100)}%` }]} />
+            </View>
+
+            <Text style={styles.heroAt}>
+              {t('prayer.atTime', {
                 time: formatTime(times.next.time, settings.hour12),
                 city: place.city,
               })}
             </Text>
-          </>
+          </View>
         )}
-      </Card>
+      </View>
 
       {/* Quick stats: today's salah + Qibla (tap to open the compass) */}
       <View style={styles.statsRow}>
@@ -329,9 +374,39 @@ function PrayerRow({
 }
 
 const styles = StyleSheet.create({
-  hero: { overflow: 'hidden', marginBottom: 16, paddingVertical: 22 },
-  heroGlyph: { position: 'absolute', right: -16, top: -10, opacity: 0.06 },
-  heroLabel: { letterSpacing: 1 },
+  hero: {
+    overflow: 'hidden',
+    marginBottom: 16,
+    borderRadius: 24,
+    minHeight: 190,
+    justifyContent: 'center',
+    shadowColor: '#062A33',
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+  },
+  heroGlyph: { position: 'absolute', right: -24, top: -20 },
+  heroInner: { padding: 24 },
+  heroTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 18 },
+  heroIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  heroEyebrow: { color: '#D4C5A4', fontSize: 12, letterSpacing: 1.5, fontFamily: 'Inter_600SemiBold' },
+  countdownRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  countdownCell: { alignItems: 'center', minWidth: 62 },
+  countdownNum: { color: '#FFFFFF', fontSize: 46, lineHeight: 50, fontFamily: 'Inter_700Bold', letterSpacing: -1 },
+  countdownLabel: { color: 'rgba(255,255,255,0.55)', fontSize: 11, letterSpacing: 1, marginTop: 2, fontFamily: 'Inter_500Medium' },
+  countdownColon: { color: 'rgba(255,255,255,0.4)', fontSize: 38, lineHeight: 50, fontFamily: 'Inter_700Bold', marginHorizontal: 2 },
+  heroBar: { height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.16)', overflow: 'hidden', marginTop: 20 },
+  heroBarFill: { height: 5, borderRadius: 3, backgroundColor: '#90D0E3' },
+  heroAt: { color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 14, fontFamily: 'Inter_500Medium' },
   statsRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   statCard: { flex: 1 },
   quickRow: { flexDirection: 'row', gap: 10, marginBottom: 22 },
