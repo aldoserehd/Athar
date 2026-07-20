@@ -63,17 +63,18 @@ export type ThemeColors = {
 };
 
 export const lightColors: ThemeColors = {
-  // Warm off-white page so the clean white cards lift off it with real contrast.
-  background: '#F2EEE9',
+  // A soft, cool-neutral page (like iOS grouped backgrounds) so crisp white cards
+  // lift off it and the teal brand reads clean and premium rather than muddy.
+  background: '#EEF1F4',
   surface: '#FFFFFF',
-  surfaceAlt: '#F7F3EE',
-  surfaceContainer: '#EFE9E2',
-  surfaceContainerHigh: '#E7E0D8',
-  border: '#E7E1D9',
+  surfaceAlt: '#F5F7F9',
+  surfaceContainer: '#E9EDF1',
+  surfaceContainerHigh: '#DFE5EA',
+  border: '#E4E9ED',
 
   primary: '#0F4C5C',
   onPrimary: '#FFFFFF',
-  primaryContainer: '#C7E7F0',
+  primaryContainer: '#CDE9F1',
   onPrimaryContainer: '#00363F',
 
   secondary: '#7C572D',
@@ -81,15 +82,15 @@ export const lightColors: ThemeColors = {
   onSecondaryContainer: '#6B4A22',
   accent: '#B5793A',
 
-  text: '#1C1B1B',
-  textMuted: '#41484B',
-  textFaint: '#767C80',
-  onSurfaceVariant: '#41484B',
-  outline: '#767C80',
+  text: '#141A1D',
+  textMuted: '#48535A',
+  textFaint: '#7A868C',
+  onSurfaceVariant: '#48535A',
+  outline: '#7A868C',
 
   success: '#2E7D32',
   danger: '#BA1A1A',
-  overlay: 'rgba(20, 18, 16, 0.45)',
+  overlay: 'rgba(15, 23, 28, 0.45)',
 };
 
 export const darkColors: ThemeColors = {

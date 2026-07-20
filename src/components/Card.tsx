@@ -40,10 +40,10 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
   },
   shadow: {
-    shadowColor: '#3A3128',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#1A2833',
+    shadowOpacity: 0.07,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 5 },
     elevation: 2,
   },
 });
