@@ -2,7 +2,7 @@ import React, { useLayoutEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { Card, Screen, Text } from '@/components';
+import { Card, GradientHero, HERO_TEXT, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { DIVINE_NAMES } from '@/features/names';
@@ -19,24 +19,26 @@ export function NamesScreen() {
 
   return (
     <Screen scroll edges={['left', 'right']} contentStyle={{ paddingBottom: 32 }}>
-      {/* Intro */}
-      <Card style={{ marginTop: 8, marginBottom: 14, alignItems: 'center' }}>
-        <Text
-          align="center"
-          style={{
-            fontFamily: theme.fonts.arabic,
-            fontSize: 26,
-            lineHeight: 42,
-            includeFontPadding: false,
-            color: theme.colors.primary,
-          }}
-        >
-          أَسْمَاءُ اللَّهِ الْحُسْنَى
-        </Text>
-        <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 8, lineHeight: 18 }}>
-          {t('names.hadith')}
-        </Text>
-      </Card>
+      {/* Intro — premium hero */}
+      <GradientHero glyph="sparkles" style={{ marginTop: 8 }}>
+        <View style={{ alignItems: 'center', paddingVertical: 24, paddingHorizontal: 20 }}>
+          <Text
+            align="center"
+            style={{
+              fontFamily: theme.fonts.arabicBold,
+              fontSize: 28,
+              lineHeight: 46,
+              includeFontPadding: false,
+              color: '#FFFFFF',
+            }}
+          >
+            أَسْمَاءُ اللَّهِ الْحُسْنَى
+          </Text>
+          <Text align="center" style={{ color: HERO_TEXT.muted, fontSize: 12, lineHeight: 18, marginTop: 10, maxWidth: 300 }}>
+            {t('names.hadith')}
+          </Text>
+        </View>
+      </GradientHero>
 
       {DIVINE_NAMES.map((name) => (
         <Card key={name.n} style={styles.row}>
