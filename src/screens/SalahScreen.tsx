@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +22,12 @@ export function SalahScreen() {
   const { settings: reminders, setAdhanEnabled } = useReminders();
 
   const [reasonFor, setReasonFor] = useState<SalahKey | null>(null);
+  // Ticks each minute so prayers unlock the moment their time arrives.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   async function toggleReminders(value: boolean) {
     if (value) {
@@ -112,14 +118,19 @@ export function SalahScreen() {
         const entry = record.entries[key];
         const name = t(`prayerNames.${key}`);
         const time = timeFor(key);
+        // A prayer can only be logged once its time has arrived — future prayers
+        // stay locked until then.
+        const locked = entry.status === 'pending' && !!time && now < time.getTime();
         return (
-          <Card key={key} style={styles.row}>
+          <Card key={key} style={[styles.row, locked && { opacity: 0.55 }]}>
             <View style={styles.rowLeft}>
-              <StatusDot status={entry.status} />
-              <View style={{ marginLeft: 12 }}>
+              <StatusDot status={locked ? 'locked' : entry.status} />
+              <View style={{ marginLeft: 12, flex: 1 }}>
                 <Text variant="bodyMedium">{name}</Text>
                 <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
-                  {entry.status === 'pending'
+                  {locked
+                    ? `${t('salah.locked')} · ${time ? formatTime(time, settings.hour12) : ''}`
+                    : entry.status === 'pending'
                     ? time
                       ? formatTime(time, settings.hour12)
                       : ''
@@ -136,7 +147,9 @@ export function SalahScreen() {
               </View>
             </View>
 
-            {entry.status === 'pending' ? (
+            {locked ? (
+              <Ionicons name="lock-closed" size={16} color={theme.colors.textFaint} />
+            ) : entry.status === 'pending' ? (
               <View style={styles.rowActions}>
                 <Pressable onPress={() => setReasonFor(key)} hitSlop={8} style={styles.couldnt}>
                   <Text variant="caption" color="textMuted">
@@ -144,6 +157,13 @@ export function SalahScreen() {
                   </Text>
                 </Pressable>
                 <Button label={t('salah.prayed')} size="sm" onPress={() => markPrayed(key)} />
+              </View>
+            ) : entry.status === 'missed' ? (
+              <View style={styles.rowActions}>
+                <Pressable onPress={() => undo(key)} hitSlop={8} accessibilityLabel={`Reset ${name}`}>
+                  <Ionicons name="ellipsis-horizontal" size={20} color={theme.colors.textFaint} />
+                </Pressable>
+                <Button label={t('salah.makeUp')} size="sm" variant="secondary" onPress={() => markPrayed(key)} />
               </View>
             ) : (
               <Pressable onPress={() => undo(key)} hitSlop={8} accessibilityLabel={`Reset ${name}`}>
@@ -190,7 +210,8 @@ function StatusDot({ status }: { status: string }) {
     prayed: { color: theme.colors.success, icon: 'checkmark-circle' },
     missed: { color: theme.colors.danger, icon: 'alert-circle' },
     excused: { color: theme.colors.accent, icon: 'pause-circle' },
-    pending: { color: theme.colors.textFaint, icon: 'ellipse-outline' },
+    pending: { color: theme.colors.primary, icon: 'ellipse-outline' },
+    locked: { color: theme.colors.textFaint, icon: 'lock-closed' },
   };
   const m = map[status] ?? map.pending;
   return <Ionicons name={m.icon} size={26} color={m.color} />;

@@ -62,6 +62,8 @@ export const translations = {
       makeupOwed: 'MAKE-UP OWED',
       makeupDesc: 'prayers to make up (qadāʾ). Exempt days — menstruation or nifās — are never counted.',
       madeOne: 'Made one up',
+      makeUp: 'Make up',
+      locked: 'Unlocks at',
       honour: 'On your honour, before Allah. Rulings shown are summaries — consult a scholar for your case.',
     },
     settings: {
@@ -407,6 +409,8 @@ export const translations = {
       makeupOwed: 'القضاء المستحَق',
       makeupDesc: 'صلوات للقضاء. الأيام المعذورة — الحيض أو النفاس — لا تُحسب.',
       madeOne: 'قضيت واحدة',
+      makeUp: 'قضاء',
+      locked: 'يُفتح عند',
       honour: 'على ضميرك، أمام الله. الأحكام المعروضة ملخّصات — استشر عالمًا لحالتك.',
     },
     settings: {
