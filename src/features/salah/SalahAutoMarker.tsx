@@ -11,7 +11,7 @@ import { SalahKey } from './types';
  * tally instead of quietly disappearing at midnight. Opt-in and off by default.
  */
 export function SalahAutoMarker() {
-  const { times } = usePrayer();
+  const { times, place } = usePrayer();
   const { autoMissed, hydrated, record, markMissed } = useSalah();
   const [now, setNow] = useState(() => Date.now());
 
@@ -22,19 +22,25 @@ export function SalahAutoMarker() {
   }, []);
 
   useEffect(() => {
-    if (!autoMissed || !hydrated || !times) return;
+    // Never auto-mark on a fallback location (times may not match where the user
+    // actually is) or on a stale times table — that would mark prayers wrongly.
+    if (!autoMissed || !hydrated || !times || place.isFallback) return;
+    if (times.date.toDateString() !== new Date(now).toDateString()) return;
+
     const prayers = times.slots.filter((s) => s.isPrayer);
-    const endOfDay = new Date();
+    const endOfDay = new Date(now);
     endOfDay.setHours(23, 59, 59, 0);
     prayers.forEach((slot, i) => {
       const key = slot.name as SalahKey;
       // A prayer's window ends when the next prayer begins (Isha → end of day).
       const deadline = prayers[i + 1]?.time.getTime() ?? endOfDay.getTime();
-      if (now > deadline && record.entries[key]?.status === 'pending') {
+      // Require BOTH the prayer's own time AND its window-end to be in the past,
+      // so a prayer that hasn't arrived yet can never be counted as missed.
+      if (now > slot.time.getTime() && now > deadline && record.entries[key]?.status === 'pending') {
         markMissed(key);
       }
     });
-  }, [now, autoMissed, hydrated, times, record, markMissed]);
+  }, [now, autoMissed, hydrated, times, place.isFallback, record, markMissed]);
 
   return null;
 }
