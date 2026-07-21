@@ -74,6 +74,13 @@
         aspect-ratio: 9 / 19.5; width: 100%;
       }
       .iphone-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .tilt3d {
+        transform: rotateY(-16deg) rotateX(5deg) rotateZ(1deg);
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        transform-style: preserve-3d;
+      }
+      .tilt3d:hover { transform: rotateY(0deg) rotateX(0deg) rotateZ(0deg); }
+      @media (max-width: 767px) { .tilt3d { transform: rotateY(-8deg) rotateX(3deg); } }
       .notch {
         position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
         width: 38%; height: 22px; background: #010f1f; border-radius: 0 0 16px 16px; z-index: 2;
@@ -143,21 +150,23 @@
             scan from a photo, and a community mosque finder. Minimalist, intentional, ad-free.
           </p>
           <div id="download" class="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
+            <a href="https://play.google.com/store/apps/details?id=com.tryathar.app" target="_blank" rel="noopener"
+               class="store-btn flex items-center gap-3 px-6 py-3.5 rounded-xl text-on-primary font-bold transition-all active:scale-95"
+               style="background:linear-gradient(135deg,#15697F,#0E4353);box-shadow:0 12px 30px rgba(21,105,127,0.35)">
+              <span class="material-symbols-outlined text-2xl">android</span>
+              <span class="text-start"><span class="block text-[10px] eyebrow opacity-80" data-i18n="getItOn">GET IT ON</span><span class="font-bold">Google Play</span></span>
+            </a>
             <span class="flex items-center gap-3 bg-surface-high px-6 py-3.5 rounded-xl border border-white/5">
               <span class="material-symbols-outlined text-primary text-2xl">phone_iphone</span>
               <span class="text-start"><span class="block text-[10px] eyebrow opacity-60" data-i18n="comingSoon">COMING SOON TO</span><span class="font-bold">App Store</span></span>
             </span>
-            <span class="flex items-center gap-3 bg-surface-high px-6 py-3.5 rounded-xl border border-white/5">
-              <span class="material-symbols-outlined text-primary text-2xl">android</span>
-              <span class="text-start"><span class="block text-[10px] eyebrow opacity-60" data-i18n="comingSoon">COMING SOON TO</span><span class="font-bold">Google Play</span></span>
-            </span>
           </div>
         </div>
 
-        <!-- Hero phone -->
-        <div class="relative justify-self-center w-[260px] sm:w-[300px]">
-          <div class="absolute inset-0 bg-primary/10 blur-[110px] rounded-full"></div>
-          <div class="iphone relative">
+        <!-- Hero phone (3D tilt) -->
+        <div class="relative justify-self-center w-[260px] sm:w-[300px]" style="perspective:1400px">
+          <div class="absolute -inset-8 rounded-full" style="background:radial-gradient(circle at 50% 40%, rgba(144,208,227,0.22), transparent 65%);filter:blur(50px)"></div>
+          <div class="iphone relative tilt3d">
             <div class="iphone-screen">
               <img data-hero class="fade-img" src="screenshots/mainPage-English.png" alt="Athar app — prayer times" />
             </div>
@@ -324,10 +333,10 @@
       <section class="max-w-[1200px] mx-auto px-6 py-16 text-center">
         <div class="tonal py-16 px-8 rounded-3xl" style="border-color: rgba(144,208,227,0.2); background: linear-gradient(135deg,#0e1c2d,#051424)">
           <h2 class="text-3xl md:text-4xl font-bold mb-4" data-i18n="ctaTitle">Begin a more intentional path</h2>
-          <p class="text-on-surface-variant mb-9 max-w-lg mx-auto" data-i18n="ctaSub">Free, ad-free, and private. Coming soon to iOS and Android, in shāʾ Allah.</p>
+          <p class="text-on-surface-variant mb-9 max-w-lg mx-auto" data-i18n="ctaSub">Free, ad-free, and private. Now on Android — iOS coming soon, in shāʾ Allah.</p>
           <div class="flex justify-center flex-wrap gap-4">
-            <a href="#" class="bg-primary text-on-primary px-9 py-4 rounded-xl font-bold active:scale-95 transition-all" data-i18n="ctaIos">Notify me — iOS</a>
-            <a href="#" class="bg-surface-bright px-9 py-4 rounded-xl font-bold border border-white/10 active:scale-95 transition-all" data-i18n="ctaAndroid">Notify me — Android</a>
+            <a href="https://play.google.com/store/apps/details?id=com.tryathar.app" target="_blank" rel="noopener" class="text-on-primary px-9 py-4 rounded-xl font-bold active:scale-95 transition-all" style="background:linear-gradient(135deg,#15697F,#0E4353);box-shadow:0 12px 30px rgba(21,105,127,0.35)" data-i18n="ctaAndroid">Download on Google Play</a>
+            <a href="#" class="bg-surface-bright px-9 py-4 rounded-xl font-bold border border-white/10 active:scale-95 transition-all" data-i18n="ctaIos">iOS — coming soon</a>
           </div>
         </div>
       </section>
@@ -382,7 +391,7 @@
           focusMockPrayed: 'I prayed', focusMockSnooze: 'Remind me in 10 min',
           heroEyebrow: 'SCHOLARLY & SERENE', heroTitle: 'Your scholarly', heroTitleAccent: 'Islamic companion.',
           heroDesc: 'Prayer times & qibla, a salah tracker with adhān, a searchable hadith library you can scan from a photo, and a community mosque finder. Minimalist, intentional, ad-free.',
-          comingSoon: 'COMING SOON TO',
+          comingSoon: 'COMING SOON TO', getItOn: 'GET IT ON',
           featuresTitle: 'Everything in one quiet place', featuresSub: 'Crafted with scholarly precision and calm minimalism — no ads, no noise.',
           f1Title: 'Prayer times & qibla', f1Body: 'Accurate worldwide times on-device, a live countdown, and an interactive qibla compass.',
           f2Title: 'Salah tracker & adhān', f2Body: 'A mindful daily record, make-up tracking, and adhān reminders with famous reciters.',
@@ -398,8 +407,8 @@
           phil2T: 'Ad-free, forever', phil2B: 'No ads, no upsells — offered as sadaqah jāriyah.',
           phil3T: 'Referenced sources', phil3B: 'Hadith are cited to their collection and grading for authenticity.',
           quoteEng: '"Actions are but by intentions…"', quoteRef: 'SAHIH AL-BUKHARI 1',
-          ctaTitle: 'Begin a more intentional path', ctaSub: 'Free, ad-free, and private. Coming soon to iOS and Android, in shāʾ Allah.',
-          ctaIos: 'Notify me — iOS', ctaAndroid: 'Notify me — Android',
+          ctaTitle: 'Begin a more intentional path', ctaSub: 'Free, ad-free, and private. Now on Android — iOS coming soon, in shāʾ Allah.',
+          ctaIos: 'iOS — coming soon', ctaAndroid: 'Download on Google Play',
           footTag: '© 2026 Athar · أثر — a trace, a transmitted tradition. Scholarly, serene, minimalist.',
           footPrivacy: 'Privacy Policy', footTerms: 'Terms of Use', footSupport: 'Support', footContact: 'Contact',
         },
@@ -417,7 +426,7 @@
           focusMockPrayed: 'لقد صلّيت', focusMockSnooze: 'ذكّرني بعد ١٠ دقائق',
           heroEyebrow: 'عِلمٌ وسكينة', heroTitle: 'رفيقك في', heroTitleAccent: 'طريق العِلم.',
           heroDesc: 'مواقيت الصلاة والقبلة، ومتابعة للصلاة مع الأذان، ومكتبة أحاديث قابلة للبحث تَعثُر على الحديث من صورته، ودليل مساجد مجتمعي. بساطةٌ وهدوءٌ بلا إعلانات.',
-          comingSoon: 'قريبًا على',
+          comingSoon: 'قريبًا على', getItOn: 'حمّله من',
           featuresTitle: 'كل ما تحتاجه في مكان هادئ', featuresSub: 'مصمَّم بدقة عِلمية وبساطة هادئة — بلا إعلانات ولا ضجيج.',
           f1Title: 'المواقيت والقبلة', f1Body: 'مواقيت دقيقة عالميًا على جهازك، وعدّ تنازلي حيّ، وبوصلة قبلة تفاعلية.',
           f2Title: 'متابعة الصلاة والأذان', f2Body: 'سجل يومي واعٍ، وتتبّع للقضاء، وتنبيهات أذان بأصوات قُرّاء مشهورين.',
@@ -433,8 +442,8 @@
           phil2T: 'بلا إعلانات للأبد', phil2B: 'لا إعلانات ولا مبيعات — صدقة جارية.',
           phil3T: 'مصادر موثَّقة', phil3B: 'الأحاديث منسوبة إلى كتبها ودرجاتها للتوثيق.',
           quoteEng: '«إنما الأعمال بالنيات»', quoteRef: 'صحيح البخاري ١',
-          ctaTitle: 'ابدأ طريقًا أكثر وعيًا', ctaSub: 'مجاني، بلا إعلانات، وخاص. قريبًا على iOS وأندرويد، إن شاء الله.',
-          ctaIos: 'أعلِمني — iOS', ctaAndroid: 'أعلِمني — أندرويد',
+          ctaTitle: 'ابدأ طريقًا أكثر وعيًا', ctaSub: 'مجاني، بلا إعلانات، وخاص. متاح الآن على أندرويد — و iOS قريبًا، إن شاء الله.',
+          ctaIos: 'iOS — قريبًا', ctaAndroid: 'حمّله من Google Play',
           footTag: '© 2026 أثر — أَثَر: ما يُنقل ويبقى. عِلمٌ، سكينة، بساطة.',
           footPrivacy: 'سياسة الخصوصية', footTerms: 'شروط الاستخدام', footSupport: 'الدعم', footContact: 'تواصل',
         },
