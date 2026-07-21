@@ -5,7 +5,9 @@ import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-import { Card, Screen, Text } from '@/components';
+import { LinearGradient } from 'expo-linear-gradient';
+
+import { Card, HERO_TEXT, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 import { useLanguage } from '@/i18n/LanguageProvider';
 
@@ -106,16 +108,17 @@ export function TasbihScreen() {
 
       {/* Big tap counter */}
       <Pressable onPress={tap} style={({ pressed }) => [styles.dialWrap, { opacity: pressed ? 0.9 : 1 }]}>
-        <View
-          style={[
-            styles.dial,
-            { borderColor: theme.colors.primary, backgroundColor: theme.colors.surfaceAlt },
-          ]}
-        >
-          <Text variant="caption" color="textFaint" style={{ marginBottom: 6 }}>
+        <View style={[styles.dial, { borderColor: theme.colors.primary }]}>
+          <LinearGradient
+            colors={['#15697F', '#0E4353', '#062A33']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Text style={{ color: HERO_TEXT.faint, fontSize: 12, marginBottom: 6 }}>
             {target > 0 ? t('tasbih.ofTarget', { target }) : t('tasbih.free')}
           </Text>
-          <Text style={[theme.type.counter, { fontSize: 72, lineHeight: 80, includeFontPadding: false, color: theme.colors.primary }]}>
+          <Text style={[theme.type.counter, { fontSize: 72, lineHeight: 80, includeFontPadding: false, color: '#FFFFFF' }]}>
             {count}
           </Text>
           <Text
@@ -124,13 +127,13 @@ export function TasbihScreen() {
               fontSize: 24,
               lineHeight: 38,
               includeFontPadding: false,
-              color: theme.colors.text,
+              color: '#FFFFFF',
               marginTop: 6,
             }}
           >
             {phrase.arabic}
           </Text>
-          <Text variant="caption" color="textMuted" style={{ marginTop: 4 }}>
+          <Text style={{ color: HERO_TEXT.muted, fontSize: 12, marginTop: 4 }}>
             {phrase.en}
           </Text>
         </View>
@@ -212,6 +215,7 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 125,
     borderWidth: 3,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
