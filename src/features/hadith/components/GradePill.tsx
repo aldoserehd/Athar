@@ -35,5 +35,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  dot: { width: 6, height: 6, borderRadius: 3, marginRight: 6 },
+  dot: { width: 6, height: 6, borderRadius: 3, marginEnd: 6 },
 });

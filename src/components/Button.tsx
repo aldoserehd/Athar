@@ -83,7 +83,7 @@ export function Button({
                 name={icon}
                 size={size === 'sm' ? 16 : 18}
                 color={fg[variant]}
-                style={{ marginRight: theme.spacing.sm }}
+              style={{ marginEnd: theme.spacing.sm }}
               />
             ) : null}
             <Text

@@ -32,9 +32,10 @@ export const fonts = {
   arabic: 'Amiri_400Regular',
   arabicBold: 'Amiri_700Bold',
   // Tajawal — clean Arabic UI text (less crowded than naskh for labels/body)
-  uiArabic: 'Tajawal_400Regular',
-  uiArabicMedium: 'Tajawal_500Medium',
-  uiArabicBold: 'Tajawal_700Bold',
+  uiArabic: 'IBMPlexSansArabic_400Regular',
+  uiArabicMedium: 'IBMPlexSansArabic_500Medium',
+  uiArabicSemibold: 'IBMPlexSansArabic_600SemiBold',
+  uiArabicBold: 'IBMPlexSansArabic_700Bold',
 } as const;
 
 /**
@@ -44,7 +45,7 @@ export const fonts = {
 export const ARABIC_UI_FONT: Record<string, string> = {
   Inter_400Regular: fonts.uiArabic,
   Inter_500Medium: fonts.uiArabicMedium,
-  Inter_600SemiBold: fonts.uiArabicBold,
+  Inter_600SemiBold: fonts.uiArabicSemibold,
   Inter_700Bold: fonts.uiArabicBold,
 };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -12,7 +12,6 @@ import { useTheme } from '@/theme';
 import { useT, useLanguage } from '@/i18n/LanguageProvider';
 import {
   formatTime,
-  methodInfo,
   PrayerSettingsSheet,
   PrayerSlot,
   sunnahTimes,
@@ -56,7 +55,7 @@ function countdownParts(ms: number): { h: number; m: number; s: number } {
 
 export function PrayerScreen() {
   const theme = useTheme();
-  const { place, settings, times, loading, ready, permissionDenied, refreshLocation } =
+  const { place, settings, profile, resolvedMethod, times, loading, ready, refreshLocation } =
     usePrayer();
   const salah = useSalah();
   const t = useT();
@@ -91,24 +90,84 @@ export function PrayerScreen() {
 
   // Last third of the night — the best time for Qiyām/Tahajjud and Witr.
   const lastThird = useMemo(() => {
-    if (!times) return null;
+    if (!times || !place || !profile) return null;
     try {
       return sunnahTimes(
         place.latitude,
         place.longitude,
-        settings.method,
-        settings.madhab
+        place.timezone,
+        profile,
       ).lastThirdOfTheNight;
     } catch {
       return null;
     }
-  }, [times, place.latitude, place.longitude, settings.method, settings.madhab]);
+  }, [times, place, profile]);
+
+  if (!place) {
+    return (
+      <Screen
+        scroll
+        title={t('prayer.title')}
+        subtitle={t('prayer.locationRequired')}
+        headerRight={<Logo size={26} />}
+      >
+        <Card alt style={styles.locationSetup}>
+          {loading || !ready ? (
+            <ActivityIndicator color={theme.colors.primary} />
+          ) : (
+            <Ionicons name="location-outline" size={28} color={theme.colors.primary} />
+          )}
+          <Text variant="heading" align="center" style={{ marginTop: 14 }}>
+            {loading || !ready ? t('prayer.findingLocation') : t('prayer.locationRequired')}
+          </Text>
+          <Text variant="body" color="textMuted" align="center" style={{ marginTop: 8 }}>
+            {t('prayer.locationRequiredDesc')}
+          </Text>
+          {!loading && ready ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => navigation.navigate('LocationSetup')}
+              style={[styles.locationButton, { backgroundColor: theme.colors.primary }]}
+            >
+              <Text variant="label" color="onPrimary">
+                {t('prayer.setLocation')}
+              </Text>
+            </Pressable>
+          ) : null}
+        </Card>
+        <Text variant="label" color="textMuted" style={styles.toolsLabel}>{t('prayer.worshipTools')}</Text>
+        <View style={styles.quickRow}>
+          {([
+            { key: 'Athkar' as const, icon: 'book-outline' as const, label: t('quick.athkar') },
+            { key: 'Tasbih' as const, icon: 'ellipse-outline' as const, label: t('quick.tasbih') },
+            { key: 'Names' as const, icon: 'sparkles-outline' as const, label: t('quick.names') },
+            { key: 'Witr' as const, icon: 'star-outline' as const, label: t('quick.witr') },
+          ]).map((tool) => (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={tool.label}
+              key={tool.key}
+              onPress={() => navigation.navigate(tool.key)}
+              style={styles.quickTile}
+            >
+              <Card style={styles.quickCard}>
+                <View style={[styles.quickIcon, { backgroundColor: theme.colors.surfaceContainerHigh }]}>
+                  <Ionicons name={tool.icon} size={20} color={theme.colors.primary} />
+                </View>
+                <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 8 }}>{tool.label}</Text>
+              </Card>
+            </Pressable>
+          ))}
+        </View>
+      </Screen>
+    );
+  }
 
   return (
     <Screen
       scroll
       title={t('prayer.title')}
-      subtitle={place.city + (place.isFallback ? ` · ${t('prayer.defaultSuffix')}` : '')}
+      subtitle={place.city}
       headerRight={
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Logo size={26} />
@@ -139,40 +198,48 @@ export function PrayerScreen() {
           </View>
         ) : (
           <View style={styles.heroInner}>
-            <View style={styles.heroTop}>
+            <View style={[styles.heroTop, isAr && Platform.OS === 'web' && styles.rowRTL]}>
               <View style={styles.heroIcon}>
                 <Ionicons name={PRAYER_ICON[times.next.name]} size={16} color="#FFFFFF" />
               </View>
-              <Text style={[styles.heroEyebrow, isAr && { letterSpacing: 0, fontFamily: 'Tajawal_500Medium' }]}>
+              <Text style={[styles.heroEyebrow, isAr && { letterSpacing: 0, fontFamily: theme.fonts.uiArabicMedium }]}>
                 {isAr
                   ? `${t('prayer.nextIs')} · ${t(`prayerNames.${times.next.name}`)}`
                   : `${t('prayer.nextIs').toUpperCase()} · ${t(`prayerNames.${times.next.name}`).toUpperCase()}`}
               </Text>
             </View>
 
-            <View style={styles.countdownRow}>
+            <View style={[styles.countdownRow, isAr && Platform.OS !== 'web' && styles.countdownLTRNative]}>
               {([
                 { v: remaining?.h ?? 0, l: t('prayer.hrs') },
                 { v: remaining?.m ?? 0, l: t('prayer.min') },
                 { v: remaining?.s ?? 0, l: t('prayer.sec') },
               ] as const).map((seg, i) => (
                 <React.Fragment key={seg.l}>
-                  {i > 0 ? <Text style={styles.countdownColon}>:</Text> : null}
+                  {i > 0 ? (
+                    <Text style={styles.countdownColon}>
+                      :
+                    </Text>
+                  ) : null}
                   <View style={styles.countdownCell}>
-                    <Text style={styles.countdownNum}>{String(seg.v).padStart(2, '0')}</Text>
-                    <Text style={styles.countdownLabel}>{seg.l}</Text>
+                    <Text style={styles.countdownNum}>
+                      {String(seg.v).padStart(2, '0')}
+                    </Text>
+                    <Text style={[styles.countdownLabel, isAr && { fontFamily: theme.fonts.uiArabicMedium }]}>
+                      {seg.l}
+                    </Text>
                   </View>
                 </React.Fragment>
               ))}
             </View>
 
-            <View style={styles.heroBar}>
+            <View style={[styles.heroBar, isAr && styles.heroBarRTL]}>
               <View style={[styles.heroBarFill, { width: `${Math.round(intervalProgress * 100)}%` }]} />
             </View>
 
-            <Text style={styles.heroAt}>
+            <Text style={[styles.heroAt, isAr && { fontFamily: theme.fonts.uiArabicMedium, textAlign: 'right' }]}>
               {t('prayer.atTime', {
-                time: formatTime(times.next.time, settings.hour12),
+                time: formatTime(times.next.time, settings.hour12, place.timezone, language),
                 city: place.city,
               })}
             </Text>
@@ -253,7 +320,7 @@ export function PrayerScreen() {
           ) : (
             <Ionicons name="locate-outline" size={16} color={theme.colors.textMuted} />
           )}
-          <Text variant="caption" color="textMuted" style={{ marginLeft: 6 }}>
+          <Text variant="caption" color="textMuted" style={{ marginStart: 6 }}>
             {place.city}
           </Text>
         </Pressable>
@@ -266,6 +333,8 @@ export function PrayerScreen() {
           isNext={times.next.name === slot.name && slot.isPrayer}
           isPast={slot.time.getTime() < now.getTime()}
           hour12={settings.hour12}
+          timezone={place.timezone}
+          locale={language}
         />
       ))}
 
@@ -279,7 +348,7 @@ export function PrayerScreen() {
         >
           <View style={styles.prayerLeft}>
             <Ionicons name="cloudy-night-outline" size={20} color={theme.colors.accent} />
-            <View style={{ marginLeft: 14 }}>
+          <View style={{ marginStart: 14 }}>
               <Text variant="body">{t('prayer.lastThird')}</Text>
               <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
                 {t('prayer.qiyamHint')}
@@ -287,24 +356,17 @@ export function PrayerScreen() {
             </View>
           </View>
           <Text variant="body" style={{ color: theme.colors.textMuted }}>
-            {formatTime(lastThird, settings.hour12)}
+            {formatTime(lastThird, settings.hour12, place.timezone, language)}
           </Text>
         </View>
       ) : null}
 
-      {permissionDenied ? (
-        <Pressable onPress={refreshLocation}>
-          <Card alt style={styles.notice}>
-            <Ionicons name="location-outline" size={18} color={theme.colors.textMuted} />
-            <Text variant="caption" color="textMuted" style={{ flex: 1, marginLeft: 10 }}>
-              {t('prayer.usingDefault', { city: place.city })}
-            </Text>
-          </Card>
-        </Pressable>
-      ) : null}
-
       <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 16 }}>
-        {t('prayer.calcNote', { method: methodInfo(settings.method).label })}
+        {t('prayer.calcNote', {
+          method: resolvedMethod
+            ? t(`settings.methods.${resolvedMethod}.label`)
+            : t('settings.automatic'),
+        })}
       </Text>
 
       <PrayerSettingsSheet
@@ -324,11 +386,15 @@ function PrayerRow({
   isNext,
   isPast,
   hour12,
+  timezone,
+  locale,
 }: {
   slot: PrayerSlot;
   isNext: boolean;
   isPast: boolean;
   hour12: boolean;
+  timezone: string;
+  locale: string;
 }) {
   const theme = useTheme();
   const t = useT();
@@ -353,7 +419,7 @@ function PrayerRow({
         <Text
           variant={isNext ? 'bodyMedium' : 'body'}
           style={{
-            marginLeft: 14,
+    marginStart: 14,
             color: isNext ? theme.colors.onPrimaryContainer : theme.colors.text,
           }}
         >
@@ -367,13 +433,15 @@ function PrayerRow({
         variant={isNext ? 'bodyMedium' : 'body'}
         style={{ color: isNext ? theme.colors.onPrimaryContainer : theme.colors.textMuted }}
       >
-        {formatTime(slot.time, hour12)}
+        {formatTime(slot.time, hour12, timezone, locale)}
       </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  locationSetup: { alignItems: 'center', paddingVertical: 32, marginTop: 12 },
+  locationButton: { borderRadius: 12, paddingHorizontal: 20, paddingVertical: 12, marginTop: 20 },
   hero: {
     overflow: 'hidden',
     marginBottom: 16,
@@ -389,6 +457,7 @@ const styles = StyleSheet.create({
   heroGlyph: { position: 'absolute', right: -24, top: -20 },
   heroInner: { padding: 24 },
   heroTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 18 },
+  rowRTL: { flexDirection: 'row-reverse' },
   heroIcon: {
     width: 30,
     height: 30,
@@ -396,20 +465,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginEnd: 10,
   },
   heroEyebrow: { color: '#D4C5A4', fontSize: 12, letterSpacing: 1.5, fontFamily: 'Inter_600SemiBold' },
   countdownRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  countdownLTRNative: { flexDirection: 'row-reverse' },
   countdownCell: { alignItems: 'center', minWidth: 62 },
-  countdownNum: { color: '#FFFFFF', fontSize: 46, lineHeight: 50, fontFamily: 'Inter_700Bold', letterSpacing: -1 },
+  countdownNum: { color: '#FFFFFF', fontSize: 46, lineHeight: 50, fontFamily: 'Inter_700Bold', letterSpacing: -1, writingDirection: 'ltr' },
   countdownLabel: { color: 'rgba(255,255,255,0.55)', fontSize: 11, letterSpacing: 1, marginTop: 2, fontFamily: 'Inter_500Medium' },
-  countdownColon: { color: 'rgba(255,255,255,0.4)', fontSize: 38, lineHeight: 50, fontFamily: 'Inter_700Bold', marginHorizontal: 2 },
+  countdownColon: { color: 'rgba(255,255,255,0.4)', fontSize: 38, lineHeight: 50, fontFamily: 'Inter_700Bold', marginHorizontal: 2, writingDirection: 'ltr' },
   heroBar: { height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.16)', overflow: 'hidden', marginTop: 20 },
+  heroBarRTL: { alignItems: 'flex-end' },
   heroBarFill: { height: 5, borderRadius: 3, backgroundColor: '#90D0E3' },
   heroAt: { color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 14, fontFamily: 'Inter_500Medium' },
   statsRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   statCard: { flex: 1 },
   quickRow: { flexDirection: 'row', gap: 10, marginBottom: 22 },
+  toolsLabel: { marginTop: 22, marginBottom: 10 },
   quickTile: { flex: 1 },
   quickCard: { flex: 1, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4 },
   quickIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
@@ -434,6 +506,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   prayerLeft: { flexDirection: 'row', alignItems: 'center' },
-  nextDot: { width: 6, height: 6, borderRadius: 3, marginLeft: 10 },
+  nextDot: { width: 6, height: 6, borderRadius: 3, marginStart: 10 },
   notice: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
 });

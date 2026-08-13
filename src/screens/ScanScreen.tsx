@@ -131,7 +131,7 @@ export function ScanScreen() {
       {phase === 'error' ? (
         <Card alt style={styles.note}>
           <Ionicons name="alert-circle-outline" size={20} color={theme.colors.danger} />
-          <Text variant="caption" color="textMuted" style={{ flex: 1, marginLeft: 10 }}>
+          <Text variant="caption" color="textMuted" style={{ flex: 1, marginStart: 10 }}>
             {error}
           </Text>
         </Card>
@@ -148,7 +148,7 @@ export function ScanScreen() {
         ) : (
           <Card alt style={styles.note}>
             <Ionicons name="search-outline" size={20} color={theme.colors.textMuted} />
-            <Text variant="caption" color="textMuted" style={{ flex: 1, marginLeft: 10 }}>
+            <Text variant="caption" color="textMuted" style={{ flex: 1, marginStart: 10 }}>
               {t('scan.noMatch')} “{text.slice(0, 80)}…”
             </Text>
           </Card>

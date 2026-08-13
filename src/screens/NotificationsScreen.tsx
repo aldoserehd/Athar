@@ -1,11 +1,11 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 import { Card, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
-import { useT } from '@/i18n/LanguageProvider';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import { SALAH_ORDER } from '@/features/salah';
 import { ensurePermission, RECITERS, reciterName, useAdhanPreview, useReminders } from '@/features/reminders';
 
@@ -23,7 +23,7 @@ const PRAYER_VOICE_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 export function NotificationsScreen() {
   const theme = useTheme();
-  const t = useT();
+  const { t, isRTL } = useLanguage();
   const navigation = useNavigation();
   const {
     settings,
@@ -38,20 +38,30 @@ export function NotificationsScreen() {
     setLockEnabled,
     toggleLockPrayer,
     setLockSnooze,
+    scheduleError,
   } = useReminders();
   const { playing, toggle: previewAdhan } = useAdhanPreview();
   const lock = settings.lock;
+  const [permissionDenied, setPermissionDenied] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: t('notifications.title') });
   }, [navigation, t]);
 
   async function toggleAdhan(v: boolean) {
-    if (v && !(await ensurePermission())) return;
+    if (v && !(await ensurePermission())) {
+      setPermissionDenied(true);
+      return;
+    }
+    setPermissionDenied(false);
     setAdhanEnabled(v);
   }
   async function toggleAthkar(v: boolean) {
-    if (v && !(await ensurePermission())) return;
+    if (v && !(await ensurePermission())) {
+      setPermissionDenied(true);
+      return;
+    }
+    setPermissionDenied(false);
     setAthkarEnabled(v);
   }
 
@@ -61,6 +71,28 @@ export function NotificationsScreen() {
         {t('notifications.lead')}
       </Text>
 
+      {scheduleError ? (
+        <Card alt style={[styles.scheduleError, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
+          <Ionicons name="warning-outline" size={18} color={theme.colors.danger} />
+          <Text variant="caption" color="textMuted" style={{ flex: 1, marginStart: 10 }}>
+            {t('notifications.scheduleError')}
+          </Text>
+        </Card>
+      ) : null}
+
+      {permissionDenied ? (
+        <Card alt style={[styles.permissionCard, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
+          <Ionicons name="notifications-off-outline" size={20} color={theme.colors.danger} />
+          <View style={styles.permissionText}>
+            <Text variant="bodyMedium">{t('notifications.permissionDeniedTitle')}</Text>
+            <Text variant="caption" color="textMuted" style={styles.permissionBody}>{t('notifications.permissionDeniedBody')}</Text>
+          </View>
+          <Pressable accessibilityRole="button" onPress={() => void Linking.openSettings()} hitSlop={8}>
+            <Text variant="label" color="primary">{t('notifications.openSettings')}</Text>
+          </Pressable>
+        </Card>
+      ) : null}
+
       {/* ───── Adhān reminders ───── */}
       <Section
         icon="notifications"
@@ -69,14 +101,13 @@ export function NotificationsScreen() {
         subtitle={t('notifications.adhanDesc')}
         value={settings.adhanEnabled}
         onValueChange={toggleAdhan}
-        defaultOpen
       >
         <Label>{t('notifications.prayers')}</Label>
         <View style={styles.inner}>
           {SALAH_ORDER.map((key, i) => (
             <View key={key}>
               {i > 0 ? <Divider /> : null}
-              <View style={styles.toggleRow}>
+              <View style={[styles.toggleRow, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
                 <Text variant="bodyMedium" style={{ flex: 1 }}>
                   {t(`prayerNames.${key}`)}
                 </Text>
@@ -152,7 +183,7 @@ export function NotificationsScreen() {
         onValueChange={toggleAthkar}
       >
         <Label>{t('notifications.athkarMode')}</Label>
-        <View style={styles.chips}>
+        <View style={[styles.chips, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
           {ATHKAR_MODES.map((mode) => {
             const active = settings.athkarMode === mode;
             return (
@@ -175,7 +206,7 @@ export function NotificationsScreen() {
         {settings.athkarMode !== 'afterPrayer' ? (
           <>
             <Label>{t('notifications.perDay')}</Label>
-            <View style={styles.chips}>
+            <View style={[styles.chips, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
               {ATHKAR_COUNTS.map((n) => {
                 const active = settings.athkarPerDay === n;
                 return (
@@ -217,11 +248,11 @@ export function NotificationsScreen() {
         <Label>{t('notifications.prayerFocusHowTitle')}</Label>
         <View style={[styles.howCard, { backgroundColor: theme.colors.surfaceContainer }]}>
           {[t('notifications.prayerFocusStep1'), t('notifications.prayerFocusStep2'), t('notifications.prayerFocusStep3')].map((step, i) => (
-            <View key={i} style={[styles.stepRow, i > 0 && { marginTop: 12 }]}>
+            <View key={i} style={[styles.stepRow, isRTL && Platform.OS === 'web' && styles.rowRTL, i > 0 && { marginTop: 12 }]}>
               <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]}>
                 <Text variant="caption" style={{ color: theme.colors.onPrimary, fontWeight: '700' }}>{i + 1}</Text>
               </View>
-              <Text variant="body" color="textMuted" style={{ flex: 1, marginLeft: 12, lineHeight: 21 }}>
+              <Text variant="body" color="textMuted" style={{ flex: 1, marginStart: 12, lineHeight: 21 }}>
                 {step}
               </Text>
             </View>
@@ -233,7 +264,7 @@ export function NotificationsScreen() {
           {SALAH_ORDER.map((key, i) => (
             <View key={key}>
               {i > 0 ? <Divider /> : null}
-              <View style={styles.toggleRow}>
+              <View style={[styles.toggleRow, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
                 <Text variant="bodyMedium" style={{ flex: 1 }}>
                   {t(`prayerNames.${key}`)}
                 </Text>
@@ -249,7 +280,7 @@ export function NotificationsScreen() {
         </View>
 
         <Label>{t('notifications.snooze')}</Label>
-        <View style={styles.chips}>
+        <View style={[styles.chips, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
           {SNOOZE_OPTIONS.map((m) => {
             const active = lock.snoozeMinutes === m;
             return (
@@ -302,6 +333,7 @@ function Section({
   children?: React.ReactNode;
 }) {
   const theme = useTheme();
+  const { isRTL } = useLanguage();
   const [open, setOpen] = useState(!!defaultOpen);
   const expandable = !!children && value;
 
@@ -312,7 +344,7 @@ function Section({
 
   return (
     <Card padded={false} style={styles.section}>
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
         <View style={[styles.iconWrap, { backgroundColor: theme.colors.surfaceContainerHigh }]}>
           <Ionicons name={icon} size={20} color={tint} />
         </View>
@@ -327,7 +359,7 @@ function Section({
           </Text>
         </Pressable>
         {expandable ? (
-          <Pressable onPress={() => setOpen((o) => !o)} hitSlop={8} style={{ marginRight: 8 }}>
+      <Pressable onPress={() => setOpen((o) => !o)} hitSlop={8} style={{ marginEnd: 8 }}>
             <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={theme.colors.textFaint} />
           </Pressable>
         ) : null}
@@ -358,15 +390,16 @@ function Collapsible({
   children: React.ReactNode;
 }) {
   const theme = useTheme();
+  const { isRTL } = useLanguage();
   const [open, setOpen] = useState(false);
   return (
     <View style={{ marginTop: 14 }}>
       <Pressable
         onPress={() => setOpen((o) => !o)}
-        style={[styles.collapsibleHead, { backgroundColor: theme.colors.surfaceContainer }]}
+        style={[styles.collapsibleHead, { backgroundColor: theme.colors.surfaceContainer }, isRTL && Platform.OS === 'web' && styles.rowRTL]}
       >
         <Ionicons name={icon} size={18} color={theme.colors.textMuted} />
-        <View style={{ flex: 1, marginLeft: 10 }}>
+        <View style={{ flex: 1, marginStart: 10 }}>
           <Text variant="bodyMedium">{title}</Text>
           {!open ? (
             <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
@@ -391,7 +424,7 @@ function Label({ children }: { children: React.ReactNode }) {
 
 function Divider() {
   const theme = useTheme();
-  return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: theme.colors.border, marginLeft: 16 }} />;
+  return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: theme.colors.border, marginStart: 16 }} />;
 }
 
 /** The reciter list with per-row preview — reused for the default voice and each prayer. */
@@ -407,6 +440,7 @@ function ReciterPicker({
   onPreview: (id: string) => void;
 }) {
   const theme = useTheme();
+  const { isRTL } = useLanguage();
   return (
     <View style={styles.inner}>
       {RECITERS.map((r, i) => {
@@ -414,7 +448,7 @@ function ReciterPicker({
         return (
           <View key={r.id}>
             {i > 0 ? <Divider /> : null}
-            <Pressable onPress={() => onSelect(r.id)} style={styles.toggleRow}>
+            <Pressable onPress={() => onSelect(r.id)} style={[styles.toggleRow, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
               <Pressable
                 onPress={() => onPreview(r.id)}
                 hitSlop={8}
@@ -423,7 +457,7 @@ function ReciterPicker({
               >
                 <Ionicons name={playing === r.id ? 'stop' : 'play'} size={15} color={theme.colors.primary} />
               </Pressable>
-              <View style={{ flex: 1, marginLeft: 12 }}>
+        <View style={{ flex: 1, marginStart: 12 }}>
                 <Text variant="bodyMedium">{r.name}</Text>
                 <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
                   {r.place}
@@ -443,6 +477,11 @@ function ReciterPicker({
 }
 
 const styles = StyleSheet.create({
+  scheduleError: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  permissionCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  permissionText: { flex: 1, marginStart: 10, marginEnd: 10 },
+  permissionBody: { marginTop: 2 },
+  rowRTL: { flexDirection: 'row-reverse' },
   section: { marginBottom: 12, overflow: 'hidden' },
   header: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
   iconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

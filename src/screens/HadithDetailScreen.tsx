@@ -121,7 +121,7 @@ export function HadithDetailScreen() {
       {hadith.narrator ? (
         <Card style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center' }}>
           <Ionicons name="person-circle-outline" size={22} color={theme.colors.textMuted} />
-          <Text variant="body" style={{ marginLeft: 10 }}>
+          <Text variant="body" style={{ marginStart: 10 }}>
             {t('hadith.narratedBy', { name: (isAr && hadith.narratorAr) || hadith.narrator })}
           </Text>
         </Card>
@@ -149,7 +149,7 @@ export function HadithDetailScreen() {
             <Card style={styles.chainHead}>
               <View style={styles.sourceLeft}>
                 <Ionicons name="git-branch-outline" size={20} color={theme.colors.primary} />
-                <Text variant="bodyMedium" style={{ marginLeft: 10 }}>
+          <Text variant="bodyMedium" style={{ marginStart: 10 }}>
                   {t('hadith.chain')}
                 </Text>
               </View>
@@ -167,7 +167,7 @@ export function HadithDetailScreen() {
                       {i + 1}
                     </Text>
                   </View>
-                  <Text variant="body" style={{ marginLeft: 12 }}>
+          <Text variant="body" style={{ marginStart: 12 }}>
                     {name}
                   </Text>
                 </View>
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   translation: { marginTop: 16, fontStyle: 'italic', lineHeight: 24 },
   sourceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 },
   sourceLeft: { flexDirection: 'row', alignItems: 'center' },
-  sourceIcon: { width: 38, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  sourceIcon: { width: 38, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginEnd: 12 },
   sectionLabel: { letterSpacing: 0.5, marginTop: 20, marginBottom: 10 },
   chainHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   chainRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 7 },

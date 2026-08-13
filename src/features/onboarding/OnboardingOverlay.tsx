@@ -1,266 +1,297 @@
-import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Logo, Text } from '@/components';
-import { useTheme, useThemeControls, ThemePreference } from '@/theme';
-import { useLanguage } from '@/i18n/LanguageProvider';
-import { LANGUAGES } from '@/i18n';
 import { ensurePermission, useReminders } from '@/features/reminders';
+import { usePrayer } from '@/features/prayer';
+import { LANGUAGES } from '@/i18n';
+import { useLanguage } from '@/i18n/LanguageProvider';
+import { useTheme } from '@/theme';
 import { useOnboarding } from './OnboardingContext';
 
-type Step =
-  | { kind: 'welcome' }
-  | { kind: 'language' }
-  | { kind: 'theme' }
-  | { kind: 'notifications' }
-  | { kind: 'feature'; icon: keyof typeof Ionicons.glyphMap; titleKey: string; bodyKey: string; feature?: boolean };
-
-const STEPS: Step[] = [
-  { kind: 'welcome' },
-  { kind: 'language' },
-  { kind: 'theme' },
-  { kind: 'notifications' },
-  { kind: 'feature', icon: 'time', titleKey: 'onboarding.prayerTitle', bodyKey: 'onboarding.prayerBody' },
-  { kind: 'feature', icon: 'compass', titleKey: 'onboarding.qiblaTitle', bodyKey: 'onboarding.qiblaBody' },
-  { kind: 'feature', icon: 'checkmark-done-circle', titleKey: 'onboarding.salahTitle', bodyKey: 'onboarding.salahBody' },
-  { kind: 'feature', icon: 'book', titleKey: 'onboarding.athkarTitle2', bodyKey: 'onboarding.athkarBody2' },
-  { kind: 'feature', icon: 'navigate', titleKey: 'onboarding.mosquesTitle', bodyKey: 'onboarding.mosquesBody' },
-];
-
-const THEME_OPTIONS: { pref: ThemePreference; icon: keyof typeof Ionicons.glyphMap; labelKey: string }[] = [
-  { pref: 'system', icon: 'phone-portrait-outline', labelKey: 'more.system' },
-  { pref: 'light', icon: 'sunny-outline', labelKey: 'more.light' },
-  { pref: 'dark', icon: 'moon-outline', labelKey: 'more.dark' },
-];
+type Step = 'welcome' | 'language' | 'location' | 'notifications' | 'focus';
+const STEPS: Step[] = ['welcome', 'language', 'location', 'notifications', 'focus'];
 
 export function OnboardingOverlay() {
   const theme = useTheme();
-  const { t, language, setLanguage } = useLanguage();
-  const { preference, setPreference } = useThemeControls();
-  const { setAdhanEnabled } = useReminders();
+  const { t, language, isRTL, setLanguage } = useLanguage();
+  const { place, locationStatus, loading: locationLoading, canAskAgain, refreshLocation } = usePrayer();
+  const { settings, setAdhanEnabled, setLockEnabled } = useReminders();
   const { visible, complete, skipAll } = useOnboarding();
   const [index, setIndex] = useState(0);
-  const [notifsOn, setNotifsOn] = useState(false);
+  const [notificationState, setNotificationState] = useState<'idle' | 'loading' | 'granted' | 'denied'>('idle');
 
   if (!visible) return null;
   const step = STEPS[index];
-  const last = index === STEPS.length - 1;
+  const isLast = index === STEPS.length - 1;
+  const locationReady = locationStatus === 'ready' && Boolean(place);
 
-  async function enableNotifs() {
-    const ok = await ensurePermission();
-    if (ok) {
+  async function enableNotifications() {
+    setNotificationState('loading');
+    const granted = await ensurePermission();
+    if (granted) {
       setAdhanEnabled(true);
-      setNotifsOn(true);
+      setNotificationState('granted');
+    } else {
+      setNotificationState('denied');
     }
   }
 
   return (
     <View style={[styles.fill, { backgroundColor: theme.colors.background }]}>
       <SafeAreaView style={styles.safe}>
-        {/* Top bar: logo + skip */}
         <View style={styles.top}>
-          <Logo size={30} />
-          <Pressable onPress={skipAll} hitSlop={8}>
-            <Text variant="label" color="textMuted">
-              {t('onboarding.skip')}
-            </Text>
+          <Logo size={32} />
+          <Pressable accessibilityRole="button" onPress={skipAll} hitSlop={10}>
+            <Text variant="label" color="textMuted">{t('onboarding.skip')}</Text>
           </Pressable>
         </View>
 
         <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-          {step.kind === 'welcome' ? (
-            <Centered
-              icon="moon"
-              title={t('onboarding.welcomeTitle')}
-              body={t('onboarding.welcomeBody')}
-            />
+          {step === 'welcome' ? (
+            <Setup icon="sparkles-outline" title={t('onboarding.welcomeTitle')} body={t('onboarding.welcomeBody')}>
+              <View style={styles.welcomePoints}>
+                <WelcomePoint icon="time-outline" text={t('onboarding.welcomeAccurate')} />
+                <WelcomePoint icon="shield-checkmark-outline" text={t('onboarding.welcomePrivate')} />
+                <WelcomePoint icon="leaf-outline" text={t('onboarding.welcomeSimple')} />
+              </View>
+            </Setup>
           ) : null}
 
-          {step.kind === 'language' ? (
-            <View style={styles.setup}>
-              <StepHeader icon="language-outline" title={t('onboarding.languageTitle')} body={t('onboarding.languageBody')} />
-              {LANGUAGES.map((lang) => {
-                const active = language === lang.code;
+          {step === 'language' ? (
+            <Setup icon="language-outline" title={t('onboarding.languageTitle')} body={t('onboarding.languageBody')}>
+              {LANGUAGES.map((item) => {
+                const active = language === item.code;
                 return (
                   <Pressable
-                    key={lang.code}
-                    onPress={() => setLanguage(lang.code)}
-                    style={[
-                      styles.optionRow,
-                      { borderColor: active ? theme.colors.primary : theme.colors.border, backgroundColor: active ? theme.colors.primaryContainer : theme.colors.surface },
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: active }}
+                    key={item.code}
+                    onPress={() => void setLanguage(item.code)}
+                    style={({ pressed }) => [
+                      styles.option,
+                      isRTL && Platform.OS === 'web' && styles.rowRTL,
+                      {
+                        borderColor: active ? theme.colors.primary : theme.colors.border,
+                        backgroundColor: active ? theme.colors.primaryContainer : theme.colors.surface,
+                        opacity: pressed ? 0.7 : 1,
+                      },
                     ]}
                   >
-                    <Text variant="bodyMedium" style={{ flex: 1, color: active ? theme.colors.onPrimaryContainer : theme.colors.text }}>
-                      {lang.native}
-                      {lang.label !== lang.native ? `  ·  ${lang.label}` : ''}
-                    </Text>
+                    <Text variant="bodyMedium" style={styles.optionLabel}>{item.native}</Text>
+                    <Text variant="caption" color="textFaint">{item.label}</Text>
                     {active ? <Ionicons name="checkmark-circle" size={22} color={theme.colors.primary} /> : null}
                   </Pressable>
                 );
               })}
-            </View>
+            </Setup>
           ) : null}
 
-          {step.kind === 'theme' ? (
-            <View style={styles.setup}>
-              <StepHeader icon="color-palette-outline" title={t('onboarding.themeTitle')} body={t('onboarding.themeBody')} />
-              <View style={styles.themeRow}>
-                {THEME_OPTIONS.map((opt) => {
-                  const active = preference === opt.pref;
-                  return (
-                    <Pressable
-                      key={opt.pref}
-                      onPress={() => setPreference(opt.pref)}
-                      style={[
-                        styles.themeCard,
-                        { borderColor: active ? theme.colors.primary : theme.colors.border, backgroundColor: active ? theme.colors.primaryContainer : theme.colors.surface },
-                      ]}
-                    >
-                      <Ionicons name={opt.icon} size={26} color={active ? theme.colors.onPrimaryContainer : theme.colors.textMuted} />
-                      <Text variant="caption" style={{ marginTop: 8, color: active ? theme.colors.onPrimaryContainer : theme.colors.textMuted }}>
-                        {t(opt.labelKey)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          ) : null}
-
-          {step.kind === 'notifications' ? (
-            <View style={styles.setup}>
-              <Centered
-                icon="notifications"
-                title={t('onboarding.notifTitle')}
-                body={t('onboarding.notifBody')}
+          {step === 'location' ? (
+            <Setup icon="location-outline" title={t('onboarding.locationTitle')} body={t('onboarding.locationBody')}>
+              <StatusCard
+                icon={locationReady ? 'checkmark-circle' : 'navigate-circle-outline'}
+                title={locationReady ? place!.city : t('onboarding.locationNeeded')}
+                body={locationReady ? t('locationSetup.localTimezone') : t('onboarding.locationPrivacy')}
+                positive={locationReady}
               />
+              <Button
+                fullWidth
+                icon={locationReady ? 'refresh' : 'navigate'}
+                label={locationLoading ? t('onboarding.checking') : locationReady ? t('onboarding.refreshLocation') : t('onboarding.allowLocation')}
+                disabled={locationLoading}
+                onPress={() => void refreshLocation()}
+                style={styles.primaryAction}
+              />
+              {!locationReady && !canAskAgain ? (
+                <Button
+                  fullWidth
+                  variant="secondary"
+                  icon="settings-outline"
+                  label={t('onboarding.openSettings')}
+                  onPress={() => void Linking.openSettings()}
+                  style={styles.secondaryAction}
+                />
+              ) : null}
+              <Text variant="caption" color="textFaint" align="center" style={styles.laterHint}>
+                {t('onboarding.manualLater')}
+              </Text>
+            </Setup>
+          ) : null}
+
+          {step === 'notifications' ? (
+            <Setup icon="notifications-outline" title={t('onboarding.notifTitle')} body={t('onboarding.notifBody')}>
+              <StatusCard
+                icon={notificationState === 'granted' || settings.adhanEnabled ? 'checkmark-circle' : 'notifications-outline'}
+                title={notificationState === 'granted' || settings.adhanEnabled ? t('onboarding.enabled') : t('onboarding.notificationsOptional')}
+                body={t('onboarding.notificationsControl')}
+                positive={notificationState === 'granted' || settings.adhanEnabled}
+              />
+              <Button
+                fullWidth
+                icon="notifications"
+                label={notificationState === 'loading' ? t('onboarding.checking') : t('onboarding.enable')}
+                disabled={notificationState === 'loading' || notificationState === 'granted'}
+                onPress={() => void enableNotifications()}
+                style={styles.primaryAction}
+              />
+              {notificationState === 'denied' ? (
+                <View style={styles.permissionHelp}>
+                  <Text variant="caption" color="error" align="center">{t('onboarding.notificationsDenied')}</Text>
+                  <Button
+                    fullWidth
+                    variant="secondary"
+                    icon="settings-outline"
+                    label={t('onboarding.openSettings')}
+                    onPress={() => void Linking.openSettings()}
+                    style={styles.secondaryAction}
+                  />
+                </View>
+              ) : null}
+            </Setup>
+          ) : null}
+
+          {step === 'focus' ? (
+            <Setup icon="shield-checkmark-outline" title={t('onboarding.focusTitle')} body={t('onboarding.focusBody')}>
               <Pressable
-                onPress={enableNotifs}
-                disabled={notifsOn}
+                accessibilityRole="switch"
+                accessibilityState={{ checked: settings.lock.enabled }}
+                onPress={() => setLockEnabled(!settings.lock.enabled)}
                 style={[
-                  styles.enableBtn,
-                  { backgroundColor: notifsOn ? theme.colors.primaryContainer : theme.colors.primary },
+                  styles.focusCard,
+                  isRTL && Platform.OS === 'web' && styles.rowRTL,
+                  {
+                    borderColor: settings.lock.enabled ? theme.colors.primary : theme.colors.border,
+                    backgroundColor: settings.lock.enabled ? theme.colors.primaryContainer : theme.colors.surface,
+                  },
                 ]}
               >
-                <Ionicons
-                  name={notifsOn ? 'checkmark-circle' : 'notifications'}
-                  size={20}
-                  color={notifsOn ? theme.colors.onPrimaryContainer : theme.colors.onPrimary}
-                />
-                <Text variant="bodyMedium" style={{ marginLeft: 10, color: notifsOn ? theme.colors.onPrimaryContainer : theme.colors.onPrimary }}>
-                  {notifsOn ? t('onboarding.enabled') : t('onboarding.enable')}
-                </Text>
+                <View style={styles.focusText}>
+                  <Text variant="bodyMedium">{t('onboarding.focusToggle')}</Text>
+                  <Text variant="caption" color="textMuted" style={styles.focusCaption}>{t('onboarding.focusTruth')}</Text>
+                </View>
+                <View style={[styles.switchTrack, { backgroundColor: settings.lock.enabled ? theme.colors.primary : theme.colors.border }]}>
+                  <View style={[styles.switchThumb, { transform: [{ translateX: settings.lock.enabled ? (isRTL ? -18 : 18) : 0 }] }]} />
+                </View>
               </Pressable>
-            </View>
-          ) : null}
-
-          {step.kind === 'feature' ? (
-            <Centered icon={step.icon} title={t(step.titleKey)} body={t(step.bodyKey)} feature={step.feature} />
+              <Text variant="caption" color="textFaint" align="center" style={styles.laterHint}>
+                {t('onboarding.focusNativeNote')}
+              </Text>
+            </Setup>
           ) : null}
         </ScrollView>
 
-        {/* Dots */}
         <View style={styles.dots}>
-          {STEPS.map((_, i) => (
+          {STEPS.map((item, dotIndex) => (
             <View
-              key={i}
+              key={item}
               style={[
                 styles.dot,
-                { backgroundColor: i === index ? theme.colors.primary : theme.colors.border, width: i === index ? 22 : 8 },
+                { backgroundColor: dotIndex === index ? theme.colors.primary : theme.colors.border, width: dotIndex === index ? 24 : 8 },
               ]}
             />
           ))}
         </View>
 
-        {/* Actions */}
-        <View style={styles.actions}>
+        <View style={[styles.actions, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
           {index > 0 ? (
-            <Pressable onPress={() => setIndex((i) => i - 1)} hitSlop={8} style={styles.back}>
-              <Ionicons name="arrow-back" size={20} color={theme.colors.textMuted} />
+            <Pressable accessibilityRole="button" onPress={() => setIndex((value) => value - 1)} hitSlop={8} style={styles.back}>
+              <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={21} color={theme.colors.textMuted} />
             </Pressable>
-          ) : (
-            <View style={{ width: 44 }} />
-          )}
-          <View style={{ flex: 1 }}>
-            <Button
-              label={last ? t('onboarding.start') : t('onboarding.next')}
-              icon={last ? 'checkmark' : 'arrow-forward'}
-              fullWidth
-              onPress={() => (last ? complete() : setIndex((i) => i + 1))}
-            />
-          </View>
-          <View style={{ width: 44 }} />
+          ) : <View style={styles.back} />}
+          <Button
+            label={isLast ? t('onboarding.start') : t('onboarding.next')}
+            icon={isLast ? 'checkmark' : isRTL ? 'arrow-back' : 'arrow-forward'}
+            fullWidth
+            onPress={() => (isLast ? complete() : setIndex((value) => value + 1))}
+            style={styles.next}
+          />
         </View>
       </SafeAreaView>
     </View>
   );
 }
 
-function StepHeader({ icon, title, body }: { icon: keyof typeof Ionicons.glyphMap; title: string; body: string }) {
+function Setup({ icon, title, body, children }: { icon: keyof typeof Ionicons.glyphMap; title: string; body: string; children: React.ReactNode }) {
   const theme = useTheme();
   return (
-    <View style={{ alignItems: 'center', marginBottom: 20 }}>
-      <View style={[styles.iconSm, { backgroundColor: theme.colors.primaryContainer }]}>
-        <Ionicons name={icon} size={26} color={theme.colors.onPrimaryContainer} />
+    <View style={styles.setup}>
+      <View style={[styles.icon, { backgroundColor: theme.colors.primaryContainer }]}>
+        <Ionicons name={icon} size={30} color={theme.colors.onPrimaryContainer} />
       </View>
-      <Text variant="title" align="center" style={{ marginTop: 14 }}>
-        {title}
-      </Text>
-      <Text variant="body" color="textMuted" align="center" style={{ marginTop: 8, maxWidth: 320 }}>
-        {body}
-      </Text>
+      <Text variant="title" align="center" style={styles.title}>{title}</Text>
+      <Text variant="body" color="textMuted" align="center" style={styles.description}>{body}</Text>
+      <View style={styles.content}>{children}</View>
     </View>
   );
 }
 
-function Centered({
-  icon,
-  title,
-  body,
-  feature,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  body: string;
-  feature?: boolean;
-}) {
+function StatusCard({ icon, title, body, positive }: { icon: keyof typeof Ionicons.glyphMap; title: string; body: string; positive?: boolean }) {
   const theme = useTheme();
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 320 }}>
-      <View
-        style={[
-          styles.iconWrap,
-          { backgroundColor: feature ? theme.colors.primary : theme.colors.primaryContainer, borderRadius: theme.radius.pill },
-        ]}
-      >
-        <Ionicons name={icon} size={52} color={feature ? theme.colors.onPrimary : theme.colors.onPrimaryContainer} />
+    <View style={[styles.statusCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+      <Ionicons name={icon} size={24} color={positive ? theme.colors.primary : theme.colors.textMuted} />
+      <View style={styles.statusText}>
+        <Text variant="bodyMedium">{title}</Text>
+        <Text variant="caption" color="textMuted" style={styles.statusBody}>{body}</Text>
       </View>
-      <Text variant="title" align="center" style={{ marginTop: 24 }}>
-        {title}
-      </Text>
-      <Text variant="body" color="textMuted" align="center" style={{ marginTop: 12, maxWidth: 320 }}>
-        {body}
-      </Text>
+    </View>
+  );
+}
+
+function WelcomePoint({ icon, text }: { icon: keyof typeof Ionicons.glyphMap; text: string }) {
+  const theme = useTheme();
+  const { isRTL } = useLanguage();
+  return (
+    <View
+      style={[
+        styles.welcomePoint,
+        { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+        isRTL && Platform.OS === 'web' && styles.rowRTL,
+      ]}
+    >
+      <View style={[styles.welcomePointIcon, { backgroundColor: theme.colors.primaryContainer }]}>
+        <Ionicons name={icon} size={18} color={theme.colors.onPrimaryContainer} />
+      </View>
+      <Text variant="bodyMedium" style={styles.welcomePointText}>{text}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   fill: { ...StyleSheet.absoluteFillObject, zIndex: 200, elevation: 200 },
-  safe: { flex: 1, paddingHorizontal: 28 },
+  safe: { flex: 1, paddingHorizontal: 24 },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 },
-  body: { flexGrow: 1, justifyContent: 'center', paddingVertical: 12 },
-  setup: { width: '100%' },
-  iconWrap: { width: 110, height: 110, alignItems: 'center', justifyContent: 'center' },
-  iconSm: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  optionRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderWidth: 1, borderRadius: 14, marginBottom: 10 },
-  themeRow: { flexDirection: 'row', gap: 12 },
-  themeCard: { flex: 1, alignItems: 'center', paddingVertical: 20, borderWidth: 1, borderRadius: 16 },
-  enableBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 15, borderRadius: 14, marginTop: 20 },
+  body: { flexGrow: 1, justifyContent: 'center', paddingVertical: 20 },
+  setup: { width: '100%', alignItems: 'center' },
+  icon: { width: 62, height: 62, borderRadius: 31, alignItems: 'center', justifyContent: 'center' },
+  title: { marginTop: 18 },
+  description: { marginTop: 8, maxWidth: 340 },
+  content: { width: '100%', marginTop: 28 },
+  rowRTL: { flexDirection: 'row-reverse' },
+  welcomePoints: { gap: 10 },
+  welcomePoint: { minHeight: 58, flexDirection: 'row', alignItems: 'center', padding: 12, borderWidth: StyleSheet.hairlineWidth, borderRadius: 16 },
+  welcomePointIcon: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  welcomePointText: { flex: 1, marginStart: 12 },
+  option: { minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, borderWidth: 1, borderRadius: 16, marginBottom: 10 },
+  optionLabel: { flex: 1 },
+  statusCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderWidth: StyleSheet.hairlineWidth, borderRadius: 16 },
+  statusText: { flex: 1, marginStart: 14 },
+  statusBody: { marginTop: 3 },
+  primaryAction: { marginTop: 14 },
+  secondaryAction: { marginTop: 10 },
+  laterHint: { marginTop: 14, paddingHorizontal: 16 },
+  permissionHelp: { marginTop: 12 },
+  focusCard: { flexDirection: 'row', alignItems: 'center', padding: 18, borderWidth: 1, borderRadius: 18 },
+  focusText: { flex: 1, paddingEnd: 16 },
+  focusCaption: { marginTop: 5 },
+  switchTrack: { width: 46, height: 28, borderRadius: 14, padding: 3, justifyContent: 'center' },
+  switchThumb: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#FFFFFF' },
   dots: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 18 },
   dot: { height: 8, borderRadius: 4 },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: 24 },
-  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingBottom: 22 },
+  back: { width: 44, height: 48, alignItems: 'center', justifyContent: 'center' },
+  next: { flex: 1 },
 });

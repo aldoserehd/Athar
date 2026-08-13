@@ -2,7 +2,7 @@
   "expo": {
     "name": "Athar",
     "slug": "athar",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "scheme": "athar",
     "userInterfaceStyle": "automatic",
@@ -34,9 +34,10 @@
       },
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -76,7 +77,13 @@
           "cameraPermission": "Athar uses the camera to scan a photo of a hadith and find it in the library."
         }
       ],
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
       "./plugins/withoutMediaPlaybackPermission"
     ],
     "extra": {

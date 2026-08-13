@@ -47,6 +47,8 @@ const DEFAULTS: ReminderSettings = {
 type RemindersContextValue = {
   settings: ReminderSettings;
   hydrated: boolean;
+  scheduleError: string | null;
+  setScheduleError: (message: string | null) => void;
   setAdhanEnabled: (v: boolean) => void;
   togglePrayer: (key: SalahKey) => void;
   setReciter: (id: string) => void;
@@ -67,6 +69,7 @@ const RemindersContext = createContext<RemindersContextValue | undefined>(undefi
 export function RemindersProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<ReminderSettings>(DEFAULTS);
   const [hydrated, setHydrated] = useState(false);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
@@ -141,6 +144,8 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
     () => ({
       settings,
       hydrated,
+      scheduleError,
+      setScheduleError,
       setAdhanEnabled,
       togglePrayer,
       setReciter,
@@ -158,6 +163,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
     [
       settings,
       hydrated,
+      scheduleError,
       setAdhanEnabled,
       togglePrayer,
       setReciter,

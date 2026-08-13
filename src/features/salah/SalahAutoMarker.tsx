@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { usePrayer } from '@/features/prayer';
+import { dateKeyAt, usePrayer } from '@/features/prayer';
 import { useSalah } from './SalahContext';
 import { SalahKey } from './types';
 
@@ -22,10 +22,10 @@ export function SalahAutoMarker() {
   }, []);
 
   useEffect(() => {
-    // Never auto-mark on a fallback location (times may not match where the user
+    // Never auto-mark without a trusted location (times may not match the user)
     // actually is) or on a stale times table — that would mark prayers wrongly.
-    if (!autoMissed || !hydrated || !times || place.isFallback) return;
-    if (times.date.toDateString() !== new Date(now).toDateString()) return;
+    if (!autoMissed || !hydrated || !times || !place) return;
+    if (times.dateKey !== dateKeyAt(new Date(now), place.timezone)) return;
 
     const prayers = times.slots.filter((s) => s.isPrayer);
     const endOfDay = new Date(now);
@@ -40,7 +40,7 @@ export function SalahAutoMarker() {
         markMissed(key);
       }
     });
-  }, [now, autoMissed, hydrated, times, place.isFallback, record, markMissed]);
+  }, [now, autoMissed, hydrated, times, place, record, markMissed]);
 
   return null;
 }

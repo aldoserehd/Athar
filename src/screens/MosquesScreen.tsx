@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Card, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 import { useT } from '@/i18n/LanguageProvider';
 import { usePrayer } from '@/features/prayer';
+import type { RootStackParamList } from '@/navigation/types';
 import {
   FACILITIES,
   fetchMosques,
@@ -19,7 +22,8 @@ import {
 export function MosquesScreen() {
   const theme = useTheme();
   const t = useT();
-  const { place } = usePrayer();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { place, loading: locationLoading } = usePrayer();
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Mosque | null>(null);
   const [mosques, setMosques] = useState<Mosque[]>([]);
@@ -28,6 +32,11 @@ export function MosquesScreen() {
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    if (!place) {
+      setMosques([]);
+      setLoading(false);
+      return undefined;
+    }
     let active = true;
     setLoading(true);
     fetchMosques({ latitude: place.latitude, longitude: place.longitude })
@@ -40,7 +49,7 @@ export function MosquesScreen() {
     return () => {
       active = false;
     };
-  }, [place.latitude, place.longitude, reloadKey]);
+  }, [place, reloadKey]);
 
   const sourceLabel =
     source === 'live' ? t('mosques.community') : source === 'osm' ? t('mosques.openstreetmap') : t('mosques.sample');
@@ -62,6 +71,32 @@ export function MosquesScreen() {
       : mosques;
     return [...list].sort((a, b) => a.distanceKm - b.distanceKm);
   }, [query, mosques]);
+
+  if (!place) {
+    return (
+      <Screen scroll title={t('mosques.title')} subtitle={t('mosques.subtitle')}>
+        <Card alt style={styles.empty}>
+          <Ionicons name="location-outline" size={28} color={theme.colors.primary} />
+          <Text variant="bodyMedium" align="center" style={{ marginTop: 10 }}>
+            {t('mosques.locationRequired')}
+          </Text>
+          <Text variant="caption" color="textMuted" align="center" style={{ marginTop: 6, maxWidth: 280 }}>
+            {t('mosques.locationRequiredDesc')}
+          </Text>
+          <Pressable
+            disabled={locationLoading}
+            onPress={() => navigation.navigate('LocationSetup')}
+            style={[styles.retry, { borderColor: theme.colors.primary }]}
+          >
+            <Ionicons name={locationLoading ? 'hourglass-outline' : 'locate-outline'} size={16} color={theme.colors.primary} />
+            <Text variant="caption" color="primary" style={{ marginStart: 6 }}>
+              {locationLoading ? t('prayer.findingLocation') : t('prayer.setLocation')}
+            </Text>
+          </Pressable>
+        </Card>
+      </Screen>
+    );
+  }
 
   return (
     <Screen scroll title={t('mosques.title')} subtitle={t('mosques.subtitle')}>
@@ -124,7 +159,7 @@ export function MosquesScreen() {
           </Text>
           <Pressable onPress={() => setReloadKey((k) => k + 1)} style={[styles.retry, { borderColor: theme.colors.primary }]}>
             <Ionicons name="refresh" size={16} color={theme.colors.primary} />
-            <Text variant="caption" color="primary" style={{ marginLeft: 6 }}>
+            <Text variant="caption" color="primary" style={{ marginStart: 6 }}>
               {t('mosques.retry')}
             </Text>
           </Pressable>
@@ -144,7 +179,7 @@ export function MosquesScreen() {
               {m.distanceKm > 0 ? (
                 <View style={[styles.distance, { backgroundColor: theme.colors.surfaceContainer }]}>
                   <Ionicons name="navigate-outline" size={12} color={theme.colors.textMuted} />
-                  <Text variant="caption" color="textMuted" style={{ marginLeft: 4 }}>
+              <Text variant="caption" color="textMuted" style={{ marginStart: 4 }}>
                     {m.distanceKm} km
                   </Text>
                 </View>
@@ -157,7 +192,7 @@ export function MosquesScreen() {
             <View style={styles.cardMeta}>
               <View style={styles.metaItem}>
                 <Ionicons name="people-outline" size={14} color={theme.colors.textMuted} />
-                <Text variant="caption" color="textMuted" style={{ marginLeft: 6 }}>
+              <Text variant="caption" color="textMuted" style={{ marginStart: 6 }}>
                   {t('mosques.jumuah', { time: m.jamaah.jumuah })}
                 </Text>
               </View>
@@ -168,7 +203,7 @@ export function MosquesScreen() {
                     name={FACILITIES[f].icon}
                     size={15}
                     color={theme.colors.textFaint}
-                    style={{ marginLeft: 8 }}
+                style={{ marginStart: 8 }}
                   />
                 ))}
               </View>
@@ -179,7 +214,7 @@ export function MosquesScreen() {
               style={[styles.dirBtn, { backgroundColor: theme.colors.primaryContainer }]}
             >
               <Ionicons name="navigate" size={15} color={theme.colors.onPrimaryContainer} />
-              <Text variant="caption" style={{ marginLeft: 6, color: theme.colors.onPrimaryContainer }}>
+              <Text variant="caption" style={{ marginStart: 6, color: theme.colors.onPrimaryContainer }}>
                 {t('mosques.directions')}
               </Text>
             </Pressable>
@@ -209,7 +244,7 @@ const styles = StyleSheet.create({
   input: { flex: 1, fontSize: 16, padding: 0 },
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   sourceTag: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  sourceDot: { width: 6, height: 6, borderRadius: 3, marginRight: 6 },
+  sourceDot: { width: 6, height: 6, borderRadius: 3, marginEnd: 6 },
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
   distance: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },

@@ -3,19 +3,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
-import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
-import {
-  Tajawal_400Regular,
-  Tajawal_500Medium,
-  Tajawal_700Bold,
-} from '@expo-google-fonts/tajawal';
+import { useFonts } from 'expo-font';
 
 import { ThemeProvider, useTheme } from '@/theme';
 import { LanguageProvider } from '@/i18n/LanguageProvider';
@@ -26,7 +14,6 @@ import { RemindersProvider, ReminderScheduler } from '@/features/reminders';
 import { AthkarProgressProvider } from '@/features/athkar';
 import { PrayerLockOverlay } from '@/features/lock';
 import { OnboardingProvider, OnboardingOverlay, TourOverlay } from '@/features/onboarding';
-import { SplashOverlay } from '@/features/splash';
 import { RootNavigator } from '@/navigation/RootNavigator';
 
 /**
@@ -51,23 +38,22 @@ function ThemedApp() {
       <PrayerLockOverlay />
       <TourOverlay />
       <OnboardingOverlay />
-      {/* Branded launch splash sits on top of everything, then fades out. */}
-      <SplashOverlay />
     </View>
   );
 }
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Amiri_400Regular,
-    Amiri_700Bold,
-    Tajawal_400Regular,
-    Tajawal_500Medium,
-    Tajawal_700Bold,
+    Inter_400Regular: require('@expo-google-fonts/inter/Inter_400Regular.ttf'),
+    Inter_500Medium: require('@expo-google-fonts/inter/Inter_500Medium.ttf'),
+    Inter_600SemiBold: require('@expo-google-fonts/inter/Inter_600SemiBold.ttf'),
+    Inter_700Bold: require('@expo-google-fonts/inter/Inter_700Bold.ttf'),
+    Amiri_400Regular: require('@expo-google-fonts/amiri/Amiri_400Regular.ttf'),
+    Amiri_700Bold: require('@expo-google-fonts/amiri/Amiri_700Bold.ttf'),
+    IBMPlexSansArabic_400Regular: require('@expo-google-fonts/ibm-plex-sans-arabic/400Regular/IBMPlexSansArabic_400Regular.ttf'),
+    IBMPlexSansArabic_500Medium: require('@expo-google-fonts/ibm-plex-sans-arabic/500Medium/IBMPlexSansArabic_500Medium.ttf'),
+    IBMPlexSansArabic_600SemiBold: require('@expo-google-fonts/ibm-plex-sans-arabic/600SemiBold/IBMPlexSansArabic_600SemiBold.ttf'),
+    IBMPlexSansArabic_700Bold: require('@expo-google-fonts/ibm-plex-sans-arabic/700Bold/IBMPlexSansArabic_700Bold.ttf'),
   });
 
   const onReady = useCallback(() => {

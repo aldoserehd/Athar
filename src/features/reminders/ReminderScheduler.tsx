@@ -22,8 +22,8 @@ function dayStamp(): string {
  * is open.
  */
 export function ReminderScheduler() {
-  const { settings, hydrated } = useReminders();
-  const { place, settings: prayerSettings, ready } = usePrayer();
+  const { settings, hydrated, setScheduleError } = useReminders();
+  const { place, profile, ready } = usePrayer();
   const { t, language } = useLanguage();
   const sig = useRef('');
   const reciterRef = useRef(settings.reciterId);
@@ -40,7 +40,7 @@ export function ReminderScheduler() {
   }, []);
 
   useEffect(() => {
-    if (!hydrated || !ready) return;
+    if (!hydrated || !ready || !place || !profile) return;
     const messages: ReminderMessages = {
       prayerName: (key: SalahKey) => t(`prayerNames.${key}`),
       adhanTitle: (name: string, time: string) => t('reminders.adhanTitle', { name, time }),
@@ -53,15 +53,22 @@ export function ReminderScheduler() {
     const calc: PrayerCalc = {
       latitude: place.latitude,
       longitude: place.longitude,
-      method: prayerSettings.method,
-      madhab: prayerSettings.madhab,
+      timezone: place.timezone,
+      profile,
     };
-    const calcSig = `${calc.latitude},${calc.longitude},${calc.method},${calc.madhab}`;
+    const calcSig = `${calc.latitude},${calc.longitude},${calc.timezone},${JSON.stringify(calc.profile)}`;
     const next = JSON.stringify(settings) + '|' + calcSig + '|' + language + '|' + day;
     if (next === sig.current) return;
     sig.current = next;
-    applyReminders(settings, calc, messages);
-  }, [settings, hydrated, ready, place, prayerSettings.method, prayerSettings.madhab, language, t, day]);
+    void applyReminders(settings, calc, messages)
+      .then((result) => {
+        if (result.stale) return;
+        setScheduleError(result.errors.length > 0 ? result.errors[0] : null);
+      })
+      .catch((error) => {
+        setScheduleError(error instanceof Error ? error.message : String(error));
+      });
+  }, [settings, hydrated, ready, place, profile, language, t, day, setScheduleError]);
 
   // Play the full adhān when its notification arrives while the app is open.
   useEffect(() => {

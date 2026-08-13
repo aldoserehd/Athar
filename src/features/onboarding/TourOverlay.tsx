@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,6 +22,10 @@ export function TourOverlay() {
   const insets = useSafeAreaInsets();
   const { tourVisible, endTour } = useOnboarding();
   const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (tourVisible) setStep(0);
+  }, [tourVisible]);
 
   if (!tourVisible) return null;
 
@@ -75,7 +79,7 @@ export function TourOverlay() {
           },
         ]}
       >
-        <View style={styles.calloutHead}>
+        <View style={[styles.calloutHead, isAr && Platform.OS === 'web' && styles.rowRTL]}>
           <View style={[styles.iconChip, { backgroundColor: theme.colors.primaryContainer }]}>
             <Ionicons name={tab.iconActive} size={18} color={theme.colors.onPrimaryContainer} />
           </View>
@@ -90,7 +94,7 @@ export function TourOverlay() {
           {t(`tour.${tabKey}`)}
         </Text>
 
-        <View style={styles.calloutActions}>
+        <View style={[styles.calloutActions, isAr && Platform.OS === 'web' && styles.rowRTL]}>
           <Pressable onPress={endTour} hitSlop={8}>
             <Text variant="label" color="textMuted">
               {t('tour.skip')}
@@ -103,7 +107,7 @@ export function TourOverlay() {
             <Text variant="label" style={{ color: theme.colors.onPrimary }}>
               {last ? t('tour.done') : t('tour.next')}
             </Text>
-            <Ionicons name={last ? 'checkmark' : 'arrow-forward'} size={16} color={theme.colors.onPrimary} style={{ marginLeft: 6 }} />
+            <Ionicons name={last ? 'checkmark' : isAr ? 'arrow-back' : 'arrow-forward'} size={16} color={theme.colors.onPrimary} style={{ marginStart: 6 }} />
           </Pressable>
         </View>
 
@@ -126,6 +130,7 @@ const styles = StyleSheet.create({
   },
   callout: { position: 'absolute', borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, padding: 16 },
   calloutHead: { flexDirection: 'row', alignItems: 'center' },
+  rowRTL: { flexDirection: 'row-reverse' },
   iconChip: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   calloutActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 },
   nextBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 9, borderRadius: 999 },

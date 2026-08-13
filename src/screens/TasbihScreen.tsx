@@ -198,7 +198,7 @@ export function TasbihScreen() {
 
       <Pressable onPress={reset} style={styles.reset} hitSlop={8}>
         <Ionicons name="refresh" size={16} color={theme.colors.textMuted} />
-        <Text variant="caption" color="textMuted" style={{ marginLeft: 6 }}>
+        <Text variant="caption" color="textMuted" style={{ marginStart: 6 }}>
           {t('tasbih.reset')}
         </Text>
       </Pressable>

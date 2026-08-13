@@ -12,6 +12,7 @@ export type RootStackParamList = {
   HadithDetail: { id: string };
   HadithScan: undefined;
   Notifications: undefined;
+  LocationSetup: undefined;
   Athkar: undefined;
   AthkarCategory: { id: AthkarCategoryId };
   Witr: undefined;

@@ -29,11 +29,14 @@ export function QiblaScreen() {
     navigation.setOptions({ title: t('qibla.title') });
   }, [navigation, t]);
 
-  const qibla = useMemo(() => qiblaFor(place.latitude, place.longitude), [place]);
+  const qibla = useMemo(
+    () => (place ? qiblaFor(place.latitude, place.longitude) : 0),
+    [place],
+  );
   const size = Math.min(Dimensions.get('window').width - 56, 340);
 
   const delta = heading == null ? 0 : angleDelta(heading, qibla); // + = turn right
-  const aligned = heading != null && Math.abs(delta) <= ALIGN_THRESHOLD;
+  const aligned = place != null && heading != null && Math.abs(delta) <= ALIGN_THRESHOLD;
 
   // Haptic pulse the moment we lock on.
   const wasAligned = useRef(false);
@@ -43,6 +46,19 @@ export function QiblaScreen() {
     }
     wasAligned.current = aligned;
   }, [aligned]);
+
+  if (!place) {
+    return (
+      <Screen scroll edges={['left', 'right']}>
+        <Card alt style={styles.status}>
+          <Ionicons name="location-outline" size={22} color={theme.colors.primary} />
+          <Text variant="body" color="textMuted" style={styles.statusText}>
+            {t('qibla.locationRequired')}
+          </Text>
+        </Card>
+      </Screen>
+    );
+  }
 
   return (
     <Screen scroll edges={['left', 'right']}>
@@ -110,12 +126,6 @@ export function QiblaScreen() {
         </Text>
       ) : null}
 
-      {place.isFallback ? (
-        <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 12 }}>
-          {t('qibla.usingDefault', { city: place.city })}
-        </Text>
-      ) : null}
-
       <Text variant="caption" color="textFaint" align="center" style={{ marginTop: 16 }}>
         {t('qibla.bearingNote')}
       </Text>
@@ -136,5 +146,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
-  statusText: { flex: 1, marginLeft: 12 },
+  statusText: { flex: 1, marginStart: 12 },
 });

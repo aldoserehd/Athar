@@ -1,13 +1,14 @@
 import {
   Coordinates,
-  PrayerTimes,
-  Prayer,
-  SunnahTimes,
-  Qibla,
   HighLatitudeRule,
+  Prayer,
+  PrayerTimes,
+  Qibla,
+  SunnahTimes,
 } from 'adhan';
 
-import { buildParams, MadhabKey, MethodKey } from './methods';
+import { buildParams, type PrayerCalculationProfile } from './methods';
+import { calendarDateAt, dateKeyAt, formatZonedTime } from './timezone';
 
 export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
 
@@ -15,16 +16,15 @@ export type PrayerSlot = {
   name: PrayerName;
   label: string;
   time: Date;
-  /** Sunrise is shown but is not a prayer to be highlighted as "next". */
   isPrayer: boolean;
 };
 
 export type ComputedTimes = {
   date: Date;
+  dateKey: string;
+  timezone: string;
   slots: PrayerSlot[];
-  /** The upcoming prayer (today or tomorrow's Fajr). */
   next: { name: PrayerName; label: string; time: Date };
-  /** The current prayer period. */
   current: PrayerName | null;
   qiblaDegrees: number;
 };
@@ -49,8 +49,8 @@ function slotsFor(times: PrayerTimes): PrayerSlot[] {
   ];
 }
 
-function mapAdhanPrayer(p: string): PrayerName | null {
-  switch (p) {
+function mapAdhanPrayer(prayer: string): PrayerName | null {
+  switch (prayer) {
     case Prayer.Fajr:
       return 'fajr';
     case Prayer.Sunrise:
@@ -68,72 +68,81 @@ function mapAdhanPrayer(p: string): PrayerName | null {
   }
 }
 
-/**
- * Compute today's prayer times for a location. Falls back to tomorrow's Fajr
- * for "next" once Isha has passed, so the countdown is always forward-looking.
- */
+function prayerTimesFor(
+  latitude: number,
+  longitude: number,
+  date: Date,
+  profile: PrayerCalculationProfile,
+): { coordinates: Coordinates; times: PrayerTimes } {
+  const coordinates = new Coordinates(latitude, longitude);
+  const params = buildParams(profile);
+  params.highLatitudeRule = HighLatitudeRule.recommended(coordinates);
+  return { coordinates, times: new PrayerTimes(coordinates, date, params) };
+}
+
 export function computeTimes(
   latitude: number,
   longitude: number,
-  method: MethodKey,
-  madhab: MadhabKey,
-  now: Date = new Date()
+  timezone: string,
+  profile: PrayerCalculationProfile,
+  now: Date = new Date(),
 ): ComputedTimes {
-  const coordinates = new Coordinates(latitude, longitude);
-  const params = buildParams(method, madhab);
-  // At high latitudes the sun may never reach the twilight angle, leaving Fajr
-  // and Isha undefined; the recommended rule derives sensible times instead.
-  params.highLatitudeRule = HighLatitudeRule.recommended(coordinates);
-  const today = new PrayerTimes(coordinates, now, params);
+  const calendarDate = calendarDateAt(now, timezone);
+  const { coordinates, times: today } = prayerTimesFor(
+    latitude,
+    longitude,
+    calendarDate,
+    profile,
+  );
 
   const nextAdhan = today.nextPrayer(now);
   let next: ComputedTimes['next'];
   if (nextAdhan === Prayer.None) {
-    // After Isha — next is tomorrow's Fajr.
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const t = new PrayerTimes(coordinates, tomorrow, params);
-    next = { name: 'fajr', label: LABELS.fajr, time: t.fajr };
+    const tomorrow = new Date(calendarDate);
+    tomorrow.setDate(calendarDate.getDate() + 1);
+    const { times } = prayerTimesFor(latitude, longitude, tomorrow, profile);
+    next = { name: 'fajr', label: LABELS.fajr, time: times.fajr };
   } else {
     const name = mapAdhanPrayer(nextAdhan) ?? 'fajr';
-    next = { name, label: LABELS[name], time: today.timeForPrayer(nextAdhan) ?? today.fajr };
+    next = {
+      name,
+      label: LABELS[name],
+      time: today.timeForPrayer(nextAdhan) ?? today.fajr,
+    };
   }
 
-  const current = mapAdhanPrayer(today.currentPrayer(now));
-  const qiblaDegrees = Qibla(coordinates);
-
   return {
-    date: now,
+    date: calendarDate,
+    dateKey: dateKeyAt(now, timezone),
+    timezone,
     slots: slotsFor(today),
     next,
-    current,
-    qiblaDegrees,
+    current: mapAdhanPrayer(today.currentPrayer(now)),
+    qiblaDegrees: Qibla(coordinates),
   };
 }
 
-/** Witr suggestion etc. could read SunnahTimes; exported for later use. */
 export function sunnahTimes(
   latitude: number,
   longitude: number,
-  method: MethodKey,
-  madhab: MadhabKey,
-  date: Date = new Date()
-) {
-  const coordinates = new Coordinates(latitude, longitude);
-  const params = buildParams(method, madhab);
-  params.highLatitudeRule = HighLatitudeRule.recommended(coordinates);
-  return new SunnahTimes(new PrayerTimes(coordinates, date, params));
+  timezone: string,
+  profile: PrayerCalculationProfile,
+  now: Date = new Date(),
+): SunnahTimes {
+  const calendarDate = calendarDateAt(now, timezone);
+  const { times } = prayerTimesFor(latitude, longitude, calendarDate, profile);
+  return new SunnahTimes(times);
 }
 
-/** Qibla bearing (degrees clockwise from true north) for a location. */
 export function qiblaFor(latitude: number, longitude: number): number {
   return Qibla(new Coordinates(latitude, longitude));
 }
 
-export function formatTime(date: Date, hour12 = true): string {
-  return date.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12,
-  });
+export function formatTime(
+  date: Date,
+  hour12 = true,
+  timezone = Intl.DateTimeFormat().resolvedOptions().timeZone,
+  locale = 'en',
+): string {
+  return formatZonedTime(date, timezone, hour12, locale);
 }

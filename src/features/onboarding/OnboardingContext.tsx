@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const STORAGE_KEY = 'athar.onboarding.v1';
+// Bump when every installed user should see a materially new walkthrough once.
+const STORAGE_KEY = 'athar.onboarding.v2';
 
 type OnboardingValue = {
   /** The first-run setup wizard (language / theme / notifications / features). */
@@ -41,7 +42,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       tourVisible,
       complete: () => {
         setVisible(false);
-        setTourVisible(true); // hand off to the coach tour
+        setTourVisible(true);
       },
       skipAll: () => {
         setVisible(false);

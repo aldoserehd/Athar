@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Button, Card, GradientHero, HERO_TEXT, Logo, ProgressRing, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
-import { useT } from '@/i18n/LanguageProvider';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import type { RootStackParamList } from '@/navigation/types';
 import { formatTime, usePrayer } from '@/features/prayer';
 import { ReasonSheet, SALAH_ORDER, SalahKey, useSalah } from '@/features/salah';
@@ -14,7 +14,7 @@ import { ensurePermission, useReminders } from '@/features/reminders';
 
 export function SalahScreen() {
   const theme = useTheme();
-  const t = useT();
+  const { t, language, isRTL } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { times, settings } = usePrayer();
   const { record, prayedToday, requiredToday, makeupOwed, markPrayed, markReason, undo, makeUpOne, autoMissed, setAutoMissed } =
@@ -67,7 +67,7 @@ export function SalahScreen() {
           {makeupOwed > 0 ? (
             <View style={[styles.makeupPill, { backgroundColor: HERO_TEXT.chip }]}>
               <Ionicons name="refresh" size={13} color={HERO_TEXT.accent} />
-              <Text style={{ color: HERO_TEXT.primary, fontSize: 13, marginLeft: 6 }}>
+            <Text style={{ color: HERO_TEXT.primary, fontSize: 13, marginStart: 6 }}>
                 {t('salah.makeupOwed')}: {makeupOwed.toLocaleString()}
               </Text>
             </View>
@@ -76,11 +76,11 @@ export function SalahScreen() {
       </GradientHero>
 
       {/* Reminders */}
-      <Card style={styles.reminder}>
+      <Card style={[styles.reminder, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
         <Pressable style={styles.reminderText} onPress={() => navigation.navigate('Notifications')}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text variant="bodyMedium">{t('salah.reminders')}</Text>
-            <Ionicons name="chevron-forward" size={14} color={theme.colors.textFaint} style={{ marginLeft: 4 }} />
+            <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={14} color={theme.colors.textFaint} style={{ marginStart: 4 }} />
           </View>
           <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
             {t('salah.remindersDesc')}
@@ -95,7 +95,7 @@ export function SalahScreen() {
       </Card>
 
       {/* Auto-count missed prayers (opt-in) */}
-      <Card style={styles.reminder}>
+      <Card style={[styles.reminder, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
         <View style={styles.reminderText}>
           <Text variant="bodyMedium">{t('salah.autoMissed')}</Text>
           <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
@@ -122,17 +122,21 @@ export function SalahScreen() {
         // stay locked until then.
         const locked = entry.status === 'pending' && !!time && now < time.getTime();
         return (
-          <Card key={key} style={[styles.row, locked && { opacity: 0.55 }]}>
-            <View style={styles.rowLeft}>
+          <Card key={key} style={[styles.row, isRTL && Platform.OS === 'web' && styles.rowRTL, locked && { opacity: 0.55 }]}>
+            <View style={[styles.rowLeft, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
               <StatusDot status={locked ? 'locked' : entry.status} />
-              <View style={{ marginLeft: 12, flex: 1 }}>
+            <View style={{ marginStart: 12, flex: 1 }}>
                 <Text variant="bodyMedium">{name}</Text>
                 <Text variant="caption" color="textFaint" style={{ marginTop: 2 }}>
                   {locked
-                    ? `${t('salah.locked')} · ${time ? formatTime(time, settings.hour12) : ''}`
+                    ? `${t('salah.locked')} · ${
+                        time && times
+                          ? formatTime(time, settings.hour12, times.timezone, language)
+                          : ''
+                      }`
                     : entry.status === 'pending'
-                    ? time
-                      ? formatTime(time, settings.hour12)
+                    ? time && times
+                      ? formatTime(time, settings.hour12, times.timezone, language)
                       : ''
                     : entry.status === 'prayed'
                     ? t('salah.prayed')
@@ -160,15 +164,11 @@ export function SalahScreen() {
               </View>
             ) : entry.status === 'missed' ? (
               <View style={styles.rowActions}>
-                <Pressable onPress={() => undo(key)} hitSlop={8} accessibilityLabel={`Reset ${name}`}>
-                  <Ionicons name="ellipsis-horizontal" size={20} color={theme.colors.textFaint} />
-                </Pressable>
+                <UndoAction label={t('salah.undo')} onPress={() => undo(key)} />
                 <Button label={t('salah.makeUp')} size="sm" variant="secondary" onPress={() => markPrayed(key)} />
               </View>
             ) : (
-              <Pressable onPress={() => undo(key)} hitSlop={8} accessibilityLabel={`Reset ${name}`}>
-                <Ionicons name="ellipsis-horizontal" size={20} color={theme.colors.textFaint} />
-              </Pressable>
+              <UndoAction label={t('salah.undo')} onPress={() => undo(key)} />
             )}
           </Card>
         );
@@ -178,7 +178,7 @@ export function SalahScreen() {
       <Text variant="label" color="textMuted" style={styles.sectionLabel}>
         {t('salah.makeupOwed')}
       </Text>
-      <Card style={styles.makeup}>
+      <Card style={[styles.makeup, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
         <View style={{ flex: 1 }}>
           <Text variant="title">{makeupOwed.toLocaleString()}</Text>
           <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
@@ -217,16 +217,38 @@ function StatusDot({ status }: { status: string }) {
   return <Ionicons name={m.icon} size={26} color={m.color} />;
 }
 
+function UndoAction({ label, onPress }: { label: string; onPress: () => void }) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      hitSlop={6}
+      style={({ pressed }) => [
+        styles.undo,
+        { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceContainerHigh },
+        pressed && { opacity: 0.65 },
+      ]}
+    >
+      <Ionicons name="arrow-undo-outline" size={14} color={theme.colors.textMuted} />
+      <Text variant="caption" color="textMuted" style={{ marginStart: 5 }}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   summaryHero: { marginBottom: 16 },
   summaryInner: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20 },
   makeupPill: { flexDirection: 'row', alignItems: 'center', marginTop: 14, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
   reminder: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  reminderText: { flex: 1, paddingRight: 12 },
+  rowRTL: { flexDirection: 'row-reverse' },
+  reminderText: { flex: 1, paddingEnd: 12 },
   sectionLabel: { letterSpacing: 0.5, marginTop: 16, marginBottom: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  rowLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 },
+  rowLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, minWidth: 0 },
   rowActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   couldnt: { paddingVertical: 6, paddingHorizontal: 4 },
+  undo: { flexDirection: 'row', alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 6 },
   makeup: { flexDirection: 'row', alignItems: 'center' },
 });

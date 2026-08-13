@@ -15,11 +15,6 @@ export type LanguageInfo = {
 export const LANGUAGES: LanguageInfo[] = [
   { code: 'en', label: 'English', native: 'English', rtl: false },
   { code: 'ar', label: 'Arabic', native: 'العربية', rtl: true },
-  { code: 'ur', label: 'Urdu', native: 'اردو', rtl: true },
-  { code: 'fr', label: 'French', native: 'Français', rtl: false },
-  { code: 'tr', label: 'Turkish', native: 'Türkçe', rtl: false },
-  { code: 'id', label: 'Indonesian', native: 'Bahasa Indonesia', rtl: false },
-  { code: 'bn', label: 'Bengali', native: 'বাংলা', rtl: false },
 ];
 
 export const i18n = new I18n(translations);

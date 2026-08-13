@@ -76,7 +76,7 @@ export function AthkarCategoryScreen() {
         <Card style={[styles.celebrate, { backgroundColor: theme.colors.primaryContainer, borderColor: theme.colors.primary }]}>
           <View style={styles.celebrateTop}>
             <Ionicons name="checkmark-circle" size={28} color={theme.colors.success} />
-            <Text variant="bodyMedium" style={{ marginLeft: 10, color: theme.colors.onPrimaryContainer, flex: 1 }}>
+            <Text variant="bodyMedium" style={{ marginStart: 10, color: theme.colors.onPrimaryContainer, flex: 1 }}>
               {t('athkar.completedTitle')}
             </Text>
             {streak > 0 ? (
@@ -99,7 +99,7 @@ export function AthkarCategoryScreen() {
             </Text>
             <Pressable onPress={share} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name="share-social-outline" size={16} color={theme.colors.onPrimaryContainer} />
-              <Text variant="caption" style={{ marginLeft: 4, color: theme.colors.onPrimaryContainer }}>
+              <Text variant="caption" style={{ marginStart: 4, color: theme.colors.onPrimaryContainer }}>
                 {t('hadith.share')}
               </Text>
             </Pressable>
@@ -125,10 +125,10 @@ export function AthkarCategoryScreen() {
         <Pressable
           onPress={() => resetCategory(category.id, category.items.map((i) => i.id))}
           hitSlop={8}
-          style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 14 }}
+              style={{ flexDirection: 'row', alignItems: 'center', marginStart: 14 }}
         >
           <Ionicons name="refresh" size={16} color={theme.colors.textMuted} />
-          <Text variant="caption" color="textMuted" style={{ marginLeft: 4 }}>
+              <Text variant="caption" color="textMuted" style={{ marginStart: 4 }}>
             {t('athkar.reset')}
           </Text>
         </Pressable>
@@ -166,7 +166,7 @@ export function AthkarCategoryScreen() {
               {virtue ? (
                 <View style={[styles.virtue, { backgroundColor: theme.colors.surfaceContainer }]}>
                   <Ionicons name="sparkles-outline" size={13} color={theme.colors.accent} />
-                  <Text variant="caption" color="textMuted" style={{ flex: 1, marginLeft: 6 }}>
+              <Text variant="caption" color="textMuted" style={{ flex: 1, marginStart: 6 }}>
                     {virtue}
                   </Text>
                 </View>

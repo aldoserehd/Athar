@@ -1,119 +1,207 @@
-import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
+import tzLookup from 'tz-lookup';
+
+export type LocationSource = 'current' | 'cached' | 'manual';
 
 export type GeoPlace = {
   latitude: number;
   longitude: number;
   city: string;
-  /** True when this is the Makkah fallback, not the user's real location. */
-  isFallback: boolean;
+  countryCode: string | null;
+  timezone: string;
+  source: LocationSource;
+  capturedAt: number;
+  accuracyMeters: number | null;
 };
 
-/** Makkah — a meaningful default when location is unavailable. */
-export const MAKKAH: GeoPlace = {
-  latitude: 21.4225,
-  longitude: 39.8262,
-  city: 'Makkah',
-  isFallback: true,
+export type LocationResult = {
+  place: GeoPlace | null;
+  granted: boolean;
+  canAskAgain: boolean;
 };
 
-const CACHE_KEY = 'athar.prayer.place.v1';
+const CACHE_KEY = 'athar.prayer.place.v2';
+const MAX_LOCATION_AGE_MS = 6 * 60 * 60 * 1000;
+const MAX_ACCURACY_METERS = 5_000;
 
-export async function loadCachedPlace(): Promise<GeoPlace | null> {
+function hasValidCoordinates(place: GeoPlace): boolean {
+  return (
+    Number.isFinite(place.latitude) &&
+    Number.isFinite(place.longitude) &&
+    place.latitude >= -90 &&
+    place.latitude <= 90 &&
+    place.longitude >= -180 &&
+    place.longitude <= 180
+  );
+}
+
+function hasValidTimezone(timezone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: timezone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isPlaceTrustworthy(place: GeoPlace, now = Date.now()): boolean {
+  if (
+    !hasValidCoordinates(place) ||
+    !place.city?.trim() ||
+    !place.timezone ||
+    !hasValidTimezone(place.timezone)
+  ) {
+    return false;
+  }
+
+  if (place.source === 'manual') return true;
+
+  const age = now - place.capturedAt;
+  return (
+    Number.isFinite(place.capturedAt) &&
+    age >= -5 * 60 * 1000 &&
+    age <= MAX_LOCATION_AGE_MS &&
+    typeof place.accuracyMeters === 'number' &&
+    Number.isFinite(place.accuracyMeters) &&
+    place.accuracyMeters >= 0 &&
+    place.accuracyMeters <= MAX_ACCURACY_METERS
+  );
+}
+
+function isGeoPlace(value: unknown): value is GeoPlace {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<GeoPlace>;
+  return (
+    typeof candidate.latitude === 'number' &&
+    typeof candidate.longitude === 'number' &&
+    typeof candidate.city === 'string' &&
+    (typeof candidate.countryCode === 'string' || candidate.countryCode === null) &&
+    typeof candidate.timezone === 'string' &&
+    (candidate.source === 'current' ||
+      candidate.source === 'cached' ||
+      candidate.source === 'manual') &&
+    typeof candidate.capturedAt === 'number' &&
+    (typeof candidate.accuracyMeters === 'number' || candidate.accuracyMeters === null)
+  );
+}
+
+export async function loadCachedPlace(now = Date.now()): Promise<GeoPlace | null> {
   try {
     const raw = await AsyncStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as GeoPlace) : null;
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!isGeoPlace(parsed)) return null;
+
+    const place: GeoPlace =
+      parsed.source === 'current' ? { ...parsed, source: 'cached' } : parsed;
+    return isPlaceTrustworthy(place, now) ? place : null;
   } catch {
     return null;
   }
 }
 
-async function cachePlace(place: GeoPlace): Promise<void> {
-  try {
-    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(place));
-  } catch {
-    /* best effort */
+export async function savePlace(place: GeoPlace): Promise<void> {
+  if (!isPlaceTrustworthy(place)) {
+    throw new Error('Cannot save an untrusted prayer location');
   }
+  await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(place));
 }
 
-async function cityNameFor(latitude: number, longitude: number): Promise<string> {
+async function placeLabelFor(
+  latitude: number,
+  longitude: number,
+): Promise<{ city: string; countryCode: string | null }> {
   try {
-    const results = await Location.reverseGeocodeAsync({ latitude, longitude });
-    const r = results[0];
-    if (r) {
-      const place = r.city || r.subregion || r.region || r.country;
-      const region = r.region && r.region !== place ? r.region : r.country;
-      return [place, region].filter(Boolean).join(', ') || 'Current location';
+    const [result] = await Location.reverseGeocodeAsync({ latitude, longitude });
+    if (result) {
+      const primary = result.city || result.subregion || result.region || result.country;
+      const secondary = result.region && result.region !== primary ? result.region : result.country;
+      return {
+        city: [primary, secondary].filter(Boolean).join(', ') || 'Current location',
+        countryCode: result.isoCountryCode?.toUpperCase() ?? null,
+      };
     }
   } catch {
-    /* reverse geocode is best-effort */
+    // Coordinates remain authoritative when reverse geocoding is unavailable.
   }
-  return 'Current location';
+  return { city: 'Current location', countryCode: null };
 }
 
-export type LocationResult = {
-  place: GeoPlace;
-  /** Whether the OS permission was granted this call. */
-  granted: boolean;
-};
+function currentPlaceFrom(
+  position: Location.LocationObject,
+  label: Awaited<ReturnType<typeof placeLabelFor>>,
+): GeoPlace {
+  const { latitude, longitude, accuracy } = position.coords;
+  return {
+    latitude,
+    longitude,
+    city: label.city,
+    countryCode: label.countryCode,
+    timezone: tzLookup(latitude, longitude),
+    source: 'current',
+    capturedAt: position.timestamp,
+    accuracyMeters: accuracy,
+  };
+}
 
-/**
- * Resolve the device location for prayer-time calculation:
- *  1. ensure permission (request only if not already granted),
- *  2. read the real position — a fast last-known fix first, then a fresh GPS
- *     reading — and reverse-geocode the city,
- *  3. on denial/failure fall back to the last cached place, then Makkah.
- *
- * Prayer times depend entirely on the coordinates, so using the device's *real*
- * location (rather than the Makkah default) is what makes the times correct in
- * every country. The caller recomputes whenever this resolves a new place.
- */
-export async function resolveLocation(): Promise<LocationResult> {
+export async function resolveLocation(options: { ignoreManual?: boolean } = {}): Promise<LocationResult> {
   let granted = false;
+  let canAskAgain = true;
+
   try {
-    // Don't re-prompt if permission was already granted in a previous session.
-    const existing = await Location.getForegroundPermissionsAsync();
-    granted = existing.granted;
-    if (!granted) {
-      const req = await Location.requestForegroundPermissionsAsync();
-      granted = req.granted;
-    }
-    if (!granted) {
-      const cached = await loadCachedPlace();
-      return { place: cached ?? MAKKAH, granted: false };
+    const cached = await loadCachedPlace();
+    if (cached?.source === 'manual' && !options.ignoreManual) {
+      const permission = await Location.getForegroundPermissionsAsync();
+      return {
+        place: cached,
+        granted: permission.granted,
+        canAskAgain: permission.canAskAgain,
+      };
     }
 
-    // A last-known fix returns almost instantly (important indoors / where a GPS
-    // lock is slow); then try for a fresh, more accurate reading.
-    let coords: { latitude: number; longitude: number } | null = null;
-    try {
-      const last = await Location.getLastKnownPositionAsync();
-      if (last) coords = { latitude: last.coords.latitude, longitude: last.coords.longitude };
-    } catch {
-      /* best-effort */
+    let permission = await Location.getForegroundPermissionsAsync();
+    granted = permission.granted;
+    canAskAgain = permission.canAskAgain;
+
+    if (!granted && canAskAgain) {
+      permission = await Location.requestForegroundPermissionsAsync();
+      granted = permission.granted;
+      canAskAgain = permission.canAskAgain;
     }
+
+    if (!granted) {
+      return { place: await loadCachedPlace(), granted, canAskAgain };
+    }
+
+    let candidate = await Location.getLastKnownPositionAsync({
+      maxAge: MAX_LOCATION_AGE_MS,
+      requiredAccuracy: MAX_ACCURACY_METERS,
+    });
+
     try {
-      const pos = await Location.getCurrentPositionAsync({
+      const current = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
-      coords = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+      const accuracy = current.coords.accuracy;
+      if (accuracy !== null && accuracy <= MAX_ACCURACY_METERS) candidate = current;
     } catch {
-      /* keep the last-known fix if the fresh read failed */
+      // A recent accurate last-known fix is still safe to use.
     }
 
-    if (!coords) {
-      // Permission is granted but no position is available yet — keep any real
-      // cached place rather than jumping to the Makkah default.
-      const cached = await loadCachedPlace();
-      return { place: cached ?? MAKKAH, granted: true };
+    if (!candidate) {
+      return { place: await loadCachedPlace(), granted, canAskAgain };
     }
 
-    const city = await cityNameFor(coords.latitude, coords.longitude);
-    const place: GeoPlace = { ...coords, city, isFallback: false };
-    await cachePlace(place);
-    return { place, granted: true };
+    const label = await placeLabelFor(candidate.coords.latitude, candidate.coords.longitude);
+    const place = currentPlaceFrom(candidate, label);
+    if (!isPlaceTrustworthy(place)) {
+      return { place: await loadCachedPlace(), granted, canAskAgain };
+    }
+
+    await savePlace(place);
+    return { place, granted, canAskAgain };
   } catch {
-    const cached = await loadCachedPlace();
-    return { place: cached ?? MAKKAH, granted };
+    return { place: await loadCachedPlace(), granted, canAskAgain };
   }
 }

@@ -57,6 +57,7 @@ export function Text({
       ? {
           fontFamily: ARABIC_UI_FONT[base.fontFamily],
           includeFontPadding: false,
+          writingDirection: 'rtl',
           ...(ARABIC_LOOSE_VARIANTS.has(variant)
             ? { lineHeight: Math.round(base.lineHeight * 1.2) }
             : null),
@@ -65,7 +66,12 @@ export function Text({
 
   return (
     <RNText
-      style={[base, arabic, { color: resolvedColor, textAlign: align }, style]}
+      style={[
+        base,
+        arabic,
+        { color: resolvedColor, textAlign: align ?? (language === 'ar' ? 'right' : undefined) },
+        style,
+      ]}
       {...rest}
     />
   );

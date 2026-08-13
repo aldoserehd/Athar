@@ -6,7 +6,8 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Alert, I18nManager } from 'react-native';
+import { I18nManager } from 'react-native';
+import { reloadAppAsync } from 'expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { deviceLanguage, i18n, isRtlLanguage, LocaleCode } from './index';
@@ -18,7 +19,7 @@ type TranslateOptions = Record<string, string | number>;
 type LanguageContextValue = {
   language: LocaleCode;
   isRTL: boolean;
-  setLanguage: (code: LocaleCode) => void;
+  setLanguage: (code: LocaleCode) => Promise<void>;
   t: (key: string, options?: TranslateOptions) => string;
 };
 
@@ -38,23 +39,25 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   i18n.locale = language;
 
   const setLanguage = useCallback(
-    (code: LocaleCode) => {
+    async (code: LocaleCode) => {
+      if (code === language) return;
+
+      // Save first so the selected language is already active after the reload.
+      await AsyncStorage.setItem(STORAGE_KEY, code).catch(() => {});
       setLanguageState(code);
       i18n.locale = code;
-      AsyncStorage.setItem(STORAGE_KEY, code).catch(() => {});
 
       // Right-to-left layout requires a native reload to fully apply.
       const wantRtl = isRtlLanguage(code);
       if (I18nManager.isRTL !== wantRtl) {
         I18nManager.allowRTL(wantRtl);
         I18nManager.forceRTL(wantRtl);
-        Alert.alert(
-          i18n.t('more.restartTitle', { locale: code }),
-          i18n.t('more.restartBody', { locale: code })
-        );
+        // Expo Go and production builds both support this; the user no longer
+        // needs to close and reopen Athar to apply the new layout direction.
+        await reloadAppAsync('Athar language direction changed').catch(() => {});
       }
     },
-    []
+    [language]
   );
 
   const t = useCallback(

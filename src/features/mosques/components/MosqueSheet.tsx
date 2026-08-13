@@ -55,7 +55,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
             <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 520 }}>
               {/* Header */}
               <View style={styles.header}>
-                <View style={{ flex: 1, paddingRight: 12 }}>
+          <View style={{ flex: 1, paddingEnd: 12 }}>
                   <View style={styles.titleRow}>
                     <Text variant="heading">{mosque.name}</Text>
                     {mosque.verified ? (
@@ -104,7 +104,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
               <Card alt style={styles.jumuah}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons name="people-outline" size={18} color={theme.colors.primary} />
-                  <Text variant="bodyMedium" style={{ marginLeft: 10 }}>
+              <Text variant="bodyMedium" style={{ marginStart: 10 }}>
                     {t('mosques.jumuah', { time: mosque.jamaah.jumuah })}
                   </Text>
                 </View>
@@ -126,7 +126,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
                       style={[styles.facility, { backgroundColor: theme.colors.surfaceContainer, borderColor: theme.colors.border }]}
                     >
                       <Ionicons name={meta.icon} size={16} color={theme.colors.primary} />
-                      <Text variant="caption" color="text" style={{ marginLeft: 8 }}>
+              <Text variant="caption" color="text" style={{ marginStart: 8 }}>
                         {meta.label}
                       </Text>
                     </View>
@@ -141,7 +141,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
                   onPress={() => Alert.alert(t('mosques.suggestEditTitle'), t('mosques.suggestEditBody'))}
                 >
                   <Ionicons name="create-outline" size={18} color={theme.colors.textMuted} />
-                  <Text variant="caption" color="textMuted" style={{ marginLeft: 8 }}>
+              <Text variant="caption" color="textMuted" style={{ marginStart: 8 }}>
                     {t('mosques.suggestEdit')}
                   </Text>
                 </Pressable>
@@ -153,7 +153,7 @@ export function MosqueSheet({ mosque, onClose, onReport }: Props) {
                   }}
                 >
                   <Ionicons name="flag-outline" size={18} color={theme.colors.textMuted} />
-                  <Text variant="caption" color="textMuted" style={{ marginLeft: 8 }}>
+              <Text variant="caption" color="textMuted" style={{ marginStart: 8 }}>
                     {t('mosques.reportListing')}
                   </Text>
                 </Pressable>

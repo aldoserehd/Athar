@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,7 +11,7 @@ import { DUA_QUNUT, WITR_GUIDE, useWitr } from '@/features/witr';
 
 export function WitrScreen() {
   const theme = useTheme();
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const isAr = language === 'ar';
   const navigation = useNavigation();
   const { times, settings } = usePrayer();
@@ -30,21 +30,28 @@ export function WitrScreen() {
       </Text>
 
       {/* Time window */}
-      <Card style={styles.window}>
+      <Card style={[styles.window, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
         <Ionicons name="time-outline" size={22} color={theme.colors.primary} />
         <View style={{ flex: 1, marginHorizontal: 12 }}>
           <Text variant="bodyMedium">{t('witr.window')}</Text>
           <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
             {ishaTime
-              ? t('witr.windowFrom', { time: formatTime(ishaTime, settings.hour12) })
+              ? t('witr.windowFrom', {
+                  time: formatTime(
+                    ishaTime,
+                    settings.hour12,
+                    times?.timezone,
+                    language,
+                  ),
+                })
               : t('witr.windowGeneric')}
           </Text>
         </View>
       </Card>
 
       {/* Track today */}
-      <Card style={styles.track}>
-        <View style={{ flex: 1, paddingRight: 12 }}>
+      <Card style={[styles.track, isRTL && Platform.OS === 'web' && styles.rowRTL]}>
+        <View style={{ flex: 1, paddingEnd: 12 }}>
           <Text variant="bodyMedium">{t('witr.trackTitle')}</Text>
           <Text variant="caption" color="textMuted" style={{ marginTop: 2 }}>
             {t('witr.trackDesc')}
@@ -63,6 +70,7 @@ export function WitrScreen() {
           <Card
             style={[
               styles.prayed,
+              isRTL && Platform.OS === 'web' && styles.rowRTL,
               prayedToday && { backgroundColor: theme.colors.primaryContainer },
             ]}
           >
@@ -73,7 +81,7 @@ export function WitrScreen() {
             />
             <Text
               variant="bodyMedium"
-              style={{ marginLeft: 12, color: prayedToday ? theme.colors.onPrimaryContainer : theme.colors.text }}
+            style={{ marginStart: 12, color: prayedToday ? theme.colors.onPrimaryContainer : theme.colors.text }}
             >
               {prayedToday ? t('witr.prayedDone') : t('witr.markPrayed')}
             </Text>
@@ -112,9 +120,9 @@ export function WitrScreen() {
       </Text>
       <Card>
         {WITR_GUIDE.map((g, i) => (
-          <View key={i} style={[styles.guideRow, i > 0 && { marginTop: 12 }]}>
+          <View key={i} style={[styles.guideRow, isRTL && Platform.OS === 'web' && styles.rowRTL, i > 0 && { marginTop: 12 }]}>
             <Ionicons name="ellipse" size={7} color={theme.colors.primary} style={{ marginTop: 8 }} />
-            <Text variant="body" color="textMuted" style={{ flex: 1, marginLeft: 10, lineHeight: 22 }}>
+          <Text variant="body" color="textMuted" style={{ flex: 1, marginStart: 10, lineHeight: 22 }}>
               {isAr ? g.ar : g.en}
             </Text>
           </View>
@@ -125,6 +133,7 @@ export function WitrScreen() {
 }
 
 const styles = StyleSheet.create({
+  rowRTL: { flexDirection: 'row-reverse' },
   window: { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
   track: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
   prayed: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },

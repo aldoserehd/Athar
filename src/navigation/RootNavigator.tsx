@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTheme } from '@/theme';
-import { useT } from '@/i18n/LanguageProvider';
+import { useLanguage, useT } from '@/i18n/LanguageProvider';
 import {
   HadithScreen,
   HadithDetailScreen,
@@ -22,6 +22,7 @@ import {
   WitrScreen,
   TasbihScreen,
   NamesScreen,
+  LocationSetupScreen,
 } from '@/screens';
 import { TABS, TabParamList, TabKey, RootStackParamList } from './types';
 
@@ -39,6 +40,7 @@ const SCREENS: Record<TabKey, React.ComponentType> = {
 function AppTabs() {
   const theme = useTheme();
   const t = useT();
+  const { language } = useLanguage();
   // Respect the device's bottom safe-area (Android gesture/3-button nav bar,
   // iPhone home indicator) so the system bar never overlaps the tab bar.
   const insets = useSafeAreaInsets();
@@ -60,7 +62,10 @@ function AppTabs() {
             paddingTop: 8,
             paddingBottom: bottomInset,
           },
-          tabBarLabelStyle: { fontFamily: theme.fonts.medium, fontSize: 11 },
+          tabBarLabelStyle: {
+            fontFamily: language === 'ar' ? theme.fonts.uiArabicMedium : theme.fonts.medium,
+            fontSize: 11,
+          },
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons name={focused ? config.iconActive : config.icon} size={size} color={color} />
           ),
@@ -76,6 +81,7 @@ function AppTabs() {
 
 export function RootNavigator() {
   const theme = useTheme();
+  const { language, t } = useLanguage();
 
   const navTheme: NavTheme = {
     ...(theme.scheme === 'dark' ? DarkTheme : DefaultTheme),
@@ -95,7 +101,12 @@ export function RootNavigator() {
         screenOptions={{
           headerStyle: { backgroundColor: theme.colors.surface },
           headerTintColor: theme.colors.primary,
-          headerTitleStyle: { fontFamily: theme.fonts.semibold, color: theme.colors.text },
+          headerTitleStyle: {
+            fontFamily: language === 'ar' ? theme.fonts.uiArabicSemibold : theme.fonts.semibold,
+            color: theme.colors.text,
+          },
+          headerBackTitle: t('common.back'),
+          headerTitleAlign: 'center',
           contentStyle: { backgroundColor: theme.colors.background },
         }}
       >
@@ -103,47 +114,52 @@ export function RootNavigator() {
         <Stack.Screen
           name="Qibla"
           component={QiblaScreen}
-          options={{ headerShown: true, title: 'Qibla', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('qibla.title') }}
         />
         <Stack.Screen
           name="HadithDetail"
           component={HadithDetailScreen}
-          options={{ headerShown: true, title: 'Hadith', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('hadith.title') }}
         />
         <Stack.Screen
           name="HadithScan"
           component={ScanScreen}
-          options={{ headerShown: true, title: 'Scan a hadith', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('scan.title') }}
         />
         <Stack.Screen
           name="Notifications"
           component={NotificationsScreen}
-          options={{ headerShown: true, title: 'Notifications', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('notifications.title') }}
+        />
+        <Stack.Screen
+          name="LocationSetup"
+          component={LocationSetupScreen}
+          options={{ headerShown: true, title: t('locationSetup.title') }}
         />
         <Stack.Screen
           name="Athkar"
           component={AthkarScreen}
-          options={{ headerShown: true, title: 'Athkar', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('athkar.title') }}
         />
         <Stack.Screen
           name="AthkarCategory"
           component={AthkarCategoryScreen}
-          options={{ headerShown: true, title: 'Athkar', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('athkar.title') }}
         />
         <Stack.Screen
           name="Witr"
           component={WitrScreen}
-          options={{ headerShown: true, title: 'Witr', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('witr.title') }}
         />
         <Stack.Screen
           name="Tasbih"
           component={TasbihScreen}
-          options={{ headerShown: true, title: 'Tasbih', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('tasbih.title') }}
         />
         <Stack.Screen
           name="Names"
           component={NamesScreen}
-          options={{ headerShown: true, title: '99 Names', headerBackTitle: 'Back' }}
+          options={{ headerShown: true, title: t('names.title') }}
         />
       </Stack.Navigator>
     </NavigationContainer>

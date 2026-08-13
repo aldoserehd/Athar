@@ -58,3 +58,9 @@ GoogleService-Info.plist
 
 # Anything private — drop sensitive files in this folder and they stay off GitHub
 private/
+.gstack/
+
+# Marketing media & QA logs — heavy/regenerated, not app source
+linkedin-launch/
+docs/qa/*.log
+docs/qa/screenshots/
